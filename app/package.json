@@ -10,7 +10,11 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview --port 5174 --strictPort",
-    "test:g8": "node --experimental-strip-types scripts/g8.ts"
+    "preview:hosting": "node scripts/serve-hosting.mjs",
+    "test": "npm run test:csv && npm run test:g8 && npm run test:g9",
+    "test:csv": "node --experimental-strip-types scripts/csv.test.ts",
+    "test:g8": "node --experimental-strip-types scripts/g8.ts",
+    "test:g9": "node --experimental-strip-types scripts/g9.ts"
   },
   "dependencies": {
     "dexie": "4.4.7",
