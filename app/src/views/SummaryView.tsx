@@ -1,12 +1,18 @@
-// F5: the finish line. Business totals, spending by category, and a CSV for the
+// The finish line. Business totals, spending by category, and a CSV for the
 // accountant. Everything is computed and exported in this browser; no AI is used.
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { ArrowRight, CircleAlert, CircleCheck, Download, FileCheck2, Inbox } from 'lucide-react';
+import { ArrowRight, CircleAlert, CircleCheck, Cloud, Cpu, Download, FileCheck2, Inbox, LoaderCircle, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import { Button, Card } from '../components/ui';
+import { Badge, Button, Card } from '../components/ui';
 import { navigate } from '../lib/actions';
+import { cloudRetryStore, friendlyCloudError } from '../lib/cloudCall';
 import { db, type Transaction } from '../lib/db';
+import { deviceStore, useOnline } from '../lib/device';
+import { cloudReady } from '../lib/firebase';
+import { CLOUD_MODEL } from '../lib/models';
+import { buildSummaryPayload, summaryPrompt, summaryStore, writePeriodSummary } from '../lib/reporter';
+import { useStore } from '../lib/store';
 import { businessCsv, downloadText, exportFileName } from '../lib/export';
 import { formatMoney, formatShortDate, formatTime, plural } from '../lib/format';
 import { markExported, useLastExport } from '../lib/journey';
@@ -100,6 +106,8 @@ export function SummaryView() {
         <Figure label="Net business" value={total(income) - total(expenses)} note="Income minus spending" signed />
       </dl>
 
+      <PeriodSummaryCard rows={transactions} />
+
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
         <Card>
           <h2 className="font-semibold">Business spending by category</h2>
@@ -138,6 +146,104 @@ export function SummaryView() {
         </Card>
       </div>
     </div>
+  );
+}
+
+/** The cloud writes a short summary from totals only. The exact payload is shown before and after sending. */
+function PeriodSummaryCard({ rows }: { rows: Transaction[] }) {
+  const state = useStore(summaryStore);
+  const online = useOnline();
+  const device = useStore(deviceStore);
+  const { retrying } = useStore(cloudRetryStore);
+  const payload = buildSummaryPayload(rows);
+  const prompt = summaryPrompt(payload);
+  const isDemo = rows.length > 0 && rows.every((t) => t.isDemo);
+  const canRun = cloudReady && (online || device.status === 'available');
+  const stale = state.result && state.sentFor !== prompt;
+
+  const run = async () => {
+    summaryStore.set({ busy: true, error: undefined });
+    try {
+      const result = await writePeriodSummary(payload, isDemo);
+      summaryStore.set({ result, busy: false, sentFor: prompt });
+    } catch (error) {
+      summaryStore.set({ busy: false, error: friendlyCloudError(error, 'The summary model') });
+    }
+  };
+
+  return (
+    <Card>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex size-10 items-center justify-center rounded-lg bg-sky-50 text-sky-700">
+            <Sparkles aria-hidden className="size-5" />
+          </span>
+          <div>
+            <h2 className="font-semibold">Monthly summary</h2>
+            <p className="text-sm text-slate-600">Written by Gemini from totals only. No transaction, merchant name, or date is sent.</p>
+          </div>
+        </div>
+        <Button variant={state.result ? 'secondary' : 'primary'} onClick={() => void run()} disabled={!canRun || state.busy}>
+          {state.busy ? <LoaderCircle aria-hidden className="size-4 animate-spin motion-reduce:animate-none" /> : <Sparkles aria-hidden className="size-4" />}
+          {state.busy ? (retrying ? 'Cloud is busy, trying again…' : 'Writing…') : state.result ? 'Write again' : 'Write summary'}
+        </Button>
+      </div>
+
+      {state.result && (
+        <div className="mt-5 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200" aria-live="polite">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone={state.result.source === 'in_cloud' ? 'cloud' : 'device'}>
+              {state.result.source === 'in_cloud' ? <Cloud aria-hidden className="size-3" /> : <Cpu aria-hidden className="size-3" />}
+              {state.result.source === 'in_cloud' ? `Cloud · ${CLOUD_MODEL}` : 'On this device · Gemini Nano'}
+            </Badge>
+            <span className="text-xs text-slate-600 tabular-nums">{(state.result.ms / 1000).toFixed(1)} s</span>
+            {state.result.fallback && (
+              <span className="text-xs text-slate-600">
+                {state.result.fallback === 'offline' ? 'You are offline, so it was written here.' : 'The cloud did not answer, so it was written here.'}
+              </span>
+            )}
+            {stale && <span className="text-xs font-medium text-amber-800">Your labels changed since this was written.</span>}
+          </div>
+          <p className="mt-3 text-lg font-semibold tracking-tight">{state.result.headline}</p>
+          {state.result.highlights.length > 0 && (
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-800">
+              {state.result.highlights.map((h) => (
+                <li key={h}>{h}</li>
+              ))}
+            </ul>
+          )}
+          {state.result.warnings.length > 0 && (
+            <ul className="mt-3 space-y-1 text-sm text-amber-900">
+              {state.result.warnings.map((w) => (
+                <li key={w} className="flex items-start gap-2">
+                  <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" /> {w}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {state.error && (
+        <p role="alert" className="mt-4 text-sm text-amber-900">
+          {state.error}
+        </p>
+      )}
+      {!canRun && (
+        <p className="mt-4 text-sm text-slate-600">
+          {!cloudReady ? 'Cloud features are not configured in this build.' : 'Offline, and on-device AI is not ready, so the summary cannot be written right now.'}
+        </p>
+      )}
+
+      <details className="group mt-4">
+        <summary className="cursor-pointer text-sm font-medium text-sky-800">
+          {state.result ? 'Exactly what was sent' : 'See exactly what will be sent'}
+        </summary>
+        <pre className="mt-2 max-h-64 overflow-auto rounded-lg bg-white p-3 font-mono text-xs leading-relaxed text-slate-800 ring-1 ring-sky-200">
+          {state.result && state.sentFor ? state.sentFor : prompt}
+        </pre>
+      </details>
+    </Card>
   );
 }
 
