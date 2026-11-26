@@ -1,0 +1,20 @@
+{
+  "name": "private-ledger-go-no-go",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Go/no-go test harness for Private Ledger: checks on-device and cloud inference through Firebase AI Logic before building the app.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "firebase": "13.2.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.6"
+  }
+}

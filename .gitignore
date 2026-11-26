@@ -1,0 +1,22 @@
+# Dependencies and build output
+node_modules/
+dist/
+
+# Local secrets: never commit
+.env
+.env.local
+.env.*.local
+
+# Go/no-go test results
+spike/go-no-go/results/
+
+# Notes stay local: every Markdown file except README.md
+*.md
+!README.md
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db

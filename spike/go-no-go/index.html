@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Go/No-Go Test</title>
+    <style>
+      :root {
+        --bg: #f7f7f5;
+        --surface: #ffffff;
+        --text: #1d1d1b;
+        --muted: #6b6b66;
+        --border: #e2e2dc;
+        --accent: #1f6feb;
+        --pass: #1a7f37;
+        --warn: #9a6700;
+        --fail: #cf222e;
+        --skip: #6b6b66;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #151514;
+          --surface: #1e1e1c;
+          --text: #ececea;
+          --muted: #a3a39d;
+          --border: #34342f;
+          --accent: #4c8dff;
+          --pass: #3fb950;
+          --warn: #d29922;
+          --fail: #f85149;
+          --skip: #a3a39d;
+          color-scheme: dark;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      main { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+      h1 { font-size: 22px; margin: 0 0 4px; }
+      h2 { font-size: 16px; margin: 0 0 12px; }
+      p { margin: 0 0 8px; }
+      .muted { color: var(--muted); }
+      section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 16px;
+      }
+      dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
+      dt { color: var(--muted); }
+      dd { margin: 0; overflow-wrap: anywhere; }
+      .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      button {
+        font: inherit;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+      }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      button:disabled { opacity: 0.5; cursor: not-allowed; }
+      progress { width: 100%; margin-top: 12px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+      th { color: var(--muted); font-weight: 500; }
+      .verdict { font-weight: 600; white-space: nowrap; }
+      .PASS { color: var(--pass); }
+      .WARN { color: var(--warn); }
+      .FAIL { color: var(--fail); }
+      .SKIP { color: var(--skip); }
+      .table-wrap { overflow-x: auto; }
+      pre {
+        margin: 0;
+        max-height: 320px;
+        overflow: auto;
+        font: 12px/1.5 ui-monospace, 'Cascadia Mono', Consolas, monospace;
+        white-space: pre-wrap;
+      }
+      ul { margin: 0; padding-left: 20px; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
