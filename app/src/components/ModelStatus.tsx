@@ -1,4 +1,5 @@
 import { CircleCheck, Cpu, Download, LoaderCircle, TriangleAlert } from 'lucide-react';
+import { openSetup } from '../lib/actions';
 import { deviceStore, enableOnDeviceAi, type DeviceState } from '../lib/device';
 import { useStore } from '../lib/store';
 import { Badge, Button, ProgressBar } from './ui';
@@ -16,7 +17,15 @@ export function ModelStatusChip() {
   const device = useStore(deviceStore);
   const chip = device.downloading ? CHIP.downloading : CHIP[device.status];
   return (
-    <a href="#/welcome" title="View on-device AI setup" className="inline-flex rounded transition-opacity hover:opacity-85">
+    <a
+      href="#/welcome"
+      title="View on-device AI setup"
+      onClick={(event) => {
+        event.preventDefault();
+        openSetup();
+      }}
+      className="inline-flex rounded transition-opacity hover:opacity-85"
+    >
       <Badge tone={chip.tone} className="py-1">
         <Cpu aria-hidden className="size-3.5" />
         {chip.text}
@@ -25,7 +34,7 @@ export function ModelStatusChip() {
   );
 }
 
-/** F1: the user always knows the model state, and can start the download. */
+/** The user always knows the model state, and can start the download. */
 export function ModelStatusCard() {
   const device = useStore(deviceStore);
   const percent = Math.round((device.progress ?? 0) * 100);

@@ -1,4 +1,4 @@
-// F3 results and F4 one-click review. Rows appear labeled one by one while the
+// Labeling results and one-click review. Rows appear labeled one by one while the
 // on-device model streams; rule-labeled rows are ready immediately.
 
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -6,6 +6,7 @@ import {
   ArrowRight,
   CircleAlert,
   CircleCheck,
+  Cloud,
   Cpu,
   FileUp,
   History,
@@ -25,7 +26,13 @@ import { navigate, setCategoryByUser, setTypeByUser, startDemo } from '../lib/ac
 import { clearAllData, db, type Transaction } from '../lib/db';
 import { deviceStore } from '../lib/device';
 import { formatMoney, formatSeconds, formatShortDate, plural } from '../lib/format';
+import { resetAdvisor } from '../lib/advisorStore';
+import { cloudRetryStore } from '../lib/cloudCall';
+import { runCloudLabelingWithConsent } from '../lib/consentLabeling';
+import { resetExplanations } from '../lib/explainer';
+import { resetSummary } from '../lib/reporter';
 import { labelingStore, recentArrivals, runOnDeviceLabeling } from '../lib/labelingRunner';
+import { NoModelChoices } from '../components/ConsentFallback';
 import { useStore } from '../lib/store';
 import { useCountUp } from '../lib/useCountUp';
 import { CATEGORIES, type Category } from '../lib/taxonomy';
@@ -40,7 +47,8 @@ const FILTERS: [Filter, string][] = [
   ['waiting', 'Waiting for AI'],
 ];
 
-const SOURCE_BADGE: Record<Exclude<Transaction['source'], 'pending'>, { text: string; tone: 'device' | 'neutral' | 'ink'; icon: LucideIcon }> = {
+const SOURCE_BADGE: Record<Exclude<Transaction['source'], 'pending'>, { text: string; tone: 'device' | 'cloud' | 'neutral' | 'ink'; icon: LucideIcon }> = {
+  cloud: { text: 'Cloud AI · consent', tone: 'cloud', icon: Cloud },
   rule: { text: 'Rule', tone: 'neutral', icon: ListChecks },
   memory: { text: 'Remembered', tone: 'neutral', icon: History },
   'on-device': { text: 'On-device AI', tone: 'device', icon: Cpu },
@@ -92,6 +100,9 @@ export function TransactionsView() {
 
   const startOver = async () => {
     await clearAllData();
+    resetAdvisor();
+    resetSummary();
+    resetExplanations();
     recentArrivals.clear();
     labelingStore.set({ status: 'idle', done: 0, total: 0, batch: 0, batches: 0, firstItemMs: undefined, message: undefined });
     setConfirmReset(false);
@@ -413,37 +424,29 @@ function TypeToggle({ tx, filter }: { tx: Transaction; filter: Filter }) {
 function LabelingStatus({ waiting }: { waiting: number }) {
   const state = useStore(labelingStore);
   const device = useStore(deviceStore);
+  const { retrying } = useStore(cloudRetryStore);
 
   if (state.status === 'running') {
     const percent = state.total ? Math.round((state.done / state.total) * 100) : 0;
+    const inCloud = state.where === 'cloud';
     return (
-      <div className="space-y-2 rounded-md bg-emerald-50 px-4 py-3 ring-1 ring-emerald-200" aria-live="polite">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-emerald-900">
+      <div className={`space-y-2 rounded-md px-4 py-3 ring-1 ${inCloud ? 'bg-sky-50 ring-sky-200' : 'bg-emerald-50 ring-emerald-200'}`} aria-live="polite">
+        <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-sm ${inCloud ? 'text-sky-900' : 'text-emerald-900'}`}>
           <LoaderCircle aria-hidden className="size-4 animate-spin motion-reduce:animate-none" />
-          <span className="font-semibold">Labeling on this device</span>
+          <span className="font-semibold">{inCloud ? 'Labeling in the cloud, with your consent' : 'Labeling on this device'}</span>
           <span className="tabular-nums">
             {state.done} of {state.total} rows · batch {state.batch} of {state.batches}
           </span>
-          {state.firstItemMs !== undefined && <span className="text-emerald-800 tabular-nums">· first label after {formatSeconds(state.firstItemMs)}</span>}
+          {state.firstItemMs !== undefined && <span className="tabular-nums">· first label after {formatSeconds(state.firstItemMs)}</span>}
+          {retrying && <span className="font-medium">· the cloud model is busy, trying again…</span>}
         </div>
         <ProgressBar value={percent} label="Labeling progress" />
       </div>
     );
   }
 
-  if (state.status === 'refused' && waiting > 0) {
-    return (
-      <div className="flex flex-wrap items-center gap-3 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
-        <CircleAlert aria-hidden className="size-4 shrink-0" />
-        <p className="min-w-[12rem] flex-1">
-          <span className="font-semibold">Nothing was sent.</span> On-device AI is not available, so {plural(waiting, 'row')} wait here instead of going to the
-          cloud. Rules already labeled the rest.
-        </p>
-        <Button variant="secondary" className="min-h-9" onClick={() => navigate('welcome')}>
-          Set up on-device AI
-        </Button>
-      </div>
-    );
+  if (waiting > 0 && state.status !== 'error' && device.status !== 'available' && device.status !== 'checking') {
+    return <NoModelChoices waiting={waiting} />;
   }
 
   if (state.status === 'error') {
@@ -452,7 +455,7 @@ function LabelingStatus({ waiting }: { waiting: number }) {
         <CircleAlert aria-hidden className="size-4 shrink-0" />
         <p className="min-w-[12rem] flex-1">Labeling stopped: {state.message}</p>
         {waiting > 0 && (
-          <Button variant="secondary" className="min-h-9" onClick={() => void runOnDeviceLabeling()}>
+          <Button variant="secondary" className="min-h-9" onClick={() => void (state.where === 'cloud' ? runCloudLabelingWithConsent() : runOnDeviceLabeling())}>
             Try again
           </Button>
         )}
@@ -486,7 +489,9 @@ function LabelingStatus({ waiting }: { waiting: number }) {
     return (
       <p className="flex flex-wrap items-center gap-2 text-sm text-emerald-800">
         <CircleCheck aria-hidden className="size-4" />
-        Every row is labeled, and raw transactions stayed on this device.
+        {state.where === 'cloud'
+          ? 'Every row is labeled. The rows you agreed to share are counted in the data boundary panel.'
+          : 'Every row is labeled, and raw transactions stayed on this device.'}
         {state.firstItemMs !== undefined && <span className="text-slate-600 tabular-nums">First label after {formatSeconds(state.firstItemMs)}.</span>}
       </p>
     );

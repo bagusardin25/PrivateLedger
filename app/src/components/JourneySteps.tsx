@@ -35,7 +35,7 @@ export function JourneySteps({ route }: { route: Route }) {
       status: !imported
         ? 'Gemini Nano in Chrome'
         : labeling.status === 'running'
-          ? `Labeling ${labeling.done}/${labeling.total}`
+          ? `${labeling.where === 'cloud' ? 'Cloud, with consent' : 'Labeling'} ${labeling.done}/${labeling.total}`
           : labeled
             ? 'All labeled'
             : `${counts.waiting} waiting`,

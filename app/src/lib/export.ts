@@ -1,4 +1,4 @@
-// F5 export: a CSV built and saved entirely in the browser. No AI, no network.
+// Export: files are built and saved entirely in the browser. No AI, no network.
 
 import type { Transaction } from './db';
 
@@ -7,6 +7,7 @@ const SOURCE_TEXT: Record<Transaction['source'], string> = {
   rule: 'Rule',
   memory: 'Remembered',
   'on-device': 'On-device AI',
+  cloud: 'Cloud AI (with consent)',
   you: 'You',
 };
 
@@ -32,8 +33,8 @@ export function exportFileName(rows: Transaction[]): string {
   return `business-transactions-${span}.csv`;
 }
 
-export function downloadText(fileName: string, text: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+export function downloadText(fileName: string, text: string, type = 'text/csv'): void {
+  const url = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }));
   const link = document.createElement('a');
   link.href = url;
   link.download = fileName;

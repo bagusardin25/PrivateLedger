@@ -3,10 +3,34 @@ import { loadDemoData } from './importer';
 import { runOnDeviceLabeling } from './labelingRunner';
 import type { Category, TxType } from './taxonomy';
 
-export type Route = 'welcome' | 'import' | 'transactions' | 'review' | 'summary';
+export type Route = 'welcome' | 'import' | 'transactions' | 'review' | 'summary' | 'advisor' | 'ledger';
 
 export function navigate(route: Route): void {
   window.location.hash = `#/${route}`;
+}
+
+let setupRequested = false;
+
+function scrollToSetup(): void {
+  document.getElementById('setup')?.scrollIntoView({ block: 'start' });
+}
+
+/** Opens the Home screen at "Set up in a minute", where on-device AI is turned on. */
+export function openSetup(): void {
+  if (window.location.hash === '#/welcome' || window.location.hash === '') {
+    scrollToSetup();
+    return;
+  }
+  setupRequested = true;
+  navigate('welcome');
+}
+
+/** Called by the app shell after a route change; true when it scrolled to the setup section. */
+export function consumeSetupRequest(): boolean {
+  if (!setupRequested) return false;
+  setupRequested = false;
+  scrollToSetup();
+  return true;
 }
 
 /** "Try with demo data": load the synthetic statement, open the table, start labeling. */
@@ -17,7 +41,7 @@ export async function startDemo(): Promise<void> {
 }
 
 /**
- * F4: one click sets business or personal, clears the review flag, and saves
+ * One click sets business or personal, clears the review flag, and saves
  * the choice as merchant memory so the same merchant never needs the model again.
  */
 export async function setTypeByUser(transactionId: string, type: Exclude<TxType, 'unsure'>): Promise<void> {
@@ -43,6 +67,27 @@ export async function setTypeByUser(transactionId: string, type: Exclude<TxType,
         })),
     );
   });
+}
+
+/**
+ * "Label by hand": rows the on-device model could not reach go to the
+ * review queue, so the user decides them one card at a time. Nothing is sent.
+ */
+export async function labelPendingByHand(): Promise<void> {
+  const pending = await db.transactions.filter((t) => t.source === 'pending').toArray();
+  await db.transactions.bulkUpdate(
+    pending.map((t) => ({
+      key: t.id,
+      changes: {
+        type: 'unsure' as const,
+        category: t.category ?? 'Other',
+        source: 'you' as const,
+        needsReview: true,
+        reviewReason: 'On-device AI was not available, so you decide',
+      },
+    })),
+  );
+  navigate('review');
 }
 
 /** Allows correcting a row's category and updating merchant memory when type is settled. */
