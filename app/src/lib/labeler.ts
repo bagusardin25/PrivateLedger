@@ -1,61 +1,13 @@
-// F3 step 5: the on-device model labels each remaining merchant once.
-// Variant S4 from the go/no-go speed test: slim schema, batch of 10, streaming.
-// First row arrived after 2.0 s in that test.
+// The on-device model labels each remaining merchant once: slim schema, batches
+// of 10, streaming. In the speed test this variant showed the first row after
+// 2.0 s, where a non-streaming batch of 20 took 27 to 36 s to show anything.
 
-import { getGenerativeModel, InferenceMode, type GenerativeModel } from 'firebase/ai';
-import { getFirebase } from './firebase';
-import { assertOnDeviceReady, TEXT_EN } from './onDevice';
+import { getLabelerModel } from './models';
+import { assertOnDeviceReady } from './onDevice';
 import type { ModelMerchant } from './prepare';
 import { CATEGORIES, isCategory, isTxType, type Category, type TxType } from './taxonomy';
 
 export const BATCH_SIZE = 10;
-
-const SYSTEM = [
-  'You label bank transactions for a freelancer whose business and personal spending share one account.',
-  'For every merchant return: id, type, category.',
-  'type is "business" only if it is clearly a cost or income of the freelance business described in the profile.',
-  'type is "personal" if it is clearly private: rent, groceries, entertainment, health, gym, streaming.',
-  'type is "unsure" if it could reasonably be either, or if the profile does not clearly explain it.',
-  'category must be exactly one value from the allowed list.',
-  'Keep every id exactly as given, return one item per merchant, and never invent merchants.',
-].join('\n');
-
-const SCHEMA = {
-  type: 'object',
-  properties: {
-    items: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          type: { type: 'string', enum: ['business', 'personal', 'unsure'] },
-          category: { type: 'string', enum: [...CATEGORIES] },
-        },
-        required: ['id', 'type', 'category'],
-      },
-    },
-  },
-  required: ['items'],
-};
-
-let model: GenerativeModel | undefined;
-
-/** `labeler` instance from PRD 7.1: ONLY_ON_DEVICE, never a cloud fallback. */
-export function getLabelerModel(): GenerativeModel {
-  model ??= getGenerativeModel(getFirebase().ai, {
-    mode: InferenceMode.ONLY_ON_DEVICE,
-    onDeviceParams: {
-      createOptions: {
-        expectedInputs: TEXT_EN,
-        expectedOutputs: TEXT_EN,
-        initialPrompts: [{ role: 'system', content: [{ type: 'text', value: SYSTEM }] }],
-      },
-      promptOptions: { responseConstraint: SCHEMA },
-    },
-  });
-  return model;
-}
 
 /** Must be called from a click handler: Chrome requires user activation to start the download. */
 export function initializeOnDeviceModel(onProgress: (value: number) => void): Promise<void> {
@@ -79,7 +31,7 @@ export interface BatchResult {
 /** Matches complete item objects in partial streamed JSON. */
 const COMPLETE_ITEM = /\{[^{}]*"id"\s*:\s*"[^"]*"[^{}]*\}/g;
 
-function buildPrompt(batch: ModelMerchant[], profile: string): string {
+export function buildLabelPrompt(batch: ModelMerchant[], profile: string): string {
   const rows = batch.map((m, i) => `m${i + 1} | ${m.example} | money ${m.direction}`).join('\n');
   return [
     `Business profile: ${profile || 'Freelancer. No profile given, so be careful with "business".'}`,
@@ -99,7 +51,7 @@ export async function labelBatch(
   onItem: (label: MerchantLabel) => Promise<void> | void,
 ): Promise<BatchResult> {
   await assertOnDeviceReady();
-  const prompt = buildPrompt(batch, profile);
+  const prompt = buildLabelPrompt(batch, profile);
   const idToKey = new Map(batch.map((m, i) => [`m${i + 1}`, m.key]));
   const seen = new Set<string>();
   const start = performance.now();

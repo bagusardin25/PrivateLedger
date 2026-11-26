@@ -1,15 +1,18 @@
-// Runs F3 step 5 over every pending merchant and keeps the Privacy Ledger exact:
+// Runs on-device labeling over every pending merchant and keeps the Privacy Ledger exact:
 // one entry per model call, plus an entry when a call is refused before sending.
 
 import { db, type Transaction } from './db';
 import { BATCH_SIZE, labelBatch } from './labeler';
-import { recordLedger } from './ledger';
+import { FEATURE, recordLedger } from './ledger';
+import { ON_DEVICE_MODEL } from './models';
 import { getDeviceStatus } from './onDevice';
 import type { ModelMerchant } from './prepare';
 import { createStore } from './store';
 
 export interface LabelingState {
   status: 'idle' | 'running' | 'done' | 'refused' | 'error';
+  /** Where the current or last run labeled rows: on this device, or in the cloud with consent. */
+  where?: 'device' | 'cloud';
   /** Rows labeled by the model in the current run. */
   done: number;
   total: number;
@@ -30,9 +33,8 @@ function chunk<T>(items: T[], size: number): T[][] {
   return out;
 }
 
-export async function runOnDeviceLabeling(): Promise<void> {
-  if (labelingStore.get().status === 'running') return;
-
+/** Rows still waiting for a model, grouped so each merchant is labeled once. */
+export async function collectPending() {
   const pending = await db.transactions.filter((t) => t.source === 'pending').toArray();
   const groups = new Map<string, Transaction[]>();
   for (const tx of pending) groups.set(tx.merchantKey, [...(groups.get(tx.merchantKey) ?? []), tx]);
@@ -43,6 +45,13 @@ export async function runOnDeviceLabeling(): Promise<void> {
     rowCount: rows.length,
   }));
   const isDemo = pending.length > 0 && pending.every((t) => t.isDemo);
+  return { pending, groups, merchants, isDemo };
+}
+
+export async function runOnDeviceLabeling(): Promise<void> {
+  if (labelingStore.get().status === 'running') return;
+
+  const { pending, groups, merchants, isDemo } = await collectPending();
 
   if (merchants.length === 0) {
     labelingStore.set({ status: 'done', done: 0, total: 0, batch: 0, batches: 0, message: undefined });
@@ -52,7 +61,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
   const status = await getDeviceStatus();
   if (status !== 'available') {
     await recordLedger({
-      feature: 'F3 labeling',
+      feature: FEATURE.labeling,
       mode: 'ONLY_ON_DEVICE',
       inferenceSource: 'refused',
       payloadPreview: `On-device AI is ${status}. ${pending.length} rows stay here unlabeled; nothing fell back to the cloud.`,
@@ -77,7 +86,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
   const batches = chunk(merchants, BATCH_SIZE);
   const runStart = performance.now();
   let done = 0;
-  labelingStore.set({ status: 'running', done: 0, total: pending.length, batch: 0, batches: batches.length, firstItemMs: undefined, message: undefined });
+  labelingStore.set({ status: 'running', where: 'device', done: 0, total: pending.length, batch: 0, batches: batches.length, firstItemMs: undefined, message: undefined });
 
   try {
     for (const [index, batch] of batches.entries()) {
@@ -107,10 +116,10 @@ export async function runOnDeviceLabeling(): Promise<void> {
       // The guard should make this impossible; if it ever happens, the ledger says so.
       const reachedCloud = result.inferenceSource === 'in_cloud';
       await recordLedger({
-        feature: 'F3 labeling',
+        feature: FEATURE.labeling,
         mode: 'ONLY_ON_DEVICE',
         inferenceSource: reachedCloud ? 'in_cloud' : 'on_device',
-        model: reachedCloud ? 'cloud (unexpected)' : 'Gemini Nano in Chrome',
+        model: reachedCloud ? 'cloud (unexpected)' : ON_DEVICE_MODEL,
         payloadPreview: reachedCloud
           ? `Unexpected: ${rowsInBatch} rows reached the cloud.`
           : `${batch.length} merchants (${rowsInBatch} rows) labeled in this browser. The ${result.promptBytes}-byte prompt never left the device.`,
