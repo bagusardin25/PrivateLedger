@@ -82,6 +82,8 @@ For the 40-row demo statement, rules label 13 rows and the model sees 27 unique 
 
 **A failed `sendMessage` breaks the SDK's `ChatSession` for good.** Later calls on the same session reject with the old error. The advisor keeps its own copy of the history and builds a fresh session for every request, so a timeout or a retry never corrupts the conversation ([`advisor.ts`](app/src/lib/advisor.ts)).
 
+**The browser enforces the boundary too.** `firebase.json` sends a Content-Security-Policy whose `connect-src` only allows Firebase AI Logic, App Check, and reCAPTCHA, so the page cannot send data anywhere else. `npm run preview:hosting` serves the production build with the same headers for a local check.
+
 **The App Check debug token cannot reach a production bundle.** It lives in `.env.development.local`, which `vite build` does not read, and the code that uses it is removed from production builds.
 
 ## Try it
@@ -121,7 +123,7 @@ The app runs without any Firebase project: on-device features work, and cloud fe
 Checks:
 
 ```bash
-npm test           # labeling rules and guard rules, no model needed
+npm test           # CSV parsing, labeling rules, guard rules; no model needed
 npm run typecheck
 npm run build
 ```
@@ -138,7 +140,13 @@ npm run build
    firebase deploy --only hosting --project your-project-id
    ```
 
-`firebase.json` builds `app/` and serves `app/dist`.
+`firebase.json` builds `app/` and serves `app/dist` with a Content-Security-Policy and other security headers. To check the production build with those headers before deploying:
+
+```bash
+cd app
+npm run build
+npm run preview:hosting   # http://localhost:5180
+```
 
 ## Project structure
 
@@ -161,7 +169,7 @@ app/
   src/lib/db.ts              IndexedDB schema (Dexie)
   src/views/                 Home, Import, Transactions, Review, Summary, Advisor, Privacy Ledger
   src/components/            Data Boundary panel, consent dialog, shared UI
-  scripts/                   rule tests that run in Node
+  scripts/                   tests that run in Node, and the local hosting preview
 spike/go-no-go/              the test page used to check on-device and cloud inference before building
 ```
 
@@ -171,7 +179,7 @@ There is no backend. Transactions, merchant memory, and the ledger live in Index
 
 - **The guard is a filter, not a proof.** It blocks amounts with dates, statement-style text, and merchants or payees found in your imported data. It does not catch a name that is not in your data, a merchant made only of common words when it stands alone (for example "Target"), or names shorter than four letters on their own. Your question itself is sent to the cloud once it passes.
 - **Rule tests are small.** Set A (8 unsafe, 8 safe messages) was written after rules v1 were locked. Set B was written before rule v2 and only shows that gap is closed. Both are in [`app/scripts/g9.ts`](app/scripts/g9.ts).
-- **CSV formats.** Dates are read as ISO, US `MM/DD/YYYY`, or `DD.MM.YYYY`. Amounts are treated as US dollars.
+- **CSV formats.** Common numeric and month-name dates are read. For dates like `03/04/2026` the order is detected per file and can be changed before importing. Amounts are treated as US dollars, in one currency.
 - **On-device AI needs capable hardware** and, for now, a Chrome flag.
 - **Retries are logged per attempt.** If a consented request is retried, its rows are counted once per transmission.
 - **Free-tier quota.** Cloud features use `gemini-3.5-flash-lite` without billing and can run out. The app says so and keeps working on the device.
