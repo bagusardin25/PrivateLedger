@@ -1,9 +1,10 @@
-// F4 review mode: one decision at a time instead of a spreadsheet. Each answer
+// Review mode: one decision at a time instead of a spreadsheet. Each answer
 // is saved as merchant memory, so the same merchant never needs asking again.
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowRight, Briefcase, CircleAlert, CircleCheck, Cpu, House, SkipForward, Undo2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { ExplainMerchant } from '../components/ExplainMerchant';
 import { Button, Card, ProgressBar } from '../components/ui';
 import { navigate, setCategoryByUser, setTypeByUser } from '../lib/actions';
 import { db, type Transaction } from '../lib/db';
@@ -168,6 +169,8 @@ function ReviewCard({
             {formatMoney(tx.amount)}
           </p>
         </div>
+
+        <ExplainMerchant tx={tx} />
 
         {tx.reviewReason && (
           <p className="mt-5 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
