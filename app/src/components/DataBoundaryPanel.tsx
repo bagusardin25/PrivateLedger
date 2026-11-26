@@ -1,21 +1,15 @@
-// F6 Data Boundary panel: always visible next to the work area. Every number
+// Data Boundary panel: always visible next to the work area. Every number
 // here is computed from IndexedDB (transactions and Privacy Ledger entries).
 // When an AI call lands, the side it happened on pulses: green for this device,
 // blue for the cloud, red for a blocked message.
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Ban, ChevronDown, ChevronUp, CircleSlash, Cloud, Cpu, Laptop, Lock, ShieldCheck, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Ban, ChevronDown, ChevronUp, Cloud, Laptop, Lock, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { db, type LedgerEntry } from '../lib/db';
+import { db } from '../lib/db';
 import { formatTime, plural } from '../lib/format';
 import { countLedger } from '../lib/ledger';
-
-const SOURCE: Record<LedgerEntry['inferenceSource'], { text: string; icon: LucideIcon; className: string }> = {
-  on_device: { text: 'On this device', icon: Cpu, className: 'text-emerald-700' },
-  in_cloud: { text: 'Sent to cloud', icon: Cloud, className: 'text-sky-700' },
-  blocked: { text: 'Blocked on device', icon: Ban, className: 'text-rose-700' },
-  refused: { text: 'Not sent', icon: CircleSlash, className: 'text-amber-700' },
-};
+import { SOURCE_META } from './sourceMeta';
 
 const FRESH_MS = 4_000;
 const BLOCKED_MS = 15_000;
@@ -30,10 +24,11 @@ export function DataBoundaryPanel() {
         demoRows: all.filter((t) => t.isDemo).length,
         byRules: all.filter((t) => t.source === 'rule' || t.source === 'memory' || t.source === 'you').length,
         byModel: all.filter((t) => t.source === 'on-device').length,
+        byCloud: all.filter((t) => t.source === 'cloud').length,
       };
     },
     [],
-    { rows: 0, demoRows: 0, byRules: 0, byModel: 0 },
+    { rows: 0, demoRows: 0, byRules: 0, byModel: 0, byCloud: 0 },
   );
 
   const [collapsed, setCollapsed] = useState(false);
@@ -119,6 +114,7 @@ export function DataBoundaryPanel() {
             </dl>
             <p className="mt-2 text-xs text-slate-700">
               {plural(stats.byModel, 'row')} labeled by Gemini Nano · {plural(stats.byRules, 'row')} by rules or you
+              {stats.byCloud > 0 && <span className="text-sky-800"> · {plural(stats.byCloud, 'row')} by cloud AI with consent</span>}
               {stats.demoRows > 0 && <span className="text-slate-600"> · demo data</span>}
             </p>
           </section>
@@ -181,7 +177,7 @@ export function DataBoundaryPanel() {
             ) : (
               <ol className="mt-2 space-y-2.5">
                 {recent.map((e) => {
-                  const source = SOURCE[e.inferenceSource];
+                  const source = SOURCE_META[e.inferenceSource];
                   return (
                     <li key={e.id} className="flex gap-2 text-sm">
                       <source.icon aria-hidden className={`mt-0.5 size-4 shrink-0 ${source.className}`} />
@@ -198,6 +194,9 @@ export function DataBoundaryPanel() {
                 })}
               </ol>
             )}
+            <a href="#/ledger" className="mt-3 inline-flex items-center gap-1 rounded text-sm font-medium text-sky-800 hover:underline">
+              Open the full Privacy Ledger <ArrowRight aria-hidden className="size-3.5" />
+            </a>
           </section>
         </div>
       )}

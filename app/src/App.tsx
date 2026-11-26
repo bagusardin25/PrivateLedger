@@ -1,26 +1,31 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Wifi, WifiOff } from 'lucide-react';
 import { useEffect, useSyncExternalStore } from 'react';
+import { DataBoundaryBar } from './components/DataBoundaryBar';
 import { DataBoundaryPanel } from './components/DataBoundaryPanel';
 import { JourneySteps } from './components/JourneySteps';
 import { ModelStatusChip } from './components/ModelStatus';
 import { BrandMark } from './components/ui';
-import { type Route } from './lib/actions';
+import { consumeSetupRequest, type Route } from './lib/actions';
 import { db } from './lib/db';
 import { refreshDeviceStatus, useOnline } from './lib/device';
+import { AdvisorView } from './views/AdvisorView';
 import { ImportView } from './views/ImportView';
+import { LedgerView } from './views/LedgerView';
 import { ReviewView } from './views/ReviewView';
 import { SummaryView } from './views/SummaryView';
 import { TransactionsView } from './views/TransactionsView';
 import { WelcomeView } from './views/WelcomeView';
 
-const ALL_ROUTES: Route[] = ['welcome', 'import', 'transactions', 'review', 'summary'];
+const ALL_ROUTES: Route[] = ['welcome', 'import', 'transactions', 'review', 'summary', 'advisor', 'ledger'];
 
 const NAV: { id: Route; label: string }[] = [
   { id: 'welcome', label: 'Home' },
   { id: 'transactions', label: 'Transactions' },
   { id: 'review', label: 'Review' },
   { id: 'summary', label: 'Summary' },
+  { id: 'advisor', label: 'Advisor' },
+  { id: 'ledger', label: 'Privacy Ledger' },
 ];
 
 function subscribeHash(listener: () => void) {
@@ -48,6 +53,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (route === 'welcome' && consumeSetupRequest()) return;
     window.scrollTo({ top: 0 });
   }, [route]);
 
@@ -69,13 +75,13 @@ export function App() {
             <BrandMark />
             <span className="text-base font-semibold tracking-tight">Private Ledger</span>
           </a>
-          <nav aria-label="Main" className="flex gap-1">
+          <nav aria-label="Main" className="order-last -mx-1 flex w-full gap-1 overflow-x-auto px-1 sm:order-none sm:mx-0 sm:w-auto sm:overflow-visible sm:px-0">
             {NAV.map((r) => (
               <a
                 key={r.id}
                 href={`#/${r.id}`}
                 aria-current={route === r.id ? 'page' : undefined}
-                className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium transition-colors duration-150 ${
+                className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-medium whitespace-nowrap transition-colors duration-150 ${
                   route === r.id ? 'bg-slate-900/5 text-slate-900' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
@@ -105,17 +111,26 @@ export function App() {
       ) : (
         <div className="mx-auto max-w-[1400px] space-y-5 px-4 py-6 sm:px-6">
           <JourneySteps route={route} />
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
+          {route !== 'ledger' && <DataBoundaryBar />}
+          {route === 'ledger' ? (
+            // The ledger is the full version of the panel, so it gets the whole width.
             <main id="main" tabIndex={-1} className="min-w-0 focus:outline-none">
-              {route === 'import' && <ImportView />}
-              {route === 'transactions' && <TransactionsView />}
-              {route === 'review' && <ReviewView />}
-              {route === 'summary' && <SummaryView />}
+              <LedgerView />
             </main>
-            <div className="lg:sticky lg:top-20 lg:self-start">
-              <DataBoundaryPanel />
+          ) : (
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
+              <main id="main" tabIndex={-1} className="min-w-0 focus:outline-none">
+                {route === 'import' && <ImportView />}
+                {route === 'transactions' && <TransactionsView />}
+                {route === 'review' && <ReviewView />}
+                {route === 'summary' && <SummaryView />}
+                {route === 'advisor' && <AdvisorView />}
+              </main>
+              <div className="lg:sticky lg:top-20 lg:self-start">
+                <DataBoundaryPanel />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
