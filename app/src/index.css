@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+
+@theme {
+  /* System fonts only: a privacy app should not fetch fonts from a third party. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Ink: primary actions and "business". Device = emerald, cloud = sky, needs you = amber, blocked = rose. */
+  --color-ink-50: #eef3f9;
+  --color-ink-100: #d9e4f1;
+  --color-ink-600: #2f5687;
+  --color-ink-700: #24466f;
+  --color-ink-800: #1e3a5f;
+  --color-ink-900: #162b47;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-slate-100 text-slate-900 antialiased;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  select,
+  label[for] {
+    cursor: pointer;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ink-800;
+  }
+}
+
+/* A labeled row briefly glows green: it was labeled on this device. */
+@keyframes arrive {
+  from {
+    background-color: var(--color-emerald-100);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+/* Data Boundary panel: a section pulses when an AI call lands in it. */
+@keyframes pulse-device {
+  0% {
+    box-shadow: inset 0 0 0 2px var(--color-emerald-500);
+  }
+  100% {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+@keyframes pulse-cloud {
+  0% {
+    box-shadow: inset 0 0 0 2px var(--color-sky-500);
+  }
+  100% {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+
+/* Review mode: the next decision card slides in. */
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Placeholder while the on-device model has not labeled a row yet. */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  border-radius: 4px;
+  background-color: var(--color-slate-200);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .row-arrive {
+    animation: arrive 1.2s ease-out;
+  }
+  .pulse-device {
+    animation: pulse-device 1.4s ease-out;
+  }
+  .card-in {
+    animation: card-in 0.28s ease-out;
+  }
+  .pulse-cloud {
+    animation: pulse-cloud 1.4s ease-out;
+  }
+  .skeleton {
+    background-image: linear-gradient(90deg, var(--color-slate-200) 0, var(--color-slate-100) 40px, var(--color-slate-200) 80px);
+    background-size: 200px 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+}
