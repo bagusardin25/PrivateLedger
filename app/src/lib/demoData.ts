@@ -1,6 +1,6 @@
 // Synthetic demo data. Every merchant line, amount, and name here is invented;
-// none of it comes from a real bank statement. Same 40 rows as the go/no-go
-// test, so results can be compared.
+// none of it comes from a real bank statement. The same 40 rows as the
+// speed and accuracy test in spike/go-no-go, so results can be compared.
 
 import type { Category } from './taxonomy.ts';
 

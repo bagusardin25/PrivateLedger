@@ -1,5 +1,5 @@
 // Local storage (IndexedDB through Dexie). Everything here stays in the browser.
-// Firestore never holds financial data (PRD section 5).
+// Nothing in these tables is ever synced to a server.
 
 import Dexie, { type EntityTable } from 'dexie';
 import type { LabelSource } from './prepare';

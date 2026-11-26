@@ -1,4 +1,4 @@
-// Deterministic labeling (F3 steps 3 and 4). The go/no-go test showed the
+// Deterministic labeling (steps 3 and 4). The test in spike/go-no-go showed the
 // on-device model never answers "unsure" (0 of 7 ambiguous rows) and labeled
 // transfers and a warehouse club as business with high confidence. These rules
 // run before the model, so those cases never depend on the model's judgment.

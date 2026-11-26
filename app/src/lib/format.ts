@@ -26,6 +26,10 @@ export function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
+export function formatDateTime(timestamp: number): string {
+  return new Date(timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
 export function plural(count: number, word: string, many = `${word}s`): string {
   return `${count.toLocaleString('en-US')} ${count === 1 ? word : many}`;
 }

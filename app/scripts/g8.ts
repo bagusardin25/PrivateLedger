@@ -1,4 +1,4 @@
-// Uji G8 (PRD section 13), the part that needs no model:
+// Tests the labeling steps that need no model (src/lib/prepare.ts):
 // - every mixed-use row lands in the review queue;
 // - transfers, P2P payments, and savings are never labeled business;
 // - how many unique merchants are left for the on-device model.

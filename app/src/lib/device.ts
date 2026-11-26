@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import { initializeOnDeviceModel } from './labeler';
+import { runOnDeviceLabeling } from './labelingRunner';
 import { getDeviceStatus, type DeviceStatus } from './onDevice';
 import { createStore } from './store';
 
@@ -28,6 +29,8 @@ export async function enableOnDeviceAi(): Promise<void> {
     deviceStore.set({ downloading: false });
     await refreshDeviceStatus();
   }
+  // Rows that were waiting for the model start as soon as it is ready.
+  if (deviceStore.get().status === 'available') void runOnDeviceLabeling();
 }
 
 function subscribeOnline(listener: () => void) {

@@ -1,8 +1,19 @@
-// Privacy Ledger (F6). Every model call writes exactly one entry. The counters
+// Privacy Ledger. Every model call writes one entry (a cloud call that is
+// retried writes one per attempt). The counters
 // shown in the Data Boundary panel are always computed from these entries,
-// never hard-coded (PRD section 5).
+// never hard-coded.
 
 import { db, type LedgerEntry } from './db';
+
+/** Feature names as they appear in the Privacy Ledger and the Data Boundary panel. */
+export const FEATURE = {
+  labeling: 'Labeling',
+  cloudLabeling: 'Cloud labeling (consent)',
+  explain: 'Explain merchant',
+  guard: 'Message guard',
+  summary: 'Monthly summary',
+  advisor: 'Advisor',
+} as const;
 
 export async function recordLedger(entry: Omit<LedgerEntry, 'id' | 'timestamp'>): Promise<void> {
   await db.ledgerEntries.add({ ...entry, timestamp: Date.now() });

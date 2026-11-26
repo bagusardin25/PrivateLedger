@@ -1,4 +1,4 @@
-// F3 steps 1–5 without any model: normalize, merchant memory, rules, mixed-use
+// Labeling steps 1 to 4, without any model: normalize, merchant memory, rules, mixed-use
 // list, then dedupe what is left so the on-device model sees each merchant once.
 // Pure functions, so the G8 script can run them in Node.
 
@@ -13,7 +13,7 @@ export interface RawRow {
   amount: number;
 }
 
-export type LabelSource = 'pending' | 'memory' | 'rule' | 'on-device' | 'you';
+export type LabelSource = 'pending' | 'memory' | 'rule' | 'on-device' | 'cloud' | 'you';
 
 export interface MemoryRule {
   merchantKey: string;

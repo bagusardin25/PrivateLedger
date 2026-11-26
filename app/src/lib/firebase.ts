@@ -1,11 +1,41 @@
 import { initializeApp, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
-import { CustomProvider, initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
+import { CustomProvider, initializeAppCheck, ReCaptchaEnterpriseProvider, ReCaptchaV3Provider, type AppCheckOptions } from 'firebase/app-check';
 import { getAI, GoogleAIBackend, type AI } from 'firebase/ai';
 
-const env = import.meta.env;
+// Every variable is read as `import.meta.env.NAME`, never through a copy of the
+// whole object. Vite replaces each reference on its own, so a build only
+// contains the values it actually uses.
+const config: FirebaseOptions = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+};
 
-/** True when .env.local holds a real Firebase web config. Cloud features need it. */
-export const hasRealConfig = Boolean(env.VITE_FIREBASE_API_KEY && env.VITE_FIREBASE_PROJECT_ID && env.VITE_FIREBASE_APP_ID);
+/** True when the build holds a real Firebase web config. */
+export const hasRealConfig = Boolean(config.apiKey && config.projectId && config.appId);
+
+export type AppCheckMode = 'recaptcha-enterprise' | 'recaptcha-v3' | 'debug-token' | 'none';
+
+/**
+ * App Check is enforced for Firebase AI Logic, so a cloud call only works with
+ * one of these:
+ * - production: reCAPTCHA Enterprise (recommended) or reCAPTCHA v3 site key;
+ * - development: the debug token from .env.development.local.
+ */
+function detectAppCheckMode(): AppCheckMode {
+  if (import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY) return 'recaptcha-enterprise';
+  if (import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY) return 'recaptcha-v3';
+  if (import.meta.env.DEV && import.meta.env.VITE_APPCHECK_DEBUG_TOKEN) return 'debug-token';
+  return 'none';
+}
+
+export const appCheckMode: AppCheckMode = detectAppCheckMode();
+
+/** Cloud features (summary, advisor, consent fallback) are offered only when a request can pass App Check. */
+export const cloudReady = hasRealConfig && appCheckMode !== 'none';
 
 /**
  * AI Logic only checks that these fields are non-empty when a model is created.
@@ -22,33 +52,25 @@ let cached: { app: FirebaseApp; ai: AI } | undefined;
 
 export function getFirebase(): { app: FirebaseApp; ai: AI } {
   if (cached) return cached;
-  const app = hasRealConfig
-    ? initializeApp({
-        apiKey: env.VITE_FIREBASE_API_KEY,
-        authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-        projectId: env.VITE_FIREBASE_PROJECT_ID,
-        appId: env.VITE_FIREBASE_APP_ID,
-        messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-        storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-      })
-    : initializeApp(PLACEHOLDER_CONFIG);
-  if (hasRealConfig) initAppCheck(app);
+  const app = initializeApp(hasRealConfig ? config : PLACEHOLDER_CONFIG);
+  if (cloudReady) initAppCheck(app);
   cached = { app, ai: getAI(app, { backend: new GoogleAIBackend() }) };
   return cached;
 }
 
-/**
- * App Check is enforced for Firebase AI Logic.
- * - Local development: the debug token from .env.local.
- * - Production: reCAPTCHA Enterprise, when a site key is configured.
- * Without either, cloud calls fail with an App Check error and the UI says so.
- */
+function appCheckProvider(): AppCheckOptions['provider'] {
+  if (import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY) return new ReCaptchaEnterpriseProvider(import.meta.env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY);
+  if (import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY) return new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY);
+  // Debug-token mode: the SDK exchanges the debug token and never asks this provider.
+  return new CustomProvider({ getToken: () => Promise.reject(new Error('No App Check provider configured for this build.')) });
+}
+
 function initAppCheck(app: FirebaseApp): void {
-  if (env.DEV && env.VITE_APPCHECK_DEBUG_TOKEN) {
-    (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string }).FIREBASE_APPCHECK_DEBUG_TOKEN = env.VITE_APPCHECK_DEBUG_TOKEN;
+  // The whole block is removed from production builds, and the token lives in
+  // .env.development.local, which `vite build` does not read.
+  if (import.meta.env.DEV) {
+    const debugToken = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN;
+    if (debugToken) (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string }).FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
   }
-  const provider = env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY
-    ? new ReCaptchaEnterpriseProvider(env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY)
-    : new CustomProvider({ getToken: () => Promise.reject(new Error('No App Check provider configured for this build.')) });
-  initializeAppCheck(app, { provider, isTokenAutoRefreshEnabled: true });
+  initializeAppCheck(app, { provider: appCheckProvider(), isTokenAutoRefreshEnabled: true });
 }

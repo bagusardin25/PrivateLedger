@@ -1,4 +1,4 @@
-/** PRD 7.4: a busy cloud model can hang for about 3 minutes before it errors, and the SDK does not cut it off. */
+/** A busy cloud model can hang until the SDK's default timeout of 180 s, so every cloud call sets its own. */
 export const CLOUD_TIMEOUT_MS = 20_000;
 
 export class TimeoutError extends Error {

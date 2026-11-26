@@ -1,11 +1,11 @@
-// F2: drag-and-drop CSV, column mapping with automatic guesses, local preview.
+// Drag-and-drop CSV, column mapping with automatic guesses, local preview.
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 import { useId, useState, type DragEvent } from 'react';
 import { Button, Card } from '../components/ui';
 import { navigate } from '../lib/actions';
-import { guessMapping, mappingIsComplete, parseCsvFile, toRawRows, type ColumnMapping, type ParsedCsv } from '../lib/csv';
+import { detectDateOrder, guessMapping, mappingIsComplete, parseCsvFile, toRawRows, type ColumnMapping, type DateOrder, type ParsedCsv } from '../lib/csv';
 import { db } from '../lib/db';
 import { formatMoney, plural } from '../lib/format';
 import { importRows } from '../lib/importer';
@@ -19,6 +19,7 @@ export function ImportView() {
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
   const inputId = useId();
+  const orderId = useId();
 
   const load = async (selected: File | undefined) => {
     if (!selected) return;
@@ -26,7 +27,7 @@ export function ImportView() {
     try {
       const parsed = await parseCsvFile(selected);
       setFile({ name: selected.name, parsed });
-      setMapping(guessMapping(parsed.headers));
+      setMapping(guessMapping(parsed.headers, parsed.rows));
     } catch (e) {
       setFile(undefined);
       setMapping(undefined);
@@ -47,6 +48,8 @@ export function ImportView() {
   };
 
   const result = file && mapping && mappingIsComplete(mapping) ? toRawRows(file.parsed, mapping) : undefined;
+  const dateInfo = file && mapping?.date ? detectDateOrder(file.parsed.rows.map((r) => r[mapping.date])) : undefined;
+  const mostlyPositive = Boolean(result && mapping?.amountMode === 'single' && !mapping.spendingIsPositive && result.rows.length >= 5 && result.positiveShare > 0.8);
 
   const onImport = async () => {
     if (!file || !result) return;
@@ -115,7 +118,12 @@ export function ImportView() {
           <fieldset className="mt-4">
             <legend className="text-sm font-medium">Match the columns</legend>
             <div className="mt-2 grid gap-3 sm:grid-cols-3">
-              <ColumnSelect label="Date" value={mapping.date} headers={file.parsed.headers} onChange={(date) => setMapping({ ...mapping, date })} />
+              <ColumnSelect
+                label="Date"
+                value={mapping.date}
+                headers={file.parsed.headers}
+                onChange={(date) => setMapping({ ...mapping, date, dateOrder: detectDateOrder(file.parsed.rows.map((r) => r[date])).order })}
+              />
               <ColumnSelect
                 label="Description"
                 value={mapping.description}
@@ -140,6 +148,32 @@ export function ImportView() {
               />
               Money in and money out are in separate columns
             </label>
+            {mapping.amountMode === 'single' && (
+              <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={mapping.spendingIsPositive}
+                  onChange={(e) => setMapping({ ...mapping, spendingIsPositive: e.target.checked })}
+                  className="size-4 accent-ink-800"
+                />
+                Spending is written as positive numbers (common in card statements)
+              </label>
+            )}
+            {dateInfo?.numeric && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-700">
+                <label htmlFor={orderId}>Dates like 03/04/2026 are written</label>
+                <select
+                  id={orderId}
+                  value={mapping.dateOrder}
+                  onChange={(e) => setMapping({ ...mapping, dateOrder: e.target.value as DateOrder })}
+                  className="min-h-9 rounded-md border border-slate-300 bg-white px-2 text-sm focus:border-ink-800"
+                >
+                  <option value="mdy">month / day / year</option>
+                  <option value="dmy">day / month / year</option>
+                </select>
+                {dateInfo.ambiguous && <span className="text-xs text-amber-900">Both readings fit this file, so check the preview.</span>}
+              </div>
+            )}
           </fieldset>
 
           {result ? (
@@ -179,6 +213,17 @@ export function ImportView() {
                   <span className="text-sm text-amber-900">{plural(result.skipped, 'row')} skipped (no description or amount).</span>
                 )}
               </div>
+              {(result.unreadDates > 0 || mostlyPositive) && (
+                <ul className="mt-3 space-y-1 text-sm text-amber-900">
+                  {result.unreadDates > 0 && (
+                    <li>
+                      {plural(result.unreadDates, 'row')} {result.unreadDates === 1 ? 'has' : 'have'} a date this app could not read. They are imported, but left
+                      out of monthly totals.
+                    </li>
+                  )}
+                  {mostlyPositive && <li>Most amounts in this file are positive. If they are purchases, tick the positive-numbers box above.</li>}
+                </ul>
+              )}
             </>
           ) : (
             <p className="mt-4 text-sm text-amber-900">Choose a column for each field to see a preview.</p>
