@@ -1,4 +1,4 @@
-// Merchant normalization (F3 step 1). Bank descriptions carry store numbers,
+// Merchant normalization (labeling step 1). Bank descriptions carry store numbers,
 // transaction IDs, phone numbers, and payment-processor prefixes, so the same
 // merchant shows up under many strings. Normalizing first lets merchant memory,
 // rules, and the on-device model work once per merchant instead of once per row.
