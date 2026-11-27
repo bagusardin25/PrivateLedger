@@ -44,51 +44,40 @@
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
 
   /*
-   * Modern Luxury Fintech Palette:
-   * - Canvas: Warm Alabaster (#f7f6f2) / Velvet Obsidian (#090a0f)
-   * - Brand Ink: Deep Midnight Indigo (#1c1f4a) with luminous periwinkle-indigo highlights
-   * - Local Device: Botanical Jade-Teal (emerald/teal)
-   * - Cloud Totals: Refined Sapphire-Indigo
-   * - Review: Warm Burnished Champagne-Amber
-   * - Blocked: Editorial Crimson
+   * Quiet Precision Fintech Palette (inspired by Mercury, Linear & Ramp):
+   * - Canvas: Soft Alabaster (#f8f8f7) / Deep Obsidian (#09090b)
+   * - Surface: Pure White (#ffffff) / Elevated Charcoal (#111114)
+   * - Primary Ink: Architectural Near-Black (#18181b) / Crisp Porcelain (#fafafa)
+   * - Semantic accents reserved strictly for meaning:
+   *     Local/Verified (Emerald), Cloud Totals (Indigo), Review (Amber), Blocked (Rose)
    */
-  --color-ink-50: #f2f3fe;
-  --color-ink-100: #e3e6fc;
-  --color-ink-200: #c9cef9;
-  --color-ink-300: #a2acf4;
-  --color-ink-400: #7882ec;
-  --color-ink-500: #555ce0;
-  --color-ink-600: #4044c7;
-  --color-ink-700: #2e3199;
-  --color-ink-800: #1e2058;
-  --color-ink-900: #14153a;
-  --color-ink-950: #0c0d24;
-
-  --color-canvas: #f7f6f2;
-  --color-obsidian: #090a0f;
-  --color-obsidian-card: #12131c;
+  --color-canvas: #f8f8f7;
+  --color-surface: #ffffff;
+  --color-obsidian: #09090b;
+  --color-obsidian-card: #111114;
 }
 
 :root {
-  --chart-0: #1e2058;
-  --chart-1: #555ce0;
-  --chart-2: #0f766e;
+  /* Restrained editorial financial chart series */
+  --chart-0: #18181b;
+  --chart-1: #047857;
+  --chart-2: #4338ca;
   --chart-3: #b45309;
-  --chart-4: #7c3aed;
-  --chart-5: #0369a1;
-  --chart-6: #be123c;
-  --chart-7: #71717a;
+  --chart-4: #64748b;
+  --chart-5: #0f766e;
+  --chart-6: #9f1239;
+  --chart-7: #a1a1aa;
 }
 
 .dark {
-  --chart-0: #818cf8;
-  --chart-1: #2dd4bf;
-  --chart-2: #a78bfa;
+  --chart-0: #e4e4e7;
+  --chart-1: #34d399;
+  --chart-2: #818cf8;
   --chart-3: #fbbf24;
-  --chart-4: #60a5fa;
-  --chart-5: #fb7185;
-  --chart-6: #34d399;
-  --chart-7: #a1a1aa;
+  --chart-4: #94a3b8;
+  --chart-5: #2dd4bf;
+  --chart-6: #fb7185;
+  --chart-7: #71717a;
 }
 
 @layer base {
@@ -100,12 +89,12 @@
     background-color: var(--color-canvas);
     color: var(--color-zinc-900);
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    @apply antialiased transition-colors duration-200 selection:bg-ink-100 selection:text-ink-950;
+    @apply antialiased transition-colors duration-200 selection:bg-zinc-900 selection:text-white;
   }
   .dark body {
     background-color: var(--color-obsidian);
     color: var(--color-zinc-100);
-    @apply selection:bg-indigo-500/30 selection:text-indigo-100;
+    @apply selection:bg-zinc-200 selection:text-zinc-950;
   }
   button:not(:disabled),
   [role='button']:not([aria-disabled='true']),
@@ -115,113 +104,98 @@
     cursor: pointer;
   }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-ink-600 dark:outline-indigo-400;
+    @apply outline-2 outline-offset-2 outline-zinc-900 dark:outline-zinc-300;
   }
 }
 
-/* Subtle architectural grid and dot textures tuned for warm alabaster & velvet obsidian. */
-.bg-dot-grid {
-  background-image: radial-gradient(rgba(28, 31, 74, 0.085) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-.dark .bg-dot-grid {
-  background-image: radial-gradient(rgba(161, 161, 170, 0.14) 1px, transparent 1px);
-}
-
-.bg-fine-grid {
-  background-image:
-    linear-gradient(to right, rgba(28, 31, 74, 0.038) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(28, 31, 74, 0.038) 1px, transparent 1px);
-  background-size: 36px 36px;
-}
-
-.dark .bg-fine-grid {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-}
-
-/* Crisp velvet-obsidian terminal styling for exact cloud payload previews. */
+/* Crisp dark terminal styling for exact cloud payload previews. */
 .code-inspector {
-  background: linear-gradient(180deg, #10121c 0%, #0a0b12 100%);
-  color: #e4e6f2;
+  background-color: #111114;
+  color: #e4e4e7;
   scrollbar-width: thin;
-  scrollbar-color: rgba(161, 161, 170, 0.3) transparent;
+  scrollbar-color: rgba(161, 161, 170, 0.25) transparent;
 }
 
 .code-inspector::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 .code-inspector::-webkit-scrollbar-thumb {
-  background-color: rgba(161, 161, 170, 0.3);
+  background-color: rgba(161, 161, 170, 0.25);
   border-radius: 9999px;
 }
 
 /* Slim, unobtrusive scrollbars for side panels and tables. */
 .thin-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(161, 161, 170, 0.38) transparent;
+  scrollbar-color: rgba(161, 161, 170, 0.3) transparent;
 }
 
 .thin-scroll::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 .thin-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(161, 161, 170, 0.38);
+  background-color: rgba(161, 161, 170, 0.3);
   border-radius: 9999px;
 }
 
-/* A labeled row briefly glows jade: it was labeled on this device. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* A labeled row briefly glows subtle emerald: it was labeled on this device. */
 @keyframes arrive {
   0% {
-    background-color: rgba(13, 148, 136, 0.16);
+    background-color: rgba(5, 150, 105, 0.12);
   }
   100% {
     background-color: transparent;
   }
 }
 
-/* Data Boundary panel: a section pulses when an AI call lands in it. */
+/* Data Boundary panel: a section pulses cleanly when an AI call lands in it. */
 @keyframes pulse-device {
   0% {
-    box-shadow: inset 0 0 0 2px var(--color-teal-500), inset 0 0 28px rgba(13, 148, 136, 0.2);
+    box-shadow: inset 2px 0 0 0 var(--color-emerald-600), inset 0 0 24px rgba(5, 150, 105, 0.12);
   }
   100% {
-    box-shadow: inset 0 0 0 2px transparent, inset 0 0 28px transparent;
+    box-shadow: inset 2px 0 0 0 transparent, inset 0 0 24px transparent;
   }
 }
 
 @keyframes pulse-cloud {
   0% {
-    box-shadow: inset 0 0 0 2px var(--color-indigo-500), inset 0 0 28px rgba(99, 102, 241, 0.2);
+    box-shadow: inset 2px 0 0 0 var(--color-indigo-600), inset 0 0 24px rgba(79, 70, 229, 0.12);
   }
   100% {
-    box-shadow: inset 0 0 0 2px transparent, inset 0 0 28px transparent;
+    box-shadow: inset 2px 0 0 0 transparent, inset 0 0 24px transparent;
   }
 }
 
 @keyframes pulse-blocked {
   0% {
-    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.42);
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.28);
   }
   70% {
-    box-shadow: 0 0 0 12px rgba(225, 29, 72, 0);
+    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
   }
 }
 
-/* Review mode: the next decision card glides smoothly into place. */
+/* Review mode: the next decision card glides calmly into place. */
 @keyframes card-in {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.985);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -233,7 +207,7 @@
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -244,10 +218,10 @@
 /* Placeholder while the on-device model has not labeled a row yet. */
 @keyframes shimmer {
   0% {
-    background-position: -260px 0;
+    background-position: -240px 0;
   }
   100% {
-    background-position: calc(260px + 100%) 0;
+    background-position: calc(240px + 100%) 0;
   }
 }
 
@@ -261,50 +235,50 @@
 }
 
 .skeleton {
-  border-radius: 8px;
-  background-color: #ebe9e4;
+  border-radius: 6px;
+  background-color: #ededec;
 }
 
 .dark .skeleton {
-  background-color: rgba(63, 63, 70, 0.5);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .row-arrive {
-    animation: arrive 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: arrive 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-device {
-    animation: pulse-device 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: pulse-device 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-cloud {
-    animation: pulse-cloud 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: pulse-cloud 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-blocked {
-    animation: pulse-blocked 1.3s ease-out;
+    animation: pulse-blocked 1.2s ease-out;
   }
   .card-in {
-    animation: card-in 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: card-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .fade-up {
-    animation: fade-up 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: fade-up 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .skeleton {
     background-image: linear-gradient(
       90deg,
-      rgba(235, 233, 228, 0.9) 0%,
-      rgba(250, 249, 246, 0.95) 45%,
-      rgba(235, 233, 228, 0.9) 90%
+      rgba(237, 237, 236, 0.9) 0%,
+      rgba(248, 248, 247, 0.95) 45%,
+      rgba(237, 237, 236, 0.9) 90%
     );
-    background-size: 260px 100%;
+    background-size: 240px 100%;
     background-repeat: no-repeat;
     animation: shimmer 1.5s ease-in-out infinite;
   }
   .dark .skeleton {
     background-image: linear-gradient(
       90deg,
-      rgba(39, 39, 42, 0.75) 0%,
-      rgba(63, 63, 70, 0.85) 45%,
-      rgba(39, 39, 42, 0.75) 90%
+      rgba(39, 39, 42, 0.7) 0%,
+      rgba(63, 63, 70, 0.75) 45%,
+      rgba(39, 39, 42, 0.7) 90%
     );
   }
   .indeterminate-bar {

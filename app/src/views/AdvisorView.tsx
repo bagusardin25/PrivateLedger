@@ -12,12 +12,11 @@ import {
   MessageSquarePlus,
   ShieldAlert,
   ShieldCheck,
-  Sparkles,
   WifiOff,
 } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { PayloadViewer } from '../components/PayloadViewer';
-import { Badge, Button, Card } from '../components/ui';
+import { Button, Card } from '../components/ui';
 import { advisorStore, resetAdvisor, sendToAdvisor, type ChatItem } from '../lib/ai/advisorStore';
 import { cloudRetryStore } from '../lib/ai/cloudCall';
 import { useOnline } from '../lib/state/device';
@@ -51,7 +50,7 @@ function RichText({ text }: { text: string }) {
         return (
           <code
             key={idx}
-            className="rounded bg-stone-100 px-1 py-0.5 font-mono text-xs text-ink-800 dark:bg-white/[0.08] dark:text-indigo-300"
+            className="rounded border border-zinc-200/80 bg-zinc-100 px-1 py-0.5 font-mono text-xs text-zinc-900 dark:border-white/[0.08] dark:bg-white/[0.06] dark:text-zinc-200"
           >
             {part.slice(1, -1)}
           </code>
@@ -62,13 +61,13 @@ function RichText({ text }: { text: string }) {
   };
 
   return (
-    <div className="space-y-1.5 text-sm leading-relaxed">
+    <div className="space-y-1.5 text-[13.5px] leading-relaxed">
       {lines.map((line, i) => {
         const bullet = /^[-*•]\s+(.*)$/.exec(line.trim());
         if (bullet) {
           return (
             <p key={i} className="flex items-start gap-2 pl-1">
-              <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+              <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-zinc-400 dark:bg-zinc-500" />
               <span>{formatInline(bullet[1])}</span>
             </p>
           );
@@ -120,39 +119,31 @@ export function AdvisorView() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-950 dark:text-white">Advisor</h1>
-            <Badge tone="device">
-              <ShieldCheck aria-hidden className="size-3" /> On-device guard
-            </Badge>
-            <Badge tone="cloud">
-              <Cloud aria-hidden className="size-3" /> Cloud totals-only
-            </Badge>
-          </div>
-          <p className="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">Advisor</h1>
+          <p className="mt-0.5 max-w-2xl text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
             The cloud model never sees a transaction. It calls local functions on this device for totals, and every response is visible below.
           </p>
         </div>
         {items.length > 0 && (
-          <Button variant="secondary" className="min-h-9 rounded-xl px-3 text-xs" onClick={resetAdvisor} disabled={busy !== false}>
+          <Button variant="secondary" className="min-h-8 px-3 text-xs" onClick={resetAdvisor} disabled={busy !== false}>
             <MessageSquarePlus aria-hidden className="size-3.5" /> New chat
           </Button>
         )}
       </div>
 
-      <Card className="flex min-h-[26rem] flex-col overflow-hidden p-0 lg:min-h-[28.5rem]">
-        {/* Architecture flow mini-strip */}
-        <div className="flex flex-wrap items-center justify-center gap-2 border-b border-stone-200/80 bg-stone-50/90 px-4 py-2 text-[11px] font-semibold text-zinc-600 dark:border-white/[0.07] dark:bg-white/[0.025] dark:text-zinc-400">
-          <span className="inline-flex items-center gap-1 text-teal-800 dark:text-teal-400">
-            <ShieldCheck aria-hidden className="size-3.5" /> 1. Guard on device
+      <Card padded={false} className="flex min-h-[27rem] flex-col overflow-hidden lg:min-h-[29rem]">
+        {/* Quiet 3-step architectural strip */}
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b border-zinc-100 bg-zinc-50/60 px-4 py-2 text-[11px] font-medium text-zinc-500 dark:border-white/[0.06] dark:bg-white/[0.02] dark:text-zinc-400">
+          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
+            <ShieldCheck aria-hidden className="size-3" /> 1. Guard on device
           </span>
-          <ArrowRight aria-hidden className="size-3 text-zinc-400" />
-          <span className="inline-flex items-center gap-1 text-indigo-700 dark:text-indigo-300">
-            <Cloud aria-hidden className="size-3.5" /> 2. Cloud reasons
+          <ArrowRight aria-hidden className="size-3 text-zinc-300 dark:text-zinc-700" />
+          <span className="inline-flex items-center gap-1 text-indigo-700 dark:text-indigo-400">
+            <Cloud aria-hidden className="size-3" /> 2. Cloud reasons
           </span>
-          <ArrowRight aria-hidden className="size-3 text-zinc-400" />
-          <span className="inline-flex items-center gap-1 text-teal-800 dark:text-teal-400">
-            <Cpu aria-hidden className="size-3.5" /> 3. Local functions return totals
+          <ArrowRight aria-hidden className="size-3 text-zinc-300 dark:text-zinc-700" />
+          <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
+            <Cpu aria-hidden className="size-3" /> 3. Local functions return totals
           </span>
         </div>
 
@@ -160,18 +151,18 @@ export function AdvisorView() {
           role="log"
           aria-live="polite"
           aria-label="Conversation"
-          className="thin-scroll flex-1 space-y-4 overflow-y-auto bg-stone-50/40 px-5 py-5 sm:px-6 dark:bg-[#0b0c14]/60"
+          className="thin-scroll flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6"
         >
           {items.length === 0 && <EmptyChat onPick={submit} onTestGuard={prefillLeakTest} disabled={disabled} />}
           {items.map((item) => (
             <Message key={item.id} item={item} />
           ))}
           {busy && (
-            <div className="inline-flex items-center gap-2.5 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-zinc-600 shadow-2xs ring-1 ring-stone-200/85 dark:bg-[#12131c] dark:text-zinc-300 dark:ring-white/10">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300">
               <LoaderCircle
                 aria-hidden
                 className={`size-3.5 animate-spin motion-reduce:animate-none ${
-                  busy === 'checking' ? 'text-teal-700 dark:text-teal-400' : 'text-indigo-600 dark:text-indigo-400'
+                  busy === 'checking' ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400'
                 }`}
               />
               {busy === 'checking'
@@ -184,14 +175,14 @@ export function AdvisorView() {
           <div ref={endRef} />
         </div>
 
-        <form onSubmit={onSubmit} className="border-t border-stone-200/80 bg-white p-3.5 sm:p-4 dark:border-white/[0.07] dark:bg-[#12131c]">
+        <form onSubmit={onSubmit} className="border-t border-zinc-100 bg-zinc-50/40 p-3.5 sm:p-4 dark:border-white/[0.06] dark:bg-white/[0.015]">
           {disabled && (
-            <p className="mb-3 flex items-center gap-2 rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs font-medium text-amber-950 ring-1 ring-amber-200/90 dark:bg-amber-950/60 dark:text-amber-200 dark:ring-amber-800/70">
-              <WifiOff aria-hidden className="size-4 shrink-0 text-amber-700 dark:text-amber-400" />
+            <p className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs font-medium text-amber-950 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+              <WifiOff aria-hidden className="size-3.5 shrink-0 text-amber-700 dark:text-amber-400" />
               {!cloudReady ? 'Cloud features are not configured in this build.' : 'The advisor needs a connection. Labeling and review still work offline.'}
             </p>
           )}
-          <div className="flex items-end gap-2 rounded-2xl bg-stone-50/90 p-2 shadow-inner ring-1 ring-stone-200/95 transition-all focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(30,32,88,0.1)] focus-within:ring-ink-700 dark:bg-[#0b0c14]/90 dark:ring-white/10 dark:focus-within:bg-[#0b0c14] dark:focus-within:ring-indigo-400">
+          <div className="flex items-end gap-2 rounded-xl border border-zinc-200/90 bg-white p-1.5 transition-colors focus-within:border-zinc-900 dark:border-white/[0.1] dark:bg-[#111114] dark:focus-within:border-zinc-400">
             <label htmlFor="advisor-input" className="sr-only">
               Ask about your totals
             </label>
@@ -204,20 +195,20 @@ export function AdvisorView() {
               onKeyDown={onKeyDown}
               disabled={disabled}
               placeholder="Ask about your totals, e.g. “What did I spend on travel this month?”"
-              className="max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2.5 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus-visible:outline-none dark:text-zinc-100 dark:placeholder:text-zinc-500"
+              className="max-h-40 min-h-9 flex-1 resize-none bg-transparent px-2.5 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus-visible:outline-none dark:text-zinc-100 dark:placeholder:text-zinc-500"
             />
             <Button
               variant="primary"
               type="submit"
               aria-label="Send"
-              className="size-10 shrink-0 rounded-xl px-0"
+              className="size-9 shrink-0 rounded-lg px-0"
               disabled={disabled || busy !== false || !draft.trim()}
             >
               <ArrowUp aria-hidden className="size-4" />
             </Button>
           </div>
-          <p className="mt-2.5 flex items-center gap-1.5 px-1 text-xs text-zinc-500 dark:text-zinc-400">
-            <ShieldCheck aria-hidden className="size-3.5 shrink-0 text-teal-700 dark:text-teal-400" />
+          <p className="mt-2 flex items-center gap-1.5 px-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+            <ShieldCheck aria-hidden className="size-3 shrink-0 text-emerald-700 dark:text-emerald-400" />
             Messages with transaction details or merchant names from your data are blocked on this device before sending.
           </p>
         </form>
@@ -236,21 +227,13 @@ function EmptyChat({
   disabled: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center px-2 py-3 text-center">
-      <div className="flex items-center gap-2">
-        <span className="flex size-10 items-center justify-center rounded-2xl bg-teal-50 text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950/70 dark:text-teal-300 dark:ring-teal-700/60">
-          <Cpu aria-hidden className="size-5" />
-        </span>
-        <span aria-hidden className="text-xs font-bold text-stone-300 dark:text-zinc-700">
-          ↔
-        </span>
-        <span className="flex size-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200/80 dark:bg-indigo-950/70 dark:text-indigo-300 dark:ring-indigo-700/60">
-          <Sparkles aria-hidden className="size-5" />
-        </span>
-      </div>
-      <h2 className="mt-3 text-lg font-extrabold tracking-tight text-zinc-950 dark:text-white">Ask about your totals</h2>
-      <p className="mt-1 max-w-md text-xs leading-relaxed text-zinc-500 sm:text-sm dark:text-zinc-400">
-        Try a question below and watch the Data Boundary panel — only aggregated numbers ever cross to the cloud.
+    <div className="flex flex-col items-center px-2 py-5 text-center">
+      <span className="flex size-10 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-700 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300">
+        <ShieldCheck aria-hidden className="size-5 text-emerald-700 dark:text-emerald-400" />
+      </span>
+      <h2 className="mt-3.5 text-base font-semibold tracking-tight text-zinc-950 dark:text-white">Ask about your totals</h2>
+      <p className="mt-1 max-w-md text-xs leading-relaxed text-zinc-500 sm:text-[13px] dark:text-zinc-400">
+        Pick a question below and watch the Data Boundary panel — only aggregated numbers ever cross to the cloud.
       </p>
 
       <div className="mt-5 grid w-full max-w-xl gap-2 sm:grid-cols-2">
@@ -260,10 +243,10 @@ function EmptyChat({
             type="button"
             disabled={disabled}
             onClick={() => onPick(s)}
-            className="group flex items-center justify-between gap-2 rounded-xl bg-white px-3.5 py-2.5 text-left text-xs font-semibold text-zinc-700 shadow-[0_1px_2px_rgba(24,24,27,0.04)] ring-1 ring-stone-200/90 transition-all duration-150 hover:-translate-y-0.5 hover:text-ink-900 hover:shadow-sm hover:ring-ink-200 disabled:pointer-events-none disabled:opacity-50 dark:bg-[#12131c] dark:text-zinc-200 dark:ring-white/[0.08] dark:hover:text-indigo-300 dark:hover:ring-indigo-500/40"
+            className="group flex items-center justify-between gap-2 rounded-lg border border-zinc-200/80 bg-zinc-50/40 px-3.5 py-2.5 text-left text-xs font-medium text-zinc-700 transition-colors duration-150 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950 disabled:pointer-events-none disabled:opacity-50 dark:border-white/[0.08] dark:bg-white/[0.02] dark:text-zinc-300 dark:hover:border-white/[0.15] dark:hover:bg-white/[0.05] dark:hover:text-white"
           >
             <span className="leading-snug">{s}</span>
-            <ArrowRight aria-hidden className="size-3.5 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-ink-700 dark:group-hover:text-indigo-400" />
+            <ArrowRight aria-hidden className="size-3.5 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-700 dark:group-hover:text-zinc-200" />
           </button>
         ))}
       </div>
@@ -272,7 +255,7 @@ function EmptyChat({
         type="button"
         disabled={disabled}
         onClick={onTestGuard}
-        className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-rose-50/90 px-3.5 py-1.5 text-xs font-semibold text-rose-800 ring-1 ring-rose-200/90 transition-colors hover:bg-rose-100/80 disabled:pointer-events-none disabled:opacity-50 dark:bg-rose-950/60 dark:text-rose-300 dark:ring-rose-800/70 dark:hover:bg-rose-950"
+        className="mt-3.5 inline-flex items-center gap-1.5 rounded-lg border border-rose-200/80 bg-rose-50/50 px-3 py-1.5 text-xs font-medium text-rose-800 transition-colors hover:bg-rose-50 disabled:pointer-events-none disabled:opacity-50 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:hover:bg-rose-500/15"
       >
         <ShieldAlert aria-hidden className="size-3.5" />
         Test the on-device guard with a sample bank row
@@ -286,16 +269,16 @@ function Message({ item }: { item: ChatItem }) {
     return (
       <div className="flex flex-col items-end gap-1">
         <p
-          className={`max-w-[85%] rounded-2xl rounded-br-sm px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+          className={`max-w-[85%] rounded-xl rounded-br-sm px-3.5 py-2.5 text-[13.5px] leading-relaxed whitespace-pre-wrap ${
             item.status === 'blocked'
-              ? 'bg-rose-50 text-rose-950 ring-1 ring-rose-300 dark:bg-rose-950/70 dark:text-rose-200 dark:ring-rose-800'
-              : 'bg-gradient-to-b from-ink-700 to-ink-800 text-white shadow-xs dark:from-indigo-400 dark:to-indigo-500 dark:text-zinc-950'
+              ? 'border border-rose-200 bg-rose-50/70 text-rose-950 dark:border-rose-500/25 dark:bg-rose-500/10 dark:text-rose-200'
+              : 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
           }`}
         >
           {item.text}
         </p>
         {item.status === 'blocked' && (
-          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
             <Ban aria-hidden className="size-3" /> Not sent
           </span>
         )}
@@ -307,15 +290,13 @@ function Message({ item }: { item: ChatItem }) {
     return (
       <div
         role="alert"
-        className="flex gap-3 rounded-2xl bg-rose-50/95 p-4 text-sm text-rose-950 shadow-xs ring-1 ring-rose-300/80 dark:bg-rose-950/60 dark:text-rose-100 dark:ring-rose-800"
+        className="flex gap-3 rounded-xl border border-rose-200/80 bg-rose-50/60 p-4 text-sm text-rose-950 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-100"
       >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-700 ring-1 ring-rose-300/70 dark:bg-rose-900 dark:text-rose-300 dark:ring-rose-700">
-          <Ban aria-hidden className="size-4" />
-        </span>
+        <Ban aria-hidden className="mt-0.5 size-4 shrink-0 text-rose-600 dark:text-rose-400" />
         <div>
-          <p className="font-bold text-rose-950 dark:text-rose-100">Blocked on this device. Nothing was sent.</p>
-          <p className="mt-1 text-xs leading-relaxed text-rose-900 dark:text-rose-200">Why: {item.reasons.join('; ')}.</p>
-          <p className="mt-1.5 text-xs text-rose-800 dark:text-rose-300">
+          <p className="text-[13px] font-semibold text-rose-950 dark:text-rose-100">Blocked on this device. Nothing was sent.</p>
+          <p className="mt-1 text-xs leading-relaxed text-rose-900/90 dark:text-rose-200">Why: {item.reasons.join('; ')}.</p>
+          <p className="mt-1.5 text-xs text-rose-800/85 dark:text-rose-300">
             Ask about totals or categories instead, for example &ldquo;How much did I spend on travel this month?&rdquo;
           </p>
         </div>
@@ -326,15 +307,13 @@ function Message({ item }: { item: ChatItem }) {
   if (item.kind === 'call') {
     const json = JSON.stringify(item.result, null, 2);
     return (
-      <details className="group overflow-hidden rounded-2xl bg-teal-50/70 text-sm ring-1 ring-teal-200/85 dark:bg-teal-950/35 dark:ring-teal-800/60">
-        <summary className="flex list-none items-center gap-2.5 px-4 py-2.5 text-teal-950 transition-colors hover:bg-teal-50 dark:text-teal-100 dark:hover:bg-teal-950/55">
-          <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-white text-teal-800 ring-1 ring-teal-200/80 dark:bg-[#0b0c14] dark:text-teal-400 dark:ring-teal-800">
-            <Cpu aria-hidden className="size-3.5" />
+      <details className="group overflow-hidden rounded-lg border border-emerald-200/75 bg-emerald-50/40 text-xs dark:border-emerald-500/20 dark:bg-emerald-500/[0.06]">
+        <summary className="flex list-none items-center gap-2 px-3.5 py-2 text-emerald-950 transition-colors hover:bg-emerald-50/70 dark:text-emerald-100 dark:hover:bg-emerald-500/10">
+          <Cpu aria-hidden className="size-3.5 shrink-0 text-emerald-700 dark:text-emerald-400" />
+          <span>
+            Cloud asked this device: <span className="font-semibold">{item.label}</span>
           </span>
-          <span className="text-xs sm:text-sm">
-            Cloud asked this device: <span className="font-bold">{item.label}</span>
-          </span>
-          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-teal-800 dark:text-teal-300">
+          <span className="ml-auto inline-flex items-center gap-1 font-medium text-emerald-800 dark:text-emerald-300">
             <span className="group-open:hidden">Inspect totals</span>
             <span className="hidden group-open:inline">Hide</span>
             <ChevronDown aria-hidden className="size-3.5 transition-transform group-open:rotate-180" />
@@ -345,7 +324,7 @@ function Message({ item }: { item: ChatItem }) {
           content={json}
           accent="device"
           maxHeightClass="max-h-56"
-          className="rounded-none border-0 border-t border-teal-200/70 dark:border-teal-800/60"
+          className="rounded-none border-0 border-t border-zinc-800"
         />
       </details>
     );
@@ -354,12 +333,13 @@ function Message({ item }: { item: ChatItem }) {
   if (item.kind === 'assistant') {
     return (
       <div className="flex flex-col items-start gap-1.5">
-        <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-zinc-900 shadow-[0_1px_3px_rgba(24,24,27,0.06)] ring-1 ring-stone-200/90 dark:bg-[#12131c] dark:text-zinc-100 dark:ring-white/10">
+        <div className="max-w-[88%] rounded-xl rounded-bl-sm border border-zinc-200/80 bg-zinc-50/60 px-4 py-3 text-zinc-800 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-200">
           <RichText text={item.text} />
         </div>
-        <Badge tone="cloud">
-          <Cloud aria-hidden className="size-3" /> Cloud · {CLOUD_MODEL}
-        </Badge>
+        <span className="inline-flex items-center gap-1.5 px-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+          <span aria-hidden className="size-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+          Cloud · {CLOUD_MODEL}
+        </span>
       </div>
     );
   }
@@ -367,7 +347,7 @@ function Message({ item }: { item: ChatItem }) {
   return (
     <p
       role="alert"
-      className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950 ring-1 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-200 dark:ring-amber-800"
+      className="rounded-lg border border-amber-200/80 bg-amber-50/70 px-3.5 py-2.5 text-xs text-amber-950 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
     >
       {item.text}
     </p>

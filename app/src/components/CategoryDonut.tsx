@@ -31,11 +31,11 @@ export function CategoryDonut({
   active?: string;
   onHover: (category?: string) => void;
 }) {
-  const size = 188;
-  const stroke = 22;
+  const size = 180;
+  const stroke = 16;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
-  const gap = rows.length > 1 ? 3 : 0;
+  const gap = rows.length > 1 ? 2.5 : 0;
 
   const slices = rows.reduce<
     (CategorySlice & { share: number; length: number; dashOffset: number; color: string; nextOffset: number })[]
@@ -58,7 +58,7 @@ export function CategoryDonut({
   const focused = slices.find((s) => s.category === active);
 
   return (
-    <div className="relative mx-auto flex size-[188px] shrink-0 items-center justify-center">
+    <div className="relative mx-auto flex size-[180px] shrink-0 items-center justify-center">
       <svg
         width={size}
         height={size}
@@ -74,7 +74,7 @@ export function CategoryDonut({
           fill="none"
           stroke="currentColor"
           strokeWidth={stroke}
-          className="text-stone-100 dark:text-white/[0.06]"
+          className="text-zinc-100 dark:text-white/[0.06]"
         />
         {slices.map((slice) => {
           const isFocused = active === slice.category;
@@ -87,11 +87,11 @@ export function CategoryDonut({
               r={radius}
               fill="none"
               stroke={slice.color}
-              strokeWidth={isFocused ? stroke + 4 : stroke}
+              strokeWidth={isFocused ? stroke + 3 : stroke}
               strokeDasharray={`${slice.length} ${circumference}`}
               strokeDashoffset={slice.dashOffset}
               strokeLinecap="butt"
-              opacity={isDimmed ? 0.35 : 1}
+              opacity={isDimmed ? 0.3 : 1}
               className="cursor-pointer transition-all duration-200"
               onMouseEnter={() => onHover(slice.category)}
               onMouseLeave={() => onHover(undefined)}
@@ -100,14 +100,14 @@ export function CategoryDonut({
         })}
       </svg>
 
-      <div className="pointer-events-none absolute inset-7 flex flex-col items-center justify-center text-center">
-        <span className="max-w-[7.5rem] truncate text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+      <div className="pointer-events-none absolute inset-6 flex flex-col items-center justify-center text-center">
+        <span className="max-w-[7.5rem] truncate text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
           {focused ? focused.category : 'Total business'}
         </span>
-        <span className="mt-0.5 text-lg font-bold tracking-tight text-zinc-950 tabular-nums dark:text-white">
+        <span className="mt-0.5 text-lg font-semibold tracking-tight text-zinc-950 tabular-nums dark:text-white">
           {formatMoney(focused ? focused.amount : total)}
         </span>
-        <span className="mt-0.5 text-[11px] font-medium text-zinc-400 tabular-nums dark:text-zinc-500">
+        <span className="mt-0.5 text-[11px] text-zinc-500 tabular-nums dark:text-zinc-400">
           {focused ? `${Math.round(focused.share * 100)}% of spend` : `${rows.length} categories`}
         </span>
       </div>

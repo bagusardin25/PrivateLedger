@@ -18,9 +18,9 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
       <button
         type="button"
         onClick={() => ask()}
-        className="mt-3.5 inline-flex min-h-8 items-center gap-1.5 rounded-full bg-ink-50/90 px-3 text-xs font-semibold text-ink-800 ring-1 ring-ink-200/80 transition-colors hover:bg-ink-100/80 dark:bg-indigo-500/10 dark:text-indigo-300 dark:ring-indigo-400/25 dark:hover:bg-indigo-500/20"
+        className="mt-3 inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-50/70 px-2.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-100/70 hover:text-zinc-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300 dark:hover:border-white/[0.15] dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
-        <CircleHelp aria-hidden className="size-3.5" /> What is this merchant?
+        <CircleHelp aria-hidden className="size-3.5 text-zinc-400" /> What is this merchant?
       </button>
     );
   }
@@ -28,7 +28,7 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
   if (state.status === 'loading') {
     return (
       <p
-        className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-stone-50 px-3 py-2 text-xs font-medium text-zinc-600 ring-1 ring-stone-200/80 dark:bg-white/[0.05] dark:text-zinc-300 dark:ring-white/10"
+        className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-600 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300"
         aria-live="polite"
       >
         <LoaderCircle aria-hidden className="size-3.5 animate-spin motion-reduce:animate-none" />
@@ -39,20 +39,20 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
 
   if (state.status === 'needs-consent') {
     return (
-      <div className="mt-3.5 rounded-xl bg-indigo-50/80 p-3.5 text-sm ring-1 ring-indigo-200/85 dark:bg-indigo-950/45 dark:ring-indigo-800/65">
-        <p className="leading-relaxed text-zinc-800 dark:text-zinc-200">
+      <div className="mt-3 rounded-lg border border-indigo-200/80 bg-indigo-50/50 p-3.5 text-xs dark:border-indigo-500/20 dark:bg-indigo-500/10">
+        <p className="leading-relaxed text-zinc-700 dark:text-zinc-200">
           On-device AI isn&apos;t available here, so this question would go to the cloud. Only the name{' '}
           <span className="font-semibold text-zinc-950 dark:text-white">&ldquo;{tx.cleanMerchant}&rdquo;</span> is sent: no amount, date, or bank
           description.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Button variant="secondary" className="min-h-8 rounded-lg px-3 text-xs" onClick={() => ask(true)} disabled={!state.cloudPossible}>
-            <Cloud aria-hidden className="size-3.5 text-indigo-700 dark:text-indigo-400" /> Send the name to the cloud
+          <Button variant="secondary" className="min-h-8 px-2.5 text-xs" onClick={() => ask(true)} disabled={!state.cloudPossible}>
+            <Cloud aria-hidden className="size-3.5 text-indigo-600 dark:text-indigo-400" /> Send the name to the cloud
           </Button>
-          <Button variant="ghost" className="min-h-8 rounded-lg px-3 text-xs" onClick={clear}>
+          <Button variant="ghost" className="min-h-8 px-2.5 text-xs" onClick={clear}>
             Not now
           </Button>
-          {!state.cloudPossible && <span className="text-xs text-zinc-600 dark:text-zinc-400">Needs a connection and a configured Firebase project.</span>}
+          {!state.cloudPossible && <span className="text-xs text-zinc-500 dark:text-zinc-400">Needs a connection and a configured Firebase project.</span>}
         </div>
       </div>
     );
@@ -62,10 +62,10 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
     return (
       <p
         role="alert"
-        className="mt-3.5 flex flex-wrap items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-200 dark:ring-amber-800"
+        className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-xs text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
       >
         {state.message}
-        <button type="button" onClick={clear} className="ml-auto rounded px-1.5 font-semibold underline">
+        <button type="button" onClick={clear} className="ml-auto font-medium underline">
           Dismiss
         </button>
       </p>
@@ -76,10 +76,10 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
   const local = result.source === 'on_device';
   return (
     <div
-      className="mt-3.5 rounded-xl bg-stone-50/90 p-3.5 text-sm ring-1 ring-stone-200/90 dark:bg-white/[0.04] dark:ring-white/10"
+      className="mt-3 rounded-lg border border-zinc-200/80 bg-zinc-50/70 p-3.5 text-sm dark:border-white/[0.08] dark:bg-white/[0.03]"
       aria-live="polite"
     >
-      <p className="leading-relaxed text-zinc-800 dark:text-zinc-200">
+      <p className="text-[13px] leading-relaxed text-zinc-700 dark:text-zinc-200">
         {result.known ? result.text : 'Not recognized. The model does not know this merchant, so it did not guess.'}
       </p>
       <div className="mt-2">

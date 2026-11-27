@@ -14,7 +14,6 @@ import {
   RotateCcw,
   ScrollText,
   ShieldCheck,
-  Sparkles,
   UploadCloud,
   WifiOff,
 } from 'lucide-react';
@@ -29,7 +28,7 @@ import { db } from '../lib/data/db';
 const PROMISES = [
   { icon: UploadCloud, text: 'Nothing uploaded' },
   { icon: Lock, text: 'No account needed' },
-  { icon: WifiOff, text: 'Works offline' },
+  { icon: WifiOff, text: 'Labeling works offline' },
   { icon: ScrollText, text: 'Every cloud call logged' },
 ];
 
@@ -60,61 +59,46 @@ export function WelcomeView() {
 
   return (
     <div>
-      {/* EDITORIAL HERO */}
-      <section className="relative overflow-hidden border-b border-stone-200/80 bg-[#fdfcfa] dark:border-white/[0.08] dark:bg-[#090a0f]">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(64rem_38rem_at_88%_-15%,rgba(85,92,224,0.11),transparent_60%),radial-gradient(48rem_30rem_at_6%_112%,rgba(15,118,110,0.09),transparent_60%)] dark:bg-[radial-gradient(64rem_38rem_at_88%_-15%,rgba(129,140,248,0.15),transparent_60%),radial-gradient(48rem_30rem_at_6%_112%,rgba(45,212,191,0.11),transparent_60%)]"
-        />
-        <div
-          aria-hidden
-          className="bg-fine-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_38%,transparent_84%)]"
-        />
+      {/* MINIMALIST EDITORIAL HERO */}
+      <section className="border-b border-zinc-200/80 bg-white dark:border-white/[0.07] dark:bg-[#09090b]">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] lg:gap-16 lg:py-20">
+          <div className="fade-up min-w-0">
+            <p className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-white/[0.09] dark:bg-white/[0.03] dark:text-zinc-300">
+              <span aria-hidden className="size-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+              On-device Gemini Nano · Firebase AI Logic
+            </p>
 
-        <div className="relative mx-auto grid max-w-[1260px] items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(0,1fr)] lg:py-20">
-          <div className="fade-up">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-teal-900 shadow-[0_1px_3px_rgba(24,24,27,0.05)] ring-1 ring-teal-200/85 dark:bg-white/[0.05] dark:text-teal-300 dark:ring-teal-500/30">
-              <span className="relative flex size-2">
-                <span aria-hidden className="absolute inline-flex size-full animate-ping rounded-full bg-teal-400 opacity-75 motion-reduce:hidden" />
-                <span aria-hidden className="relative inline-flex size-2 rounded-full bg-teal-600 dark:bg-teal-400" />
-              </span>
-              <Cpu aria-hidden className="size-3.5 text-teal-700 dark:text-teal-400" />
-              Hybrid AI · Gemini Nano in Chrome
-            </div>
-
-            <h1 className="mt-5 text-4xl leading-[1.06] font-extrabold tracking-[-0.03em] text-zinc-950 text-balance sm:text-[3.25rem] dark:text-white">
+            <h1 className="mt-6 text-3xl leading-[1.08] font-semibold tracking-[-0.035em] text-zinc-950 text-balance sm:text-[2.85rem] dark:text-white">
               Sort business from personal spending.{' '}
-              <span className="bg-gradient-to-r from-ink-800 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-indigo-300 dark:via-violet-300 dark:to-teal-300">
-                Your bank statement never leaves your laptop.
-              </span>
+              <span className="text-zinc-500 dark:text-zinc-400">Your bank statement never leaves your laptop.</span>
             </h1>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-600 sm:text-[17px] dark:text-zinc-400">
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400">
               Gemini Nano labels every row locally inside Chrome. The cloud model only ever receives totals — and a live Data Boundary lets you inspect
               every byte that leaves.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-2.5">
               {hasData ? (
                 <>
-                  <Button variant="primary" className="group min-h-12 px-6 text-[15px]" onClick={() => navigate('transactions')}>
+                  <Button variant="primary" className="group min-h-11 px-5 text-sm" onClick={() => navigate('transactions')}>
                     Continue with {counts.total.toLocaleString('en-US')} transactions
                     <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />
                   </Button>
-                  <Button className="min-h-12 px-5 text-[15px]" onClick={() => void onDemo()} disabled={starting}>
-                    <RotateCcw aria-hidden className="size-4" />
+                  <Button className="min-h-11 px-4 text-sm" onClick={() => void onDemo()} disabled={starting}>
+                    <RotateCcw aria-hidden className="size-3.5" />
                     {starting ? 'Loading demo…' : counts.demo > 0 ? 'Restart demo' : 'Try demo data'}
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button variant="primary" className="group min-h-12 px-6 text-[15px]" onClick={() => void onDemo()} disabled={starting}>
-                    <Play aria-hidden className="size-4 fill-current" />
+                  <Button variant="primary" className="group min-h-11 px-5 text-sm" onClick={() => void onDemo()} disabled={starting}>
+                    <Play aria-hidden className="size-3.5 fill-current" />
                     {starting ? 'Loading demo…' : 'Try it with demo data'}
                     {!starting && <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />}
                   </Button>
-                  <Button className="min-h-12 px-5 text-[15px]" onClick={() => navigate('import')}>
-                    <FileUp aria-hidden className="size-4 text-ink-700 dark:text-indigo-300" /> Import your CSV
+                  <Button className="min-h-11 px-4 text-sm" onClick={() => navigate('import')}>
+                    <FileUp aria-hidden className="size-3.5 text-zinc-500 dark:text-zinc-400" /> Import your CSV
                   </Button>
                 </>
               )}
@@ -123,22 +107,17 @@ export function WelcomeView() {
             {error && (
               <p
                 role="alert"
-                className="mt-3 rounded-xl bg-rose-50 px-3.5 py-2 text-sm text-rose-800 ring-1 ring-rose-200 dark:bg-rose-950/70 dark:text-rose-200 dark:ring-rose-800"
+                className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200"
               >
                 Could not load the demo: {error}
               </p>
             )}
 
-            <ul className="mt-8 grid max-w-lg grid-cols-2 gap-2.5 text-sm">
+            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2.5 border-t border-zinc-100 pt-6 text-xs text-zinc-500 dark:border-white/[0.06] dark:text-zinc-400">
               {PROMISES.map((p) => (
-                <li
-                  key={p.text}
-                  className="flex items-center gap-2.5 rounded-xl bg-white/90 px-3 py-2 text-xs font-semibold text-zinc-700 shadow-2xs ring-1 ring-stone-200/85 dark:bg-white/[0.04] dark:text-zinc-200 dark:ring-white/[0.08]"
-                >
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950/80 dark:text-teal-300 dark:ring-teal-700/60">
-                    <p.icon aria-hidden className="size-3.5" />
-                  </span>
-                  {p.text}
+                <li key={p.text} className="inline-flex items-center gap-1.5">
+                  <p.icon aria-hidden className="size-3.5 text-zinc-400 dark:text-zinc-500" />
+                  <span>{p.text}</span>
                 </li>
               ))}
             </ul>
@@ -148,17 +127,17 @@ export function WelcomeView() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-[1260px] space-y-14 px-4 py-14 sm:px-6">
-        <ArchitectureBento />
+      <div className="mx-auto max-w-[1240px] space-y-14 px-4 py-14 sm:px-6">
+        <ArchitectureSection />
 
         <section aria-labelledby="setup" className="space-y-5">
           <div>
-            <p className="text-xs font-bold tracking-wider text-ink-600 uppercase dark:text-indigo-400">Local setup</p>
-            <h2 id="setup" className="mt-1 text-2xl font-extrabold tracking-tight text-zinc-950 dark:text-white">
+            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Local setup</p>
+            <h2 id="setup" className="mt-1 text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">
               Ready in a minute
             </h2>
           </div>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
             <Card>
               <ModelStatusCard />
             </Card>
@@ -180,15 +159,22 @@ const DEMO_PREVIEW_ROWS = [
   { merchant: 'Stripe · Acme Studio', category: 'Income', amount: '+$2,400.00', type: 'business' as const, by: 'Rule' },
 ];
 
-const CLOUD_TOTALS_SAMPLE = `{
+// Same text and field names as summaryPrompt() in lib/ai/reporter.ts builds; only the figures are examples.
+const CLOUD_TOTALS_SAMPLE = `Monthly totals (no individual transactions):
+{
   "period": "2026-10",
-  "businessExpenses": {
-    "Software & Subscriptions": 149.99,
-    "Travel": 312.40,
-    "Office & Coworking": 275.00
+  "currency": "USD",
+  "totals": {
+    "business_spending": 737.39,
+    "personal_spending": 2412.86,
+    "business_income": 5450,
+    "not_sorted_count": 0
   },
-  "rawTransactionsIncluded": 0,
-  "merchantNamesIncluded": 0
+  "business_spending_by_category": [
+    { "category": "Office & Coworking", "total": 350, "count": 1 },
+    { "category": "Travel", "total": 312.4, "count": 1 },
+    { "category": "Software & Subscriptions", "total": 74.99, "count": 2 }
+  ]
 }`;
 
 /** Interactive 3-tab product showcase right in the hero so visitors grasp all 3 pillars immediately. */
@@ -197,29 +183,23 @@ function InteractiveShowcase() {
   const [coffeeChoice, setCoffeeChoice] = useState<'unsure' | 'business' | 'personal'>('unsure');
 
   return (
-    <figure className="relative">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-5 rounded-[2rem] bg-gradient-to-tr from-indigo-300/25 via-violet-200/20 to-teal-200/25 blur-3xl dark:from-indigo-500/18 dark:via-violet-500/12 dark:to-teal-500/14"
-      />
-
-      <div className="relative overflow-hidden rounded-2xl border border-stone-200/90 bg-white shadow-[0_6px_18px_rgba(24,24,27,0.06),0_28px_60px_-18px_rgba(28,31,74,0.18)] dark:border-white/10 dark:bg-[#12131c] dark:shadow-[0_28px_64px_-18px_rgba(0,0,0,0.8)]">
-        {/* Velvet Obsidian window bar + interactive mode tabs */}
-        <div className="border-b border-stone-200/80 bg-gradient-to-r from-[#0e101c] via-[#15182d] to-[#111322] px-4 pt-3 pb-2.5 text-white dark:border-white/[0.08]">
+    <figure className="relative min-w-0">
+      <div className="overflow-hidden rounded-xl border border-zinc-200/90 bg-white shadow-[0_12px_36px_-16px_rgba(0,0,0,0.08)] dark:border-white/[0.09] dark:bg-[#111114] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75)]">
+        {/* Clean architectural window bar + mode tabs */}
+        <div className="border-b border-zinc-100 bg-zinc-50/70 px-4 pt-3 pb-2.5 dark:border-white/[0.06] dark:bg-white/[0.02]">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5" aria-hidden>
-              <span className="size-2.5 rounded-full bg-white/20" />
-              <span className="size-2.5 rounded-full bg-white/20" />
-              <span className="size-2.5 rounded-full bg-white/20" />
-            </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-0.5 text-[11px] font-medium text-zinc-200 ring-1 ring-white/10">
-              <Lock aria-hidden className="size-3 text-teal-400" />
+            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+              <Lock aria-hidden className="size-3 text-emerald-600 dark:text-emerald-400" />
               private-ledger · local
             </span>
-            <span className="text-[10px] font-semibold tracking-wider text-teal-300 uppercase">Live preview</span>
+            <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Interactive preview</span>
           </div>
 
-          <div role="tablist" aria-label="Product capability preview" className="mt-3 grid grid-cols-3 gap-1 rounded-xl bg-white/[0.06] p-1">
+          <div
+            role="tablist"
+            aria-label="Product capability preview"
+            className="mt-2.5 grid grid-cols-3 gap-1 rounded-lg bg-zinc-200/60 p-0.5 dark:bg-white/[0.05]"
+          >
             {(
               [
                 ['local', 'On-device AI', Cpu],
@@ -235,14 +215,22 @@ function InteractiveShowcase() {
                   type="button"
                   aria-selected={active}
                   onClick={() => setTab(id)}
-                  className={`inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-semibold transition-all ${
-                    active ? 'bg-white text-zinc-950 shadow-sm' : 'text-zinc-300 hover:bg-white/10 hover:text-white'
+                  className={`inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors ${
+                    active
+                      ? 'bg-white text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:bg-[#1b1b20] dark:text-white'
+                      : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
                   }`}
                 >
                   <Icon
                     aria-hidden
                     className={`size-3.5 ${
-                      active ? (id === 'local' ? 'text-teal-700' : id === 'cloud' ? 'text-indigo-600' : 'text-rose-600') : ''
+                      active
+                        ? id === 'local'
+                          ? 'text-emerald-700 dark:text-emerald-400'
+                          : id === 'cloud'
+                            ? 'text-indigo-600 dark:text-indigo-400'
+                            : 'text-rose-600 dark:text-rose-400'
+                        : 'text-zinc-400 dark:text-zinc-500'
                     }`}
                   />
                   {label}
@@ -253,30 +241,30 @@ function InteractiveShowcase() {
         </div>
 
         {/* Interactive Tab Body */}
-        <div className="min-h-[17.5rem] bg-white dark:bg-[#12131c]">
+        <div className="min-h-[16.75rem] bg-white dark:bg-[#111114]">
           {tab === 'local' && (
-            <ul className="divide-y divide-stone-100 dark:divide-white/[0.06]">
+            <ul className="divide-y divide-zinc-100 dark:divide-white/[0.05]">
               {DEMO_PREVIEW_ROWS.map((row) => (
-                <li key={row.merchant} className="flex items-center gap-3 px-4 py-3.5">
+                <li key={row.merchant} className="flex items-center gap-3 px-4 py-3">
                   <MerchantAvatar name={row.merchant} size="md" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{row.merchant}</p>
+                    <p className="truncate text-[13px] font-medium text-zinc-950 dark:text-zinc-100">{row.merchant}</p>
                     <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                       {row.category} · {row.by}
                     </p>
                   </div>
                   <span
-                    className={`text-sm font-bold tabular-nums ${
-                      row.amount.startsWith('+') ? 'text-teal-700 dark:text-teal-400' : 'text-zinc-900 dark:text-zinc-100'
+                    className={`text-[13px] font-medium tabular-nums ${
+                      row.amount.startsWith('+') ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-900 dark:text-zinc-100'
                     }`}
                   >
                     {row.amount}
                   </span>
                   <span
-                    className={`w-[4.75rem] rounded-lg py-1 text-center text-[11px] font-semibold ${
+                    className={`w-[4.5rem] rounded-md py-1 text-center text-[11px] font-medium ${
                       row.type === 'business'
-                        ? 'bg-ink-800 text-white dark:bg-indigo-400 dark:text-zinc-950'
-                        : 'bg-stone-100 text-zinc-700 dark:bg-white/[0.08] dark:text-zinc-300'
+                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
+                        : 'bg-zinc-100 text-zinc-600 dark:bg-white/[0.07] dark:text-zinc-300'
                     }`}
                   >
                     {row.type === 'business' ? 'Business' : 'Personal'}
@@ -284,26 +272,26 @@ function InteractiveShowcase() {
                 </li>
               ))}
               <li
-                className={`flex flex-wrap items-center gap-3 px-4 py-3.5 transition-colors ${
-                  coffeeChoice === 'unsure' ? 'bg-amber-50/45 dark:bg-amber-950/20' : ''
+                className={`flex flex-wrap items-center gap-3 px-4 py-3 transition-colors ${
+                  coffeeChoice === 'unsure' ? 'bg-amber-50/40 dark:bg-amber-500/[0.05]' : ''
                 }`}
               >
                 <MerchantAvatar name="Starbucks" size="md" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">Starbucks</p>
+                  <p className="truncate text-[13px] font-medium text-zinc-950 dark:text-zinc-100">Starbucks</p>
                   <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                    {coffeeChoice === 'unsure' ? 'Mixed-use · tap to try sorting' : 'Remembered locally for Starbucks'}
+                    {coffeeChoice === 'unsure' ? 'Mixed-use · try sorting' : 'Remembered locally for Starbucks'}
                   </p>
                 </div>
-                <span className="text-sm font-bold text-zinc-900 tabular-nums dark:text-zinc-100">−$6.45</span>
-                <div className="inline-flex gap-0.5 rounded-lg bg-stone-100 p-0.5 ring-1 ring-stone-200/90 dark:bg-white/[0.06] dark:ring-white/10">
+                <span className="text-[13px] font-medium text-zinc-900 tabular-nums dark:text-zinc-100">−$6.45</span>
+                <div className="inline-flex gap-0.5 rounded-md border border-zinc-200/80 bg-zinc-50 p-0.5 dark:border-white/[0.08] dark:bg-white/[0.04]">
                   <button
                     type="button"
                     onClick={() => setCoffeeChoice('business')}
-                    className={`rounded-md px-2 py-1 text-[11px] font-semibold transition-colors ${
+                    className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
                       coffeeChoice === 'business'
-                        ? 'bg-ink-800 text-white shadow-2xs dark:bg-indigo-400 dark:text-zinc-950'
-                        : 'text-zinc-600 hover:bg-white dark:text-zinc-300 dark:hover:bg-white/10'
+                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
+                        : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white'
                     }`}
                   >
                     Biz
@@ -311,10 +299,10 @@ function InteractiveShowcase() {
                   <button
                     type="button"
                     onClick={() => setCoffeeChoice('personal')}
-                    className={`rounded-md px-2 py-1 text-[11px] font-semibold transition-colors ${
+                    className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
                       coffeeChoice === 'personal'
-                        ? 'bg-zinc-700 text-white shadow-2xs dark:bg-zinc-500'
-                        : 'text-zinc-600 hover:bg-white dark:text-zinc-300 dark:hover:bg-white/10'
+                        ? 'bg-zinc-700 text-white dark:bg-zinc-500'
+                        : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white'
                     }`}
                   >
                     Pers
@@ -327,18 +315,19 @@ function InteractiveShowcase() {
           {tab === 'cloud' && (
             <div className="space-y-3 p-4">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">Exact payload sent for Monthly Summary</p>
+                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">What the cloud receives for a monthly summary</p>
                 <Badge tone="cloud">PREFER_IN_CLOUD</Badge>
               </div>
               <PayloadViewer
-                title="Outbound cloud request (totals only)"
+                title="Example request, in the same format as the real one"
                 content={CLOUD_TOTALS_SAMPLE}
                 accent="cloud"
-                maxHeightClass="max-h-48"
+                maxHeightClass="max-h-44"
                 showCopy={false}
               />
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                No bank descriptions, dates, client names, or individual line items ever cross the boundary.
+                No bank description, transaction date, client name, or line item is in this request. After a real run, the Privacy Ledger
+                shows the exact one.
               </p>
             </div>
           )}
@@ -346,23 +335,21 @@ function InteractiveShowcase() {
           {tab === 'guard' && (
             <div className="space-y-3 p-4">
               <div className="flex flex-col items-end gap-1">
-                <p className="max-w-[90%] rounded-2xl rounded-br-sm bg-rose-50 px-3.5 py-2 font-mono text-xs text-rose-950 ring-1 ring-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:ring-rose-800">
+                <p className="max-w-[92%] rounded-xl rounded-br-sm border border-rose-200 bg-rose-50/70 px-3 py-2 font-mono text-xs text-rose-950 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
                   10/12 DELTA AIR LINES -312.40 — is this deductible?
                 </p>
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
                   <Ban aria-hidden className="size-3" /> Not sent · 0 bytes left device
                 </span>
               </div>
-              <div className="flex items-start gap-2.5 rounded-xl bg-rose-50/90 p-3.5 text-xs leading-relaxed text-rose-950 ring-1 ring-rose-300/80 dark:bg-rose-950/50 dark:text-rose-200 dark:ring-rose-800/80">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-900 dark:text-rose-300">
-                  <Ban aria-hidden className="size-4" />
-                </span>
+              <div className="flex items-start gap-2.5 rounded-lg border border-rose-200/80 bg-rose-50/50 p-3 text-xs leading-relaxed text-rose-950 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
+                <Ban aria-hidden className="mt-0.5 size-4 shrink-0 text-rose-600 dark:text-rose-400" />
                 <div>
-                  <p className="font-bold">Blocked on this device by the outgoing guard.</p>
+                  <p className="font-semibold">Blocked on this device by the outgoing guard.</p>
                   <p className="mt-0.5 opacity-90">Detected amount with date and merchant from your data. Ask about category totals instead.</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between rounded-xl bg-stone-50 px-3 py-2 text-[11px] text-zinc-600 ring-1 ring-stone-200/85 dark:bg-white/[0.04] dark:text-zinc-300 dark:ring-white/10">
+              <div className="flex items-center justify-between rounded-lg border border-zinc-200/80 bg-zinc-50/70 px-3 py-2 text-[11px] text-zinc-600 dark:border-white/[0.08] dark:bg-white/[0.02] dark:text-zinc-400">
                 <span>Guard runs locally with rules + Gemini Nano</span>
                 <Badge tone="device">ONLY_ON_DEVICE</Badge>
               </div>
@@ -370,40 +357,29 @@ function InteractiveShowcase() {
           )}
         </div>
 
-        {/* Signature split data boundary footer */}
-        <div className="relative grid grid-cols-2 border-t border-stone-200/80 dark:border-white/[0.08]">
-          <div className="flex items-center gap-2.5 bg-gradient-to-br from-teal-50/90 to-teal-50/30 px-4 py-3 text-teal-950 dark:from-teal-950/45 dark:to-[#12131c] dark:text-teal-100">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-white text-teal-800 shadow-2xs ring-1 ring-teal-200/80 dark:bg-[#0b0c14] dark:text-teal-400 dark:ring-teal-800/60">
-              <Laptop aria-hidden className="size-4" />
-            </span>
+        {/* Clean hairline split boundary footer */}
+        <div className="relative grid grid-cols-2 divide-x divide-zinc-200/80 border-t border-zinc-200/80 bg-zinc-50/60 dark:divide-white/[0.07] dark:border-white/[0.07] dark:bg-white/[0.02]">
+          <div className="flex items-center gap-2.5 px-4 py-3">
+            <Laptop aria-hidden className="size-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
             <div className="leading-tight">
-              <span className="block text-base font-extrabold tabular-nums">40</span>
-              <span className="text-[11px] font-semibold text-teal-800 dark:text-teal-300">kept on device</span>
+              <span className="block text-sm font-semibold text-zinc-950 tabular-nums dark:text-white">40</span>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">kept on device</span>
             </div>
           </div>
 
-          <span
-            aria-hidden
-            className="absolute top-1/2 left-1/2 flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#141628] text-teal-400 shadow-md ring-2 ring-white dark:ring-[#12131c]"
-          >
-            <Lock className="size-3.5" />
-          </span>
-
-          <div className="flex items-center gap-2.5 border-l border-dashed border-stone-300 bg-gradient-to-br from-indigo-50/85 to-indigo-50/30 px-4 py-3 pl-6 text-indigo-950 dark:border-white/15 dark:from-indigo-950/45 dark:to-[#12131c] dark:text-indigo-100">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-700 shadow-2xs ring-1 ring-indigo-200/80 dark:bg-[#0b0c14] dark:text-indigo-400 dark:ring-indigo-800/60">
-              <Cloud aria-hidden className="size-4" />
-            </span>
+          <div className="flex items-center gap-2.5 px-4 py-3">
+            <Cloud aria-hidden className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
             <div className="leading-tight">
-              <span className="block text-base font-extrabold text-teal-700 tabular-nums dark:text-teal-400">0</span>
-              <span className="text-[11px] font-semibold text-indigo-900 dark:text-indigo-300">raw rows sent</span>
+              <span className="block text-sm font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">0</span>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">raw rows sent</span>
             </div>
           </div>
         </div>
       </div>
 
-      <figcaption className="mt-4 flex items-center justify-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-        <ShieldCheck aria-hidden className="size-3.5 text-teal-700 dark:text-teal-400" />
-        Switch tabs above to inspect how Private Ledger separates local data from cloud math
+      <figcaption className="mt-3 flex items-center justify-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
+        <ShieldCheck aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" />
+        Switch tabs above to inspect how local data stays separated from cloud math
       </figcaption>
     </figure>
   );
@@ -416,41 +392,42 @@ const PIPELINE_STEPS = [
   { icon: Database, label: 'IndexedDB' },
 ];
 
-const LOCAL_TOOL_SNIPPET = `// Cloud calls a local function running in your browser
-cloud.call("get_spending_by_category", { period: "2026-10" })
+// The function name, arguments, and answer use the real format from lib/ai/localFunctions.ts; the figures are examples.
+const LOCAL_TOOL_SNIPPET = `// The cloud model asks for a function that runs in your browser
+get_spending_by_category({ "period": "2026-10", "type": "business" })
 
-// Device queries IndexedDB and returns ONLY totals
-← { "Software": 149.99, "Travel": 312.40, "Meals": 42.15 }`;
+// Your device reads IndexedDB and answers with totals only
+{ "period": "2026-10", "type": "business", "currency": "USD", "totals": [
+  { "category": "Office & Coworking", "total": 350, "count": 1 },
+  { "category": "Travel", "total": 312.4, "count": 1 } ] }`;
 
-/** Asymmetric Bento Grid communicating the hybrid privacy architecture visually. */
-function ArchitectureBento() {
+/** Unified architectural hairline grid explaining the hybrid data boundary. */
+function ArchitectureSection() {
   return (
     <section aria-labelledby="how-it-works">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="text-xs font-bold tracking-wider text-teal-700 uppercase dark:text-teal-400">Hybrid architecture</p>
-          <h2 id="how-it-works" className="mt-1 text-2xl font-extrabold tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
+          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Hybrid architecture</p>
+          <h2 id="how-it-works" className="mt-1 text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">
             How the data boundary works
           </h2>
         </div>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">Every AI model mode follows the sensitivity of the data it handles.</p>
       </div>
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-12">
-        {/* Bento 1: Local pipeline (7 cols) */}
-        <article className="relative overflow-hidden rounded-2xl border border-teal-200/75 bg-gradient-to-br from-teal-50/65 via-white to-white p-6 shadow-[0_1px_2px_rgba(24,24,27,0.03),0_10px_28px_-10px_rgba(15,118,110,0.08)] lg:col-span-7 dark:border-teal-800/45 dark:from-teal-950/30 dark:via-[#12131c] dark:to-[#12131c]">
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-12">
+        {/* Card 1: Local pipeline (7 cols) */}
+        <article className="min-w-0 rounded-xl border border-zinc-200/80 bg-white p-6 lg:col-span-7 dark:border-white/[0.08] dark:bg-[#111114]">
           <div className="flex items-center justify-between gap-2">
             <Badge tone="device">
               <Laptop aria-hidden className="size-3" /> Stays on your laptop
             </Badge>
-            <code className="rounded-md bg-teal-100/70 px-2 py-0.5 font-mono text-[11px] font-semibold text-teal-900 dark:bg-teal-950 dark:text-teal-300">
-              ONLY_ON_DEVICE
-            </code>
+            <code className="font-mono text-[11px] font-medium text-zinc-500 dark:text-zinc-400">ONLY_ON_DEVICE</code>
           </div>
-          <h3 className="mt-4 text-xl font-bold tracking-tight text-zinc-950 dark:text-white">
+          <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">
             Parse, normalize, and label rows inside Chrome
           </h3>
-          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             Deterministic rules settle transfers, fees, and mixed-use stores immediately. Unique merchants stream through Gemini Nano in Chrome and
             never leave IndexedDB.
           </p>
@@ -458,13 +435,11 @@ function ArchitectureBento() {
             {PIPELINE_STEPS.map((step, i) => (
               <div
                 key={step.label}
-                className="flex items-center gap-2 rounded-xl bg-white/95 px-3 py-2.5 text-xs font-semibold text-zinc-800 shadow-2xs ring-1 ring-teal-200/75 dark:bg-[#0b0c14]/70 dark:text-zinc-200 dark:ring-teal-800/45"
+                className="flex items-center gap-2 rounded-lg border border-zinc-200/75 bg-zinc-50/70 px-3 py-2 text-xs font-medium text-zinc-800 dark:border-white/[0.07] dark:bg-white/[0.03] dark:text-zinc-200"
               >
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-300">
-                  <step.icon aria-hidden className="size-3.5" />
-                </span>
+                <step.icon aria-hidden className="size-3.5 shrink-0 text-emerald-700 dark:text-emerald-400" />
                 <span className="truncate">
-                  <span className="mr-1 text-teal-700/80 dark:text-teal-400">{i + 1}.</span>
+                  <span className="mr-1 text-zinc-500 dark:text-zinc-400">{i + 1}.</span>
                   {step.label}
                 </span>
               </div>
@@ -472,47 +447,44 @@ function ArchitectureBento() {
           </div>
         </article>
 
-        {/* Bento 2: Auditable proof (5 cols) */}
-        <article className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-stone-200/85 bg-white p-6 shadow-[0_1px_2px_rgba(24,24,27,0.03),0_10px_28px_-10px_rgba(24,24,27,0.06)] lg:col-span-5 dark:border-white/[0.08] dark:bg-[#12131c]">
+        {/* Card 2: Auditable proof (5 cols) */}
+        <article className="flex flex-col justify-between rounded-xl border border-zinc-200/80 bg-white p-6 lg:col-span-5 dark:border-white/[0.08] dark:bg-[#111114]">
           <div>
             <div className="flex items-center justify-between gap-2">
-              <Badge tone="ink">
-                <ShieldCheck aria-hidden className="size-3" /> Auditable proof
+              <Badge tone="neutral">
+                <ShieldCheck aria-hidden className="size-3 text-emerald-700 dark:text-emerald-400" /> Auditable proof
               </Badge>
-              <span className="text-[11px] font-semibold text-zinc-400">Not a promise</span>
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Not a promise</span>
             </div>
-            <h3 className="mt-4 text-xl font-bold tracking-tight text-zinc-950 dark:text-white">A boundary you can inspect</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-              Every AI request writes an immutable record to the Privacy Ledger with its exact payload, mode, model, and size — exportable as JSON.
+            <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">A boundary you can inspect</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Every AI request writes a record to the Privacy Ledger with its exact payload, mode, model, and size — exportable as JSON.
             </p>
           </div>
-          <div className="mt-5 flex items-center gap-4 rounded-xl bg-stone-50/95 px-4 py-3 ring-1 ring-stone-200/85 dark:bg-[#0b0c14]/70 dark:ring-white/[0.08]">
-            <span className="text-4xl leading-none font-extrabold text-teal-700 tabular-nums dark:text-teal-400">0</span>
-            <div className="text-xs leading-snug text-zinc-600 dark:text-zinc-300">
+          <div className="mt-5 flex items-center gap-4 border-t border-zinc-100 pt-4 dark:border-white/[0.06]">
+            <span className="text-3xl leading-none font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">0</span>
+            <div className="text-xs leading-snug text-zinc-500 dark:text-zinc-400">
               <strong className="block font-semibold text-zinc-900 dark:text-white">Raw transactions sent</strong>
-              Computed directly from ledger records + enforced by CSP
+              Counted from the Privacy Ledger records. On the hosted app, a content security policy also limits which servers the page can
+              reach.
             </div>
           </div>
         </article>
 
-        {/* Bento 3: Full-width Velvet Obsidian showcase card (12 cols) */}
-        <article className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-[#0e101c] via-[#14172b] to-[#0b0c14] p-6 text-white shadow-[0_18px_48px_-14px_rgba(12,13,36,0.55)] sm:p-7 lg:col-span-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(40rem_20rem_at_100%_0%,rgba(129,140,248,0.18),transparent_60%),radial-gradient(30rem_16rem_at_0%_100%,rgba(45,212,191,0.12),transparent_60%)]"
-          />
-          <div className="relative grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+        {/* Card 3: Local function calling bridge (12 cols) */}
+        <article className="min-w-0 rounded-xl border border-zinc-200/80 bg-white p-6 lg:col-span-12 dark:border-white/[0.08] dark:bg-[#111114]">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-400/15 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-200 ring-1 ring-indigo-400/30">
-                  <Sparkles aria-hidden className="size-3" /> Cloud thinks · Device holds data
-                </span>
-                <code className="rounded-md bg-white/[0.08] px-2 py-0.5 font-mono text-[11px] text-zinc-300">ONLY_IN_CLOUD + Local Functions</code>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Badge tone="cloud">
+                  <Cloud aria-hidden className="size-3" /> Cloud thinks · Device holds data
+                </Badge>
+                <code className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">ONLY_IN_CLOUD + Local Functions</code>
               </div>
-              <h3 className="mt-4 text-xl font-bold tracking-tight text-white sm:text-2xl">
+              <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 sm:text-xl dark:text-white">
                 Ask the Advisor anything about your totals
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 The cloud advisor cannot read your bank statement. It invokes local functions inside your browser that query IndexedDB and return
                 aggregated totals only — while an on-device guard blocks accidentally pasted statement rows before they leave.
               </p>
@@ -562,26 +534,26 @@ function ProfileEditor() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3">
-        <span className="flex size-10 items-center justify-center rounded-xl bg-ink-50 text-ink-800 ring-1 ring-ink-200/80 dark:bg-indigo-950/70 dark:text-indigo-300 dark:ring-indigo-700/60">
-          <Laptop aria-hidden className="size-5" />
+        <span className="flex size-9 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-zinc-700 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-zinc-300">
+          <Laptop aria-hidden className="size-4" />
         </span>
         <div>
-          <h3 className="font-bold text-zinc-950 dark:text-white">Your business</h3>
+          <h3 className="text-sm font-semibold text-zinc-950 dark:text-white">Your business</h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Private context for the on-device model</p>
         </div>
       </div>
 
-      <label htmlFor="profile" className="mt-4 block text-sm text-zinc-600 dark:text-zinc-300">
+      <label htmlFor="profile" className="mt-4 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
         What does your business pay for? Pick a starter or describe your work:
       </label>
 
-      <div className="mt-2.5 flex flex-wrap gap-1.5">
+      <div className="mt-2 flex flex-wrap gap-1.5">
         {PROFILE_PRESETS.map((preset) => (
           <button
             key={preset.label}
             type="button"
             onClick={() => void persist(preset.text)}
-            className="rounded-full bg-stone-50 px-2.5 py-1 text-xs font-semibold text-zinc-700 ring-1 ring-stone-200/90 transition-colors hover:bg-ink-50 hover:text-ink-900 hover:ring-ink-200 dark:bg-white/[0.05] dark:text-zinc-200 dark:ring-white/10 dark:hover:bg-indigo-500/15 dark:hover:text-indigo-300"
+            className="rounded-md border border-zinc-200/80 bg-zinc-50/70 px-2.5 py-1 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-100 hover:text-zinc-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300 dark:hover:border-white/[0.15] dark:hover:bg-white/[0.07] dark:hover:text-white"
           >
             + {preset.label}
           </button>
@@ -598,16 +570,16 @@ function ProfileEditor() {
         }}
         onBlur={() => void save()}
         placeholder="Freelance graphic designer. Business tools: design software, stock photos, coworking desk, portfolio website."
-        className="mt-3 w-full rounded-xl border border-stone-200 bg-stone-50/60 p-3 text-sm leading-relaxed text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-ink-700 focus:bg-white focus:outline-none dark:border-white/10 dark:bg-[#0b0c14]/70 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-indigo-400 dark:focus:bg-[#0b0c14]"
+        className="mt-3 w-full rounded-lg border border-zinc-200/90 bg-zinc-50/50 p-3 text-sm leading-relaxed text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-white focus:outline-none dark:border-white/[0.09] dark:bg-white/[0.02] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-400 dark:focus:bg-[#111114]"
       />
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-          <Lock aria-hidden className="size-3.5 text-teal-700 dark:text-teal-400" /> Stays on this device. Never sent to the cloud.
+          <Lock aria-hidden className="size-3 text-emerald-700 dark:text-emerald-400" /> Stays on this device. Never sent to the cloud.
         </p>
         <Button
           variant={saved ? 'device' : dirty ? 'primary' : 'ghost'}
-          className="min-h-8 shrink-0 rounded-lg px-3 text-xs"
+          className="min-h-8 shrink-0 px-3 text-xs"
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => void save()}
           disabled={!dirty && !saved}
