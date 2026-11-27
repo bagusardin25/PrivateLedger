@@ -7,7 +7,7 @@ Private Ledger helps freelancers separate business from personal spending in a b
 Built for [#BuildHybridAI 2026](https://firebasehybridaihackathon.devpost.com/) with **Firebase AI Logic** hybrid inference. Platform: Web (Chrome desktop).
 
 - Live app: https://private-ledger.web.app
-- Demo video: _link added at submission_
+- Demo video: https://youtu.be/SxASQV2i_28
 
 ![Private Ledger home screen: "Sort business from personal spending. Your bank statement never leaves your laptop." with an interactive preview of transactions sorted on the laptop](docs/screenshots/home.png)
 
