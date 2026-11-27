@@ -265,7 +265,7 @@ export function DataBoundaryPanel() {
               </ol>
             )}
             <a
-              href="#/ledger"
+              href="/ledger"
               className="mt-3 flex items-center justify-between rounded-lg border border-line px-3 py-2 text-xs font-medium text-fg-secondary transition-colors hover:border-line-strong hover:bg-sunken hover:text-fg"
             >
               <span>Open Privacy Ledger</span>

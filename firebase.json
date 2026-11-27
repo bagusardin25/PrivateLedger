@@ -4,6 +4,7 @@
     "public": "app/dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "predeploy": ["npm --prefix app run build"],
+    "rewrites": [{ "source": "**", "destination": "/index.html" }],
     "headers": [
       {
         "source": "/assets/**",
@@ -11,6 +12,14 @@
       },
       {
         "source": "/index.html",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "source": "/",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "source": "/@(import|transactions|review|summary|advisor|ledger)",
         "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
       },
       {

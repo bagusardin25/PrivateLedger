@@ -5,6 +5,8 @@
 import { detectDateOrder, detectDecimalMark, guessMapping, normalizeDate, parseAmount, toRawRows } from '../src/lib/core/csv.ts';
 import { currencyInText, detectCurrency, pickCurrency } from '../src/lib/core/currency.ts';
 import { normalizeMerchant } from '../src/lib/core/merchant.ts';
+import { readFileSync } from 'node:fs';
+import Papa from 'papaparse';
 
 let failures = 0;
 function eq(actual: unknown, expected: unknown, label: string) {
@@ -171,6 +173,29 @@ const MERCHANTS: [string, string][] = [
 ];
 for (const [input, key] of MERCHANTS) eq(normalizeMerchant(input).key, key, `normalizeMerchant(${JSON.stringify(input)})`);
 
-const total = DATES.length + 4 + AMOUNTS.length + 3 + 2 + MARKED.length + 4 + 13 + 2 + 1 + MERCHANTS.length;
+// The sample statements in samples/ import cleanly with no help from the browser's locale.
+function readSample(name: string) {
+  const text = readFileSync(new URL(`../../samples/${name}`, import.meta.url), 'utf8');
+  const result = Papa.parse<Record<string, string>>(text, { header: true, skipEmptyLines: 'greedy', transformHeader: (h) => h.trim() });
+  return { headers: (result.meta.fields ?? []).filter(Boolean), rows: result.data };
+}
+const SAMPLES: [string, string, number, number][] = [
+  // file, currency, rows, first amount
+  ['statement-rupiah.csv', 'IDR', 26, 7500000],
+  ['statement-euro.csv', 'EUR', 22, 2400],
+];
+for (const [file, currency, count, first] of SAMPLES) {
+  const sample = readSample(file);
+  const mapping = guessMapping(sample.headers, sample.rows);
+  const imported = toRawRows(sample, mapping);
+  const keys = new Set(imported.rows.map((r) => normalizeMerchant(r.description).key));
+  eq(
+    [mapping.currency, mapping.decimalMark, imported.rows.length, imported.skipped, imported.unreadDates, imported.rows[0]?.amount, keys.size === imported.rows.length],
+    [currency, 'comma', count, 0, 0, first, true],
+    `sample ${file}`,
+  );
+}
+
+const total = DATES.length + 4 + AMOUNTS.length + 3 + 2 + MARKED.length + 4 + 13 + 2 + 1 + MERCHANTS.length + SAMPLES.length;
 console.log(`${failures === 0 ? 'PASS' : 'FAIL'}  CSV helpers: ${total - failures}/${total} checks`);
 process.exitCode = failures ? 1 : 0;

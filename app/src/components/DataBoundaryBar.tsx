@@ -14,7 +14,7 @@ export function DataBoundaryBar() {
 
   return (
     <a
-      href="#/ledger"
+      href="/ledger"
       aria-label="Privacy summary. Open the Privacy Ledger."
       className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl border border-line bg-surface px-4 py-2.5 text-xs transition-colors hover:border-line-strong lg:hidden"
     >

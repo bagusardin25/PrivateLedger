@@ -130,7 +130,7 @@ For the 40-row demo statement, rules sort 13 rows and the model sees 27 unique m
 
 The demo still works. Saved rules sort part of it, and for the rest you choose: sort by hand in Review, or send the demo rows to Cloud AI after seeing exactly what will be sent. Demo rows sent this way are counted separately from your own data. Nothing moves to the cloud on its own.
 
-Then write the monthly summary, ask the advisor a question, and paste a line from the demo into the chat to watch the privacy check stop it. To see currencies at work, import a statement from your own bank, or any CSV with amounts in rupiah or euros.
+Then write the monthly summary, ask the advisor a question, and paste a line from the demo into the chat to watch the privacy check stop it. To see currencies at work, import [`samples/statement-rupiah.csv`](samples/statement-rupiah.csv) (an Indonesian bank format) or [`samples/statement-euro.csv`](samples/statement-euro.csv) (a German bank format). Both are invented. You can also use a statement from your own bank.
 
 ## Run it locally
 
@@ -211,6 +211,7 @@ app/src/
 app/scripts/      tests that run in Node, and the local hosting preview
 spike/go-no-go/   the test page used to check on-device and cloud inference before building
 docs/screenshots/ the screenshots in this README
+samples/          invented bank statements in rupiah and euros, for trying the importer
 ```
 
 There is no backend. Transactions, merchant memory, and the ledger live in IndexedDB in your browser. The only network destinations are Firebase AI Logic and App Check, which loads reCAPTCHA in production.

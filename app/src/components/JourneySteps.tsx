@@ -1,7 +1,7 @@
 // Compact horizontal stepper for the product journey: import, label, review, export.
 
 import { Check, ChevronRight } from 'lucide-react';
-import type { Route } from '../lib/state/actions';
+import { routePath, type Route } from '../lib/state/actions';
 import { useJourneyCounts, useLastExport } from '../lib/state/journey';
 import { labelingStore } from '../lib/ai/labelingRunner';
 import { useStore } from '../lib/util/store';
@@ -62,7 +62,7 @@ export function JourneySteps({ route }: { route: Route }) {
           return (
             <li key={step.id} className="relative flex items-center">
               <a
-                href={`#/${step.id}`}
+                href={routePath(step.id)}
                 aria-current={here ? 'step' : undefined}
                 className={`group flex w-full items-center gap-2.5 px-3.5 py-2.5 transition-colors duration-150 ${
                   here
