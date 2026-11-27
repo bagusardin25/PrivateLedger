@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "private-ledger",
     "public": "app/dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "predeploy": ["npm --prefix app run build"],
