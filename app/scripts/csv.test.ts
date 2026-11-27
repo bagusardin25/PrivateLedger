@@ -179,19 +179,20 @@ function readSample(name: string) {
   const result = Papa.parse<Record<string, string>>(text, { header: true, skipEmptyLines: 'greedy', transformHeader: (h) => h.trim() });
   return { headers: (result.meta.fields ?? []).filter(Boolean), rows: result.data };
 }
-const SAMPLES: [string, string, number, number][] = [
-  // file, currency, rows, first amount
-  ['statement-rupiah.csv', 'IDR', 26, 7500000],
-  ['statement-euro.csv', 'EUR', 22, 2400],
+const SAMPLES: [string, string, string, number, number][] = [
+  // file, currency, decimal mark, rows, first amount
+  ['statement-rupiah.csv', 'IDR', 'comma', 26, 7500000],
+  ['statement-euro.csv', 'EUR', 'comma', 22, 2400],
+  ['statement-usd.csv', 'USD', 'dot', 40, -59.99],
 ];
-for (const [file, currency, count, first] of SAMPLES) {
+for (const [file, currency, decimalMark, count, first] of SAMPLES) {
   const sample = readSample(file);
   const mapping = guessMapping(sample.headers, sample.rows);
   const imported = toRawRows(sample, mapping);
   const keys = new Set(imported.rows.map((r) => normalizeMerchant(r.description).key));
   eq(
     [mapping.currency, mapping.decimalMark, imported.rows.length, imported.skipped, imported.unreadDates, imported.rows[0]?.amount, keys.size === imported.rows.length],
-    [currency, 'comma', count, 0, 0, first, true],
+    [currency, decimalMark, count, 0, 0, first, true],
     `sample ${file}`,
   );
 }

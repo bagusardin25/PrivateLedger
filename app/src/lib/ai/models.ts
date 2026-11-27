@@ -14,9 +14,13 @@
 // Firebase AI Logic sends an ONLY_ON_DEVICE request to the cloud when the
 // browser has no `LanguageModel` API (see onDevice.ts). Callers of `labeler`
 // and `guard` must therefore pass assertOnDeviceReady() first.
+//
+// The getter of every instance that can reach the cloud calls recoverAppCheck()
+// first: if App Check was set up while offline, that finishes the setup (see
+// firebase.ts).
 
 import { getGenerativeModel, InferenceMode, Schema, type GenerativeModel } from 'firebase/ai';
-import { getFirebase } from './firebase';
+import { getFirebase, recoverAppCheck } from './firebase';
 import { FUNCTION_DECLARATIONS } from './localFunctions';
 import { TEXT_EN } from './onDevice';
 import { CATEGORIES } from '../core/taxonomy';
@@ -84,6 +88,7 @@ let consentLabeler: GenerativeModel | undefined;
  * send rows because on-device AI is unavailable.
  */
 export function getConsentLabelerModel(): GenerativeModel {
+  recoverAppCheck();
   consentLabeler ??= getGenerativeModel(getFirebase().ai, {
     mode: InferenceMode.ONLY_IN_CLOUD,
     inCloudParams: {
@@ -153,6 +158,7 @@ let explainer: GenerativeModel | undefined;
  * cloud, which the app only allows after the user agrees (see explainer.ts).
  */
 export function getExplainerModel(): GenerativeModel {
+  recoverAppCheck();
   explainer ??= getGenerativeModel(getFirebase().ai, {
     mode: InferenceMode.PREFER_ON_DEVICE,
     inCloudParams: {
@@ -190,6 +196,7 @@ let reporter: GenerativeModel | undefined;
  * writes better; when the cloud cannot answer, the SDK falls back to Gemini Nano.
  */
 export function getReporterModel(): GenerativeModel {
+  recoverAppCheck();
   reporter ??= getGenerativeModel(getFirebase().ai, {
     mode: InferenceMode.PREFER_IN_CLOUD,
     inCloudParams: {
@@ -230,6 +237,7 @@ let advisor: GenerativeModel | undefined;
 
 /** `advisor`: ONLY_IN_CLOUD. Multi-turn chat and function calling only exist in the cloud. */
 export function getAdvisorModel(): GenerativeModel {
+  recoverAppCheck();
   advisor ??= getGenerativeModel(getFirebase().ai, {
     mode: InferenceMode.ONLY_IN_CLOUD,
     inCloudParams: { model: CLOUD_MODEL, systemInstruction: ADVISOR_SYSTEM, tools: [{ functionDeclarations: FUNCTION_DECLARATIONS }] },

@@ -7,7 +7,7 @@ Private Ledger helps freelancers separate business from personal spending in a b
 Built for [#BuildHybridAI 2026](https://firebasehybridaihackathon.devpost.com/) with **Firebase AI Logic** hybrid inference. Platform: Web (Chrome desktop).
 
 - Live app: https://private-ledger.web.app
-- Demo video: _link added at submission_
+- Demo video: https://youtu.be/SxASQV2i_28
 
 ![Private Ledger home screen: "Sort business from personal spending. Your bank statement never leaves your laptop." with an interactive preview of transactions sorted on the laptop](docs/screenshots/home.png)
 
@@ -110,6 +110,8 @@ For the 40-row demo statement, rules sort 13 rows and the model sees 27 unique m
 
 **A failed `sendMessage` breaks the SDK's `ChatSession` for good.** Later calls on the same session reject with the old error. The advisor keeps its own copy of the history and builds a fresh session for every request, so a timeout or a retry never corrupts the conversation ([`advisor.ts`](app/src/lib/ai/advisor.ts)).
 
+**A first AI call made offline could switch App Check off for the whole visit.** Firebase and App Check are set up on the first AI call. Sorting works offline, so that call can happen without a connection, and the App Check SDK (13.2.0) adds its reCAPTCHA script with no handler for a failed load. Every later cloud request then waited for a token that could not come, until the page was reloaded. The app watches that script and loads it again when the connection returns ([`firebase.ts`](app/src/lib/ai/firebase.ts)), so sorting offline and then asking Cloud AI works in one visit.
+
 **It installs as an app and starts offline.** Private Ledger is an installable web app. A service worker, generated at build time with the exact file list of that build, caches only the app's own files, so the installed app opens without a connection and sorting keeps working. Requests to Firebase AI Logic, App Check, and reCAPTCHA are never cached or touched by the worker.
 
 **The browser enforces the privacy line too.** `firebase.json` sends a Content-Security-Policy whose `connect-src` only allows Firebase AI Logic, App Check, and reCAPTCHA, so the page cannot send data anywhere else. `npm run preview:hosting` serves the production build with the same headers for a local check.
@@ -130,7 +132,7 @@ For the 40-row demo statement, rules sort 13 rows and the model sees 27 unique m
 
 The demo still works. Saved rules sort part of it, and for the rest you choose: sort by hand in Review, or send the demo rows to Cloud AI after seeing exactly what will be sent. Demo rows sent this way are counted separately from your own data. Nothing moves to the cloud on its own.
 
-Then write the monthly summary, ask the advisor a question, and paste a line from the demo into the chat to watch the privacy check stop it. To see currencies at work, import [`samples/statement-rupiah.csv`](samples/statement-rupiah.csv) (an Indonesian bank format) or [`samples/statement-euro.csv`](samples/statement-euro.csv) (a German bank format). Both are invented. You can also use a statement from your own bank.
+Then write the monthly summary, ask the advisor a question, and paste a line from the demo into the chat to watch the privacy check stop it. To see currencies at work, import [`samples/statement-rupiah.csv`](samples/statement-rupiah.csv) (an Indonesian bank format), [`samples/statement-euro.csv`](samples/statement-euro.csv) (a German bank format), or [`samples/statement-usd.csv`](samples/statement-usd.csv) (a US bank format). All three are invented. You can also use a statement from your own bank.
 
 ## Run it locally
 
@@ -211,7 +213,7 @@ app/src/
 app/scripts/      tests that run in Node, and the local hosting preview
 spike/go-no-go/   the test page used to check on-device and cloud inference before building
 docs/screenshots/ the screenshots in this README
-samples/          invented bank statements in rupiah and euros, for trying the importer
+samples/          invented bank statements in rupiah, euros, and US dollars, for trying the importer
 ```
 
 There is no backend. Transactions, merchant memory, and the ledger live in IndexedDB in your browser. The only network destinations are Firebase AI Logic and App Check, which loads reCAPTCHA in production.
