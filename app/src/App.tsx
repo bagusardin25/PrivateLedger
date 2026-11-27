@@ -1,21 +1,46 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Wifi, WifiOff } from 'lucide-react';
-import { useEffect, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import { DataBoundaryBar } from './components/DataBoundaryBar';
 import { DataBoundaryPanel } from './components/DataBoundaryPanel';
 import { JourneySteps } from './components/JourneySteps';
 import { ModelStatusChip } from './components/ModelStatus';
-import { BrandMark } from './components/ui';
+import { BrandMark, Card } from './components/ui';
 import { consumeSetupRequest, type Route } from './lib/state/actions';
 import { db } from './lib/data/db';
 import { refreshDeviceStatus, useOnline } from './lib/state/device';
-import { AdvisorView } from './views/AdvisorView';
-import { ImportView } from './views/ImportView';
-import { LedgerView } from './views/LedgerView';
-import { ReviewView } from './views/ReviewView';
-import { SummaryView } from './views/SummaryView';
-import { TransactionsView } from './views/TransactionsView';
 import { WelcomeView } from './views/WelcomeView';
+
+// Home is part of the first download; every other screen is its own chunk.
+const loaders = {
+  import: () => import('./views/ImportView').then((m) => ({ default: m.ImportView })),
+  transactions: () => import('./views/TransactionsView').then((m) => ({ default: m.TransactionsView })),
+  review: () => import('./views/ReviewView').then((m) => ({ default: m.ReviewView })),
+  summary: () => import('./views/SummaryView').then((m) => ({ default: m.SummaryView })),
+  advisor: () => import('./views/AdvisorView').then((m) => ({ default: m.AdvisorView })),
+  ledger: () => import('./views/LedgerView').then((m) => ({ default: m.LedgerView })),
+};
+const ImportView = lazy(loaders.import);
+const TransactionsView = lazy(loaders.transactions);
+const ReviewView = lazy(loaders.review);
+const SummaryView = lazy(loaders.summary);
+const AdvisorView = lazy(loaders.advisor);
+const LedgerView = lazy(loaders.ledger);
+
+/** Fetches the other screens once the first one is idle, so switching screens never waits on the network. */
+function prefetchScreens(): () => void {
+  const run = () => Object.values(loaders).forEach((load) => void load());
+  if ('requestIdleCallback' in window) {
+    const id = window.requestIdleCallback(run, { timeout: 3000 });
+    return () => window.cancelIdleCallback(id);
+  }
+  const timer = setTimeout(run, 1500);
+  return () => clearTimeout(timer);
+}
+
+function Screen({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<Card className="text-sm text-slate-600">Loading…</Card>}>{children}</Suspense>;
+}
 
 const ALL_ROUTES: Route[] = ['welcome', 'import', 'transactions', 'review', 'summary', 'advisor', 'ledger'];
 
@@ -49,7 +74,11 @@ export function App() {
     void refreshDeviceStatus();
     const onFocus = () => void refreshDeviceStatus();
     window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
+    const cancelPrefetch = prefetchScreens();
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      cancelPrefetch();
+    };
   }, []);
 
   useEffect(() => {
@@ -115,16 +144,20 @@ export function App() {
           {route === 'ledger' ? (
             // The ledger is the full version of the panel, so it gets the whole width.
             <main id="main" tabIndex={-1} className="min-w-0 focus:outline-none">
-              <LedgerView />
+              <Screen>
+                <LedgerView />
+              </Screen>
             </main>
           ) : (
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
               <main id="main" tabIndex={-1} className="min-w-0 focus:outline-none">
-                {route === 'import' && <ImportView />}
-                {route === 'transactions' && <TransactionsView />}
-                {route === 'review' && <ReviewView />}
-                {route === 'summary' && <SummaryView />}
-                {route === 'advisor' && <AdvisorView />}
+                <Screen>
+                  {route === 'import' && <ImportView />}
+                  {route === 'transactions' && <TransactionsView />}
+                  {route === 'review' && <ReviewView />}
+                  {route === 'summary' && <SummaryView />}
+                  {route === 'advisor' && <AdvisorView />}
+                </Screen>
               </main>
               <div className="lg:sticky lg:top-20 lg:self-start">
                 <DataBoundaryPanel />
