@@ -23,30 +23,30 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center px-6 text-center">
-        <div className="w-full rounded-2xl border border-slate-200/80 bg-white p-8 shadow-[0_8px_30px_-8px_rgba(15,23,42,0.12)]">
-          <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-700 ring-1 ring-amber-200">
-            <ShieldAlert aria-hidden className="size-6" />
+      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 text-center">
+        <div className="w-full rounded-xl border border-zinc-200/80 bg-white p-7 dark:border-white/[0.08] dark:bg-[#111114]">
+          <span className="mx-auto flex size-10 items-center justify-center rounded-lg border border-amber-200/80 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+            <ShieldAlert aria-hidden className="size-5" />
           </span>
-          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">Something went wrong on this screen</h1>
-          <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
+          <h1 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">Something went wrong on this screen</h1>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
             Your transactions and the Privacy Ledger are still safely stored in this browser. Reloading brings the app back, and nothing was sent anywhere.
           </p>
-          <pre className="code-inspector mt-5 max-h-36 w-full overflow-auto rounded-xl p-3.5 text-left font-mono text-xs leading-relaxed">
+          <pre className="code-inspector mt-5 max-h-36 w-full overflow-auto rounded-lg border border-zinc-800 p-3 text-left font-mono text-xs leading-relaxed">
             {this.state.error.message}
           </pre>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-2.5">
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="inline-flex min-h-10 items-center rounded-xl bg-gradient-to-b from-ink-700 to-ink-800 px-4 text-sm font-medium text-white shadow-sm transition hover:from-ink-600 hover:to-ink-700"
+              className="inline-flex min-h-9 items-center rounded-lg bg-zinc-900 px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-white"
             >
               Reload the app
             </button>
             <a
               href="#/welcome"
               onClick={() => this.setState({ error: undefined })}
-              className="inline-flex min-h-10 items-center rounded-xl bg-white px-4 text-sm font-medium text-slate-900 shadow-xs ring-1 ring-slate-200 ring-inset transition hover:bg-slate-50"
+              className="inline-flex min-h-9 items-center rounded-lg border border-zinc-200 bg-white px-3.5 text-[13px] font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-white/[0.1] dark:bg-[#16161a] dark:text-zinc-100 dark:hover:bg-white/[0.06]"
             >
               Go to Home
             </a>

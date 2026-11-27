@@ -1,24 +1,83 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Self-hosted variable fonts bundled locally by Vite (zero third-party requests, CSP font-src 'self'). */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
 @theme {
-  /* System fonts only: a privacy app should not fetch fonts from a third party. */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Ink: primary actions and "business". Device = emerald, cloud = sky, needs you = amber, blocked = rose. */
-  --color-ink-50: #eef4fb;
-  --color-ink-100: #d9e6f4;
-  --color-ink-200: #b8cfe8;
-  --color-ink-300: #8cb2da;
-  --color-ink-400: #5c8cc2;
-  --color-ink-500: #3a68a0;
-  --color-ink-600: #2a5182;
-  --color-ink-700: #20416b;
-  --color-ink-800: #173256;
-  --color-ink-900: #102440;
-  --color-ink-950: #0a182c;
+  /*
+   * Quiet Precision Fintech Palette (inspired by Mercury, Linear & Ramp):
+   * - Canvas: Soft Alabaster (#f8f8f7) / Deep Obsidian (#09090b)
+   * - Surface: Pure White (#ffffff) / Elevated Charcoal (#111114)
+   * - Primary Ink: Architectural Near-Black (#18181b) / Crisp Porcelain (#fafafa)
+   * - Semantic accents reserved strictly for meaning:
+   *     Local/Verified (Emerald), Cloud Totals (Indigo), Review (Amber), Blocked (Rose)
+   */
+  --color-canvas: #f8f8f7;
+  --color-surface: #ffffff;
+  --color-obsidian: #09090b;
+  --color-obsidian-card: #111114;
+}
 
-  --color-canvas: #f5f7fb;
+:root {
+  /* Restrained editorial financial chart series */
+  --chart-0: #18181b;
+  --chart-1: #047857;
+  --chart-2: #4338ca;
+  --chart-3: #b45309;
+  --chart-4: #64748b;
+  --chart-5: #0f766e;
+  --chart-6: #9f1239;
+  --chart-7: #a1a1aa;
+}
+
+.dark {
+  --chart-0: #e4e4e7;
+  --chart-1: #34d399;
+  --chart-2: #818cf8;
+  --chart-3: #fbbf24;
+  --chart-4: #94a3b8;
+  --chart-5: #2dd4bf;
+  --chart-6: #fb7185;
+  --chart-7: #71717a;
 }
 
 @layer base {
@@ -28,9 +87,14 @@
   }
   body {
     background-color: var(--color-canvas);
-    color: var(--color-slate-900);
+    color: var(--color-zinc-900);
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    @apply antialiased selection:bg-ink-100 selection:text-ink-950;
+    @apply antialiased transition-colors duration-200 selection:bg-zinc-900 selection:text-white;
+  }
+  .dark body {
+    background-color: var(--color-obsidian);
+    color: var(--color-zinc-100);
+    @apply selection:bg-zinc-200 selection:text-zinc-950;
   }
   button:not(:disabled),
   [role='button']:not([aria-disabled='true']),
@@ -40,96 +104,98 @@
     cursor: pointer;
   }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-ink-700;
+    @apply outline-2 outline-offset-2 outline-zinc-900 dark:outline-zinc-300;
   }
-}
-
-/* Subtle dot-grid surface texture for hero and featured surfaces. */
-.bg-dot-grid {
-  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
-  background-size: 20px 20px;
 }
 
 /* Crisp dark terminal styling for exact cloud payload previews. */
 .code-inspector {
-  background: linear-gradient(180deg, #0d1526 0%, #0a1120 100%);
-  color: #e2ecf8;
+  background-color: #111114;
+  color: #e4e4e7;
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  scrollbar-color: rgba(161, 161, 170, 0.25) transparent;
 }
 
 .code-inspector::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 .code-inspector::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.35);
+  background-color: rgba(161, 161, 170, 0.25);
   border-radius: 9999px;
 }
 
 /* Slim, unobtrusive scrollbars for side panels and tables. */
 .thin-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+  scrollbar-color: rgba(161, 161, 170, 0.3) transparent;
 }
 
 .thin-scroll::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 .thin-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.45);
+  background-color: rgba(161, 161, 170, 0.3);
   border-radius: 9999px;
 }
 
-/* A labeled row briefly glows green: it was labeled on this device. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* A labeled row briefly glows subtle emerald: it was labeled on this device. */
 @keyframes arrive {
   0% {
-    background-color: rgba(16, 185, 129, 0.16);
+    background-color: rgba(5, 150, 105, 0.12);
   }
   100% {
     background-color: transparent;
   }
 }
 
-/* Data Boundary panel: a section pulses when an AI call lands in it. */
+/* Data Boundary panel: a section pulses cleanly when an AI call lands in it. */
 @keyframes pulse-device {
   0% {
-    box-shadow: inset 0 0 0 2px var(--color-emerald-500), inset 0 0 24px rgba(16, 185, 129, 0.16);
+    box-shadow: inset 2px 0 0 0 var(--color-emerald-600), inset 0 0 24px rgba(5, 150, 105, 0.12);
   }
   100% {
-    box-shadow: inset 0 0 0 2px transparent, inset 0 0 24px transparent;
+    box-shadow: inset 2px 0 0 0 transparent, inset 0 0 24px transparent;
   }
 }
 
 @keyframes pulse-cloud {
   0% {
-    box-shadow: inset 0 0 0 2px var(--color-sky-500), inset 0 0 24px rgba(14, 165, 233, 0.16);
+    box-shadow: inset 2px 0 0 0 var(--color-indigo-600), inset 0 0 24px rgba(79, 70, 229, 0.12);
   }
   100% {
-    box-shadow: inset 0 0 0 2px transparent, inset 0 0 24px transparent;
+    box-shadow: inset 2px 0 0 0 transparent, inset 0 0 24px transparent;
   }
 }
 
 @keyframes pulse-blocked {
   0% {
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.28);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
   }
 }
 
-/* Review mode: the next decision card glides smoothly into place. */
+/* Review mode: the next decision card glides calmly into place. */
 @keyframes card-in {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.985);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -141,7 +207,7 @@
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -170,7 +236,11 @@
 
 .skeleton {
   border-radius: 6px;
-  background-color: var(--color-slate-200);
+  background-color: #ededec;
+}
+
+.dark .skeleton {
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -178,30 +248,38 @@
     animation: arrive 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-device {
-    animation: pulse-device 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: pulse-device 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-cloud {
-    animation: pulse-cloud 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: pulse-cloud 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-blocked {
-    animation: pulse-blocked 1.3s ease-out;
+    animation: pulse-blocked 1.2s ease-out;
   }
   .card-in {
-    animation: card-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: card-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .fade-up {
-    animation: fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: fade-up 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .skeleton {
     background-image: linear-gradient(
       90deg,
-      var(--color-slate-200) 0%,
-      var(--color-slate-100) 45%,
-      var(--color-slate-200) 90%
+      rgba(237, 237, 236, 0.9) 0%,
+      rgba(248, 248, 247, 0.95) 45%,
+      rgba(237, 237, 236, 0.9) 90%
     );
     background-size: 240px 100%;
     background-repeat: no-repeat;
     animation: shimmer 1.5s ease-in-out infinite;
+  }
+  .dark .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      rgba(39, 39, 42, 0.7) 0%,
+      rgba(63, 63, 70, 0.75) 45%,
+      rgba(39, 39, 42, 0.7) 90%
+    );
   }
   .indeterminate-bar {
     animation: indeterminate-bar 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;

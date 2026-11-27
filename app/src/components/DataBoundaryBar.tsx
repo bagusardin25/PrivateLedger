@@ -16,28 +16,28 @@ export function DataBoundaryBar() {
     <a
       href="#/ledger"
       aria-label="Data boundary summary. Open the Privacy Ledger."
-      className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-xs shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300 lg:hidden"
+      className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl border border-zinc-200/80 bg-white px-4 py-2.5 text-xs transition-colors hover:border-zinc-300 lg:hidden dark:border-white/[0.08] dark:bg-[#111114] dark:hover:border-white/[0.15]"
     >
-      <span className="inline-flex items-center gap-1.5 font-semibold text-slate-700">
-        <ShieldCheck aria-hidden className="size-4 text-emerald-700" />
+      <span className="inline-flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100">
+        <ShieldCheck aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" />
         Boundary
       </span>
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 font-semibold text-emerald-800 tabular-nums ring-1 ring-emerald-200/80">
-        <Laptop aria-hidden className="size-3.5" /> {rows.toLocaleString('en-US')} local
+      <span className="inline-flex items-center gap-1.5 font-medium text-zinc-600 tabular-nums dark:text-zinc-300">
+        <Laptop aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" /> {rows.toLocaleString('en-US')} local
       </span>
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-semibold tabular-nums ring-1 ${
-          nothingSent ? 'bg-emerald-50 text-emerald-800 ring-emerald-200/80' : 'bg-sky-50 text-sky-800 ring-sky-200/80'
+        className={`inline-flex items-center gap-1.5 font-medium tabular-nums ${
+          nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-700 dark:text-indigo-400'
         }`}
       >
         <Cloud aria-hidden className="size-3.5" /> {counters.rawSentUser} raw sent
       </span>
       {counters.blockedMessages > 0 && (
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 font-semibold text-rose-700 tabular-nums ring-1 ring-rose-200/80">
+        <span className="inline-flex items-center gap-1.5 font-medium text-rose-700 tabular-nums dark:text-rose-400">
           <Ban aria-hidden className="size-3.5" /> {counters.blockedMessages} blocked
         </span>
       )}
-      <span className="ml-auto inline-flex items-center gap-1 font-semibold text-ink-700">
+      <span className="ml-auto inline-flex items-center gap-1 font-medium text-zinc-500 dark:text-zinc-400">
         Ledger <ArrowRight aria-hidden className="size-3.5" />
       </span>
     </a>

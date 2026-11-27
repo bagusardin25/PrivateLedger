@@ -1,19 +1,21 @@
-import { Check, Copy, Lock } from 'lucide-react';
+import { Check, Copy, Lock, Moon, Sun } from 'lucide-react';
 import { useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { themeStore, toggleTheme } from '../lib/state/theme';
+import { useStore } from '../lib/util/store';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'device' | 'danger';
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'bg-gradient-to-b from-ink-700 to-ink-800 text-white shadow-[0_1px_2px_rgba(15,23,42,0.2),inset_0_1px_0_rgba(255,255,255,0.14)] ring-1 ring-ink-900/20 hover:from-ink-600 hover:to-ink-700 disabled:from-slate-300 disabled:to-slate-300 disabled:text-white/90 disabled:shadow-none disabled:ring-transparent',
+    'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-white disabled:bg-zinc-200 disabled:text-zinc-400 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500',
   secondary:
-    'bg-white text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.05)] ring-1 ring-inset ring-slate-200/90 hover:bg-slate-50 hover:ring-slate-300 disabled:text-slate-400 disabled:shadow-none disabled:hover:bg-white',
+    'bg-white text-zinc-900 border border-zinc-200/90 hover:bg-zinc-50 hover:border-zinc-300 dark:bg-[#16161a] dark:text-zinc-100 dark:border-white/[0.1] dark:hover:bg-white/[0.06] dark:hover:border-white/[0.16] disabled:text-zinc-400 disabled:hover:bg-white dark:disabled:hover:bg-[#16161a]',
   ghost:
-    'text-slate-600 hover:bg-slate-200/60 hover:text-slate-900 disabled:text-slate-400 disabled:hover:bg-transparent',
+    'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 disabled:text-zinc-400 disabled:hover:bg-transparent',
   device:
-    'bg-gradient-to-b from-emerald-600 to-emerald-700 text-white shadow-[0_1px_2px_rgba(6,78,59,0.22),inset_0_1px_0_rgba(255,255,255,0.18)] ring-1 ring-emerald-800/20 hover:from-emerald-500 hover:to-emerald-600 disabled:from-emerald-300 disabled:to-emerald-300 disabled:shadow-none',
+    'bg-emerald-700 text-white hover:bg-emerald-800 dark:bg-emerald-500 dark:text-zinc-950 dark:hover:bg-emerald-400 disabled:bg-emerald-200 disabled:text-emerald-700/60 dark:disabled:bg-emerald-950 dark:disabled:text-emerald-700',
   danger:
-    'bg-gradient-to-b from-rose-600 to-rose-700 text-white shadow-[0_1px_2px_rgba(136,19,55,0.22),inset_0_1px_0_rgba(255,255,255,0.16)] ring-1 ring-rose-800/20 hover:from-rose-500 hover:to-rose-600 disabled:from-rose-300 disabled:to-rose-300 disabled:shadow-none',
+    'bg-rose-600 text-white hover:bg-rose-700 dark:bg-rose-500 dark:text-white dark:hover:bg-rose-400 disabled:bg-rose-200 dark:disabled:bg-rose-950',
 };
 
 export function Button({
@@ -25,7 +27,7 @@ export function Button({
   return (
     <button
       type="button"
-      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-medium transition-all duration-150 active:scale-[0.985] disabled:cursor-not-allowed disabled:active:scale-100 ${VARIANTS[variant]} ${className}`}
+      className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-lg px-3.5 text-[13px] font-medium transition-colors duration-150 active:scale-[0.99] disabled:cursor-not-allowed disabled:active:scale-100 ${VARIANTS[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -36,15 +38,15 @@ export function Button({
 type ProgressTone = 'device' | 'cloud' | 'ink';
 
 const PROGRESS_TRACK: Record<ProgressTone, string> = {
-  device: 'bg-emerald-100/90',
-  cloud: 'bg-sky-100/90',
-  ink: 'bg-slate-200/80',
+  device: 'bg-zinc-100 dark:bg-white/[0.06]',
+  cloud: 'bg-zinc-100 dark:bg-white/[0.06]',
+  ink: 'bg-zinc-100 dark:bg-white/[0.06]',
 };
 
 const PROGRESS_FILL: Record<ProgressTone, string> = {
-  device: 'bg-gradient-to-r from-emerald-600 to-emerald-500',
-  cloud: 'bg-gradient-to-r from-sky-600 to-sky-500',
-  ink: 'bg-gradient-to-r from-ink-800 to-ink-600',
+  device: 'bg-emerald-600 dark:bg-emerald-400',
+  cloud: 'bg-indigo-600 dark:bg-indigo-400',
+  ink: 'bg-zinc-900 dark:bg-zinc-100',
 };
 
 export function ProgressBar({ value, label, tone = 'device' }: { value?: number; label: string; tone?: ProgressTone }) {
@@ -52,7 +54,7 @@ export function ProgressBar({ value, label, tone = 'device' }: { value?: number;
   const clamped = determinate ? Math.max(0, Math.min(100, value)) : undefined;
   return (
     <div
-      className={`h-2 w-full overflow-hidden rounded-full ${PROGRESS_TRACK[tone]}`}
+      className={`h-1.5 w-full overflow-hidden rounded-full ${PROGRESS_TRACK[tone]}`}
       role="progressbar"
       aria-label={label}
       aria-valuenow={clamped}
@@ -71,28 +73,36 @@ export function ProgressBar({ value, label, tone = 'device' }: { value?: number;
 type Tone = 'device' | 'cloud' | 'review' | 'danger' | 'neutral' | 'ink';
 
 const TONES: Record<Tone, string> = {
-  device: 'bg-emerald-50/90 text-emerald-800 ring-emerald-200/90',
-  cloud: 'bg-sky-50/90 text-sky-800 ring-sky-200/90',
-  review: 'bg-amber-50/90 text-amber-900 ring-amber-200/90',
-  danger: 'bg-rose-50/90 text-rose-800 ring-rose-200/90',
-  neutral: 'bg-slate-100/90 text-slate-700 ring-slate-200/80',
-  ink: 'bg-ink-50 text-ink-800 ring-ink-200/80',
+  device: 'bg-emerald-50 text-emerald-800 border-emerald-200/70 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
+  cloud: 'bg-indigo-50 text-indigo-800 border-indigo-200/70 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
+  review: 'bg-amber-50 text-amber-800 border-amber-200/80 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20',
+  danger: 'bg-rose-50 text-rose-800 border-rose-200/80 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/20',
+  neutral: 'bg-zinc-100/90 text-zinc-600 border-zinc-200/70 dark:bg-white/[0.06] dark:text-zinc-300 dark:border-white/[0.08]',
+  ink: 'bg-zinc-900 text-white border-zinc-900 dark:bg-zinc-100 dark:text-zinc-950 dark:border-zinc-100',
 };
 
 export function Badge({ tone = 'neutral', children, className = '' }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] leading-4 font-semibold tracking-[0.01em] whitespace-nowrap ring-1 ring-inset ${TONES[tone]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] leading-4 font-medium whitespace-nowrap ${TONES[tone]} ${className}`}
     >
       {children}
     </span>
   );
 }
 
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function Card({
+  children,
+  className = '',
+  padded = true,
+}: {
+  children: ReactNode;
+  className?: string;
+  padded?: boolean;
+}) {
   return (
     <section
-      className={`rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.03),0_6px_20px_-6px_rgba(15,23,42,0.06)] ${className}`}
+      className={`rounded-xl border border-zinc-200/80 bg-white dark:border-white/[0.08] dark:bg-[#111114] ${padded ? 'p-5 sm:p-6' : ''} ${className}`}
     >
       {children}
     </section>
@@ -103,9 +113,9 @@ export function BrandMark({ className = '' }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className={`inline-flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-ink-600 via-ink-800 to-ink-950 text-white shadow-[0_2px_8px_-2px_rgba(23,50,86,0.5),inset_0_1px_0_rgba(255,255,255,0.22)] ${className}`}
+      className={`inline-flex size-7 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 ${className}`}
     >
-      <Lock className="size-4" strokeWidth={2.25} />
+      <Lock className="size-3.5" strokeWidth={2.2} />
     </span>
   );
 }
@@ -113,7 +123,7 @@ export function BrandMark({ className = '' }: { className?: string }) {
 export function Kbd({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <kbd
-      className={`inline-flex min-w-5 items-center justify-center rounded-md border border-slate-300/90 bg-white px-1.5 py-0.5 font-mono text-[11px] leading-none font-semibold text-slate-700 shadow-[0_1px_0_rgba(15,23,42,0.08)] ${className}`}
+      className={`inline-flex min-w-5 items-center justify-center rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 font-mono text-[10px] leading-none font-medium text-zinc-600 dark:border-white/[0.12] dark:bg-white/[0.05] dark:text-zinc-300 ${className}`}
     >
       {children}
     </kbd>
@@ -138,14 +148,30 @@ export function CopyButton({ text, label = 'Copy', dark = false }: { text: strin
       type="button"
       onClick={() => void onCopy()}
       aria-label={copied ? 'Copied to clipboard' : label}
-      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
         dark
-          ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+          ? 'text-zinc-400 hover:bg-white/[0.08] hover:text-zinc-100'
+          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/[0.08] dark:hover:text-zinc-100'
       }`}
     >
-      {copied ? <Check aria-hidden className="size-3 text-emerald-400" /> : <Copy aria-hidden className="size-3" />}
+      {copied ? <Check aria-hidden className="size-3 text-emerald-500" /> : <Copy aria-hidden className="size-3" />}
       {copied ? 'Copied' : label}
+    </button>
+  );
+}
+
+export function ThemeToggle() {
+  const { theme } = useStore(themeStore);
+  const dark = theme === 'dark';
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="inline-flex size-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-white/[0.07] dark:hover:text-zinc-100"
+    >
+      {dark ? <Sun aria-hidden className="size-4" /> : <Moon aria-hidden className="size-4" />}
     </button>
   );
 }

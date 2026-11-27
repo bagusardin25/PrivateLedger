@@ -3,10 +3,11 @@
 // numbers the Data Boundary panel shows.
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Ban, ChevronDown, Cloud, Cpu, Download, Inbox, ShieldCheck, Tag, Terminal, type LucideIcon } from 'lucide-react';
+import { ChevronDown, Download, Inbox, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
+import { PayloadViewer } from '../components/PayloadViewer';
 import { SOURCE_META } from '../components/sourceMeta';
-import { Badge, Button, Card, CopyButton } from '../components/ui';
+import { Badge, Button, Card } from '../components/ui';
 import { navigate } from '../lib/state/actions';
 import { db, type LedgerEntry, type LedgerSource } from '../lib/data/db';
 import { downloadText } from '../lib/data/export';
@@ -43,7 +44,7 @@ export function LedgerView() {
         <div className="skeleton h-6 w-40" />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-6">
           {[0, 1, 2, 3, 4].map((n) => (
-            <div key={n} className="skeleton h-24 rounded-xl" />
+            <div key={n} className="skeleton h-20 rounded-lg" />
           ))}
         </div>
       </Card>
@@ -64,87 +65,80 @@ export function LedgerView() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950">Privacy Ledger</h1>
-          <p className="mt-1 max-w-2xl text-sm text-slate-500">
+          <h1 className="text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">Privacy Ledger</h1>
+          <p className="mt-0.5 max-w-2xl text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
             Every AI call this app made, and the exact payload of each request that left this device. All counters are computed directly from these records.
           </p>
         </div>
-        <Button variant="secondary" onClick={exportJson} disabled={entries.length === 0}>
-          <Download aria-hidden className="size-4" /> Export ledger JSON
+        <Button variant="secondary" className="min-h-8.5 px-3 text-xs" onClick={exportJson} disabled={entries.length === 0}>
+          <Download aria-hidden className="size-3.5" /> Export ledger JSON
         </Button>
       </div>
 
-      <dl className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
-        <div
-          className={`col-span-2 rounded-2xl px-5 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ring-1 md:col-span-4 xl:col-span-2 ${
-            nothingSent
-              ? 'bg-gradient-to-br from-emerald-50 via-emerald-50/60 to-white ring-emerald-200/90'
-              : 'bg-gradient-to-br from-sky-50 via-sky-50/60 to-white ring-sky-200/90'
-          }`}
-        >
-          <dt className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-            <span
-              className={`flex size-6 items-center justify-center rounded-lg ${
-                nothingSent ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'
-              }`}
-            >
-              <ShieldCheck aria-hidden className="size-3.5" />
-            </span>
+      {/* UNIFIED FORENSIC TELEMETRY STRIP */}
+      <dl className="grid grid-cols-2 divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200/80 bg-white md:grid-cols-4 xl:grid-cols-6 xl:divide-x xl:divide-y-0 dark:divide-white/[0.06] dark:border-white/[0.08] dark:bg-[#111114]">
+        <div className="col-span-2 px-5 py-4 md:col-span-4 xl:col-span-2">
+          <dt className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <ShieldCheck aria-hidden className={`size-3.5 ${nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400'}`} />
             Raw transactions sent to cloud
           </dt>
-          <dd className={`mt-2 text-4xl font-bold tracking-tight tabular-nums ${nothingSent ? 'text-emerald-800' : 'text-sky-900'}`}>
+          <dd
+            className={`mt-1.5 text-3xl font-semibold tracking-tight tabular-nums ${
+              nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-700 dark:text-indigo-400'
+            }`}
+          >
             {counters.rawSentUser}
           </dd>
-          <dd className="mt-1 text-xs text-slate-600">
-            {counters.rawSentDemo > 0 ? `Your own data · plus ${plural(counters.rawSentDemo, 'demo row')} sent with consent` : 'Your own data · verified from log'}
+          <dd className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
+            {counters.rawSentDemo > 0 ? `Your own data · +${plural(counters.rawSentDemo, 'demo row')} with consent` : 'Your own data · verified from ledger'}
           </dd>
         </div>
-        <Counter label="Merchant names shared" value={counters.merchantNamesShared} icon={Tag} tone="bg-slate-100 text-slate-600" />
-        <Counter label="Cloud requests" value={counters.cloudRequests} icon={Cloud} tone="bg-sky-50 text-sky-700" />
-        <Counter label="On-device AI calls" value={counters.onDeviceCalls} icon={Cpu} tone="bg-emerald-50 text-emerald-700" />
-        <Counter label="Messages blocked" value={counters.blockedMessages} icon={Ban} tone="bg-rose-50 text-rose-700" />
+        <Counter label="Merchant names shared" value={counters.merchantNamesShared} className="border-r border-zinc-100 md:border-r xl:border-r-0 dark:border-white/[0.06]" />
+        <Counter label="Cloud requests" value={counters.cloudRequests} className="md:border-r md:border-zinc-100 xl:border-r-0 md:dark:border-white/[0.06]" />
+        <Counter label="On-device AI calls" value={counters.onDeviceCalls} tone="text-emerald-700 dark:text-emerald-400" className="border-r border-zinc-100 md:border-r xl:border-r-0 dark:border-white/[0.06]" />
+        <Counter label="Messages blocked" value={counters.blockedMessages} tone={counters.blockedMessages > 0 ? 'text-rose-700 dark:text-rose-400' : undefined} />
       </dl>
 
-      <div role="group" aria-label="Filter ledger entries" className="inline-flex flex-wrap gap-1 rounded-xl bg-slate-200/70 p-1 ring-1 ring-slate-200/80">
+      <div
+        role="group"
+        aria-label="Filter ledger entries"
+        className="inline-flex flex-wrap items-center gap-0.5 rounded-lg border border-zinc-200/80 bg-white p-0.5 dark:border-white/[0.08] dark:bg-[#111114]"
+      >
         {FILTERS.map(([id, label]) => (
           <button
             key={id}
             type="button"
             aria-pressed={filter === id}
             onClick={() => setFilter(id)}
-            className={`inline-flex min-h-8 items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-all duration-150 ${
+            className={`inline-flex min-h-7 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors duration-150 ${
               filter === id
-                ? 'bg-white text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/5'
-                : 'text-slate-600 hover:bg-white/60 hover:text-slate-900'
+                ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
+                : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100'
             }`}
           >
             {label}
-            <span
-              className={`rounded-full px-1.5 py-0.5 text-[11px] leading-none tabular-nums ${
-                filter === id ? 'bg-slate-100 text-slate-700' : 'text-slate-500'
-              }`}
-            >
-              {count(id)}
-            </span>
+            <span className={`text-[11px] tabular-nums ${filter === id ? 'opacity-75' : 'text-zinc-500 dark:text-zinc-400'}`}>{count(id)}</span>
           </button>
         ))}
       </div>
 
       {entries.length === 0 ? (
-        <Card className="flex flex-col items-center p-12 text-center">
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 ring-1 ring-slate-200/80">
-            <Inbox aria-hidden className="size-6" />
+        <Card className="flex flex-col items-center py-14 text-center">
+          <span className="flex size-11 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-500 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-400">
+            <Inbox aria-hidden className="size-5" />
           </span>
-          <h2 className="mt-4 text-lg font-bold tracking-tight text-slate-950">No AI calls yet</h2>
-          <p className="mt-2 max-w-md text-sm text-slate-600">Label some transactions, write a summary, or ask the advisor. Each call appears here as it happens.</p>
+          <h2 className="mt-4 text-base font-semibold tracking-tight text-zinc-950 dark:text-white">No AI calls yet</h2>
+          <p className="mt-1.5 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+            Label some transactions, write a summary, or ask the advisor. Each call appears here as it happens.
+          </p>
           <Button variant="primary" className="mt-6" onClick={() => navigate('transactions')}>
             Go to transactions
           </Button>
         </Card>
       ) : visible.length === 0 ? (
-        <Card className="py-10 text-center text-sm text-slate-500">No entries of this kind.</Card>
+        <Card className="py-10 text-center text-xs text-zinc-500 dark:text-zinc-400">No entries of this kind.</Card>
       ) : (
-        <ol className="space-y-2.5" aria-label="Ledger entries, newest first">
+        <ol className="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200/80 bg-white dark:divide-white/[0.06] dark:border-white/[0.08] dark:bg-[#111114]" aria-label="Ledger entries, newest first">
           {visible.map((entry) => (
             <Entry key={entry.id} entry={entry} />
           ))}
@@ -152,11 +146,13 @@ export function LedgerView() {
       )}
 
       <Card>
-        <h2 className="text-base font-semibold tracking-tight text-slate-950">Why each feature runs where it does</h2>
-        <p className="mt-0.5 text-sm text-slate-500">The inference mode follows how sensitive the data is. Each row is its own Firebase AI Logic model instance.</p>
-        <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200/80">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="border-b border-slate-200/80 bg-slate-50/90 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+        <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-white">Why each feature runs where it does</h2>
+        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+          The inference mode follows how sensitive the data is. Each row is its own Firebase AI Logic model instance.
+        </p>
+        <div className="mt-4 overflow-x-auto rounded-lg border border-zinc-200/80 dark:border-white/[0.08]">
+          <table className="w-full min-w-[640px] text-left text-[13px]">
+            <thead className="border-b border-zinc-200/80 bg-zinc-50/70 text-[11px] font-medium text-zinc-500 dark:border-white/[0.07] dark:bg-white/[0.02] dark:text-zinc-400">
               <tr>
                 <th scope="col" className="px-4 py-2.5">
                   Feature
@@ -172,17 +168,17 @@ export function LedgerView() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-zinc-100 bg-white dark:divide-white/[0.05] dark:bg-[#111114]">
               {MODES.map((row) => (
-                <tr key={row.feature} className="hover:bg-slate-50/70">
-                  <th scope="row" className="px-4 py-3 font-semibold whitespace-nowrap text-slate-900">
+                <tr key={row.feature} className="hover:bg-zinc-50/70 dark:hover:bg-white/[0.02]">
+                  <th scope="row" className="px-4 py-3 font-medium whitespace-nowrap text-zinc-950 dark:text-zinc-100">
                     {row.feature}
                   </th>
                   <td className="px-4 py-3">
                     <ModeChip mode={row.mode} />
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{row.data}</td>
-                  <td className="px-4 py-3 text-slate-700">{row.where}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{row.data}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{row.where}</td>
                 </tr>
               ))}
             </tbody>
@@ -193,16 +189,11 @@ export function LedgerView() {
   );
 }
 
-function Counter({ label, value, icon: Icon, tone }: { label: string; value: number; icon: LucideIcon; tone: string }) {
+function Counter({ label, value, tone = 'text-zinc-950 dark:text-white', className = '' }: { label: string; value: number; tone?: string; className?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white px-4 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-      <div className="flex items-center justify-between gap-2">
-        <dt className="text-xs font-semibold text-slate-500">{label}</dt>
-        <span className={`flex size-6 shrink-0 items-center justify-center rounded-lg ${tone}`}>
-          <Icon aria-hidden className="size-3.5" />
-        </span>
-      </div>
-      <dd className="mt-2 text-2xl font-bold tracking-tight text-slate-950 tabular-nums">{value}</dd>
+    <div className={`px-4 py-4 ${className}`}>
+      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</dt>
+      <dd className={`mt-2 text-2xl font-semibold tracking-tight tabular-nums ${tone}`}>{value}</dd>
     </div>
   );
 }
@@ -211,8 +202,10 @@ function ModeChip({ mode }: { mode: string }) {
   const onDevice = mode.includes('ON_DEVICE');
   return (
     <code
-      className={`rounded-md px-2 py-0.5 font-mono text-[11px] font-medium whitespace-nowrap ring-1 ring-inset ${
-        onDevice ? 'bg-emerald-50/90 text-emerald-800 ring-emerald-200/90' : 'bg-sky-50/90 text-sky-800 ring-sky-200/90'
+      className={`rounded border px-1.5 py-0.5 font-mono text-[11px] font-medium whitespace-nowrap ${
+        onDevice
+          ? 'border-emerald-200/70 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300'
+          : 'border-indigo-200/70 bg-indigo-50 text-indigo-800 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-300'
       }`}
     >
       {mode}
@@ -223,42 +216,35 @@ function ModeChip({ mode }: { mode: string }) {
 function Entry({ entry }: { entry: LedgerEntry }) {
   const meta = SOURCE_META[entry.inferenceSource];
   const sent = entry.inferenceSource === 'in_cloud';
+  const accent = sent ? 'cloud' : entry.inferenceSource === 'blocked' ? 'danger' : 'device';
+
   return (
     <li>
-      <details className="group relative overflow-hidden rounded-2xl border border-slate-200/85 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition-shadow open:shadow-[0_6px_20px_-6px_rgba(15,23,42,0.1)]">
-        <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${meta.accentBar}`} />
-        <summary className="flex list-none flex-wrap items-center gap-x-2.5 gap-y-1.5 py-3.5 pr-4 pl-5 transition-colors hover:bg-slate-50/80">
-          <span className={`flex size-7 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ${meta.iconBg}`}>
-            <meta.icon aria-hidden className="size-3.5" />
-          </span>
-          <span className="font-semibold text-slate-900">{entry.feature}</span>
-          <Badge tone={meta.tone}>{meta.text}</Badge>
+      <details className="group">
+        <summary className="flex list-none flex-wrap items-center gap-x-2.5 gap-y-1.5 px-4 py-3 text-[13px] transition-colors hover:bg-zinc-50/75 dark:hover:bg-white/[0.025]">
+          <span aria-hidden className={`size-2 shrink-0 rounded-full ${meta.dot}`} />
+          <span className="font-medium text-zinc-950 dark:text-white">{entry.feature}</span>
+          <span className={`text-xs font-medium ${meta.className}`}>{meta.text}</span>
           <ModeChip mode={entry.mode} />
           {entry.consent && <Badge tone="review">With consent</Badge>}
-          {entry.isDemo && <Badge tone="neutral">Demo data</Badge>}
+          {entry.isDemo && <Badge tone="neutral">Demo</Badge>}
           {entry.error && <Badge tone="danger">Failed</Badge>}
-          <span className="ml-auto flex flex-wrap items-center gap-x-3 text-xs text-slate-500 tabular-nums">
-            {entry.model && <span className="font-mono text-[11px] text-slate-600">{entry.model}</span>}
+          <span className="ml-auto flex flex-wrap items-center gap-x-3 text-xs text-zinc-500 tabular-nums dark:text-zinc-400">
+            {entry.model && <span className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">{entry.model}</span>}
             {entry.bytes > 0 && <span>{formatBytes(entry.bytes)}</span>}
             {entry.durationMs !== undefined && <span>{formatSeconds(entry.durationMs)}</span>}
             <time dateTime={new Date(entry.timestamp).toISOString()}>{formatDateTime(entry.timestamp)}</time>
-            <ChevronDown aria-hidden className="size-4 text-slate-400 transition-transform group-open:rotate-180" />
+            <ChevronDown aria-hidden className="size-3.5 text-zinc-400 transition-transform group-open:rotate-180" />
           </span>
         </summary>
 
-        <div className="border-t border-slate-100 bg-slate-50/50 py-4 pr-4 pl-5">
-          <div className="overflow-hidden rounded-xl ring-1 ring-slate-900/15">
-            <div className="flex items-center justify-between gap-2 bg-slate-900 px-3.5 py-2 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
-              <span className="inline-flex items-center gap-1.5">
-                <Terminal aria-hidden className={`size-3.5 ${sent ? 'text-sky-400' : 'text-emerald-400'}`} />
-                {sent ? 'Exact payload sent to the cloud' : 'What happened on this device'}
-              </span>
-              <CopyButton text={entry.payloadPreview} label="Copy" dark />
-            </div>
-            <pre className="code-inspector max-h-80 overflow-auto p-3.5 font-mono text-xs leading-relaxed whitespace-pre-wrap">
-              {entry.payloadPreview}
-            </pre>
-          </div>
+        <div className="border-t border-zinc-100 bg-zinc-50/50 px-4 py-4 dark:border-white/[0.06] dark:bg-white/[0.015]">
+          <PayloadViewer
+            title={sent ? 'Exact payload sent to the cloud' : 'What happened on this device'}
+            content={entry.payloadPreview}
+            accent={accent}
+            maxHeightClass="max-h-80"
+          />
 
           <dl className="mt-3.5 grid grid-cols-3 gap-2.5 text-xs sm:max-w-lg">
             <Fact label="Raw rows sent" value={String(entry.rawRowCount)} />
@@ -267,7 +253,7 @@ function Entry({ entry }: { entry: LedgerEntry }) {
           </dl>
 
           {entry.error && (
-            <p className="mt-3 rounded-xl bg-rose-50 px-3.5 py-2.5 text-xs text-rose-900 ring-1 ring-rose-200">
+            <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50/70 px-3 py-2 text-xs text-rose-900 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
               <span className="font-semibold">No answer:</span> {entry.error}
             </p>
           )}
@@ -279,9 +265,9 @@ function Entry({ entry }: { entry: LedgerEntry }) {
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-white px-3 py-2 ring-1 ring-slate-200/80">
-      <dt className="text-[11px] text-slate-500">{label}</dt>
-      <dd className="mt-0.5 truncate font-semibold text-slate-900 tabular-nums" title={value}>
+    <div className="rounded-lg border border-zinc-200/80 bg-white px-3 py-2 dark:border-white/[0.08] dark:bg-[#111114]">
+      <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">{label}</dt>
+      <dd className="mt-0.5 truncate font-medium text-zinc-950 tabular-nums dark:text-white" title={value}>
         {value}
       </dd>
     </div>
