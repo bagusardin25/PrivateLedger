@@ -110,6 +110,8 @@ For the 40-row demo statement, rules sort 13 rows and the model sees 27 unique m
 
 **A failed `sendMessage` breaks the SDK's `ChatSession` for good.** Later calls on the same session reject with the old error. The advisor keeps its own copy of the history and builds a fresh session for every request, so a timeout or a retry never corrupts the conversation ([`advisor.ts`](app/src/lib/ai/advisor.ts)).
 
+**A first AI call made offline could switch App Check off for the whole visit.** Firebase and App Check are set up on the first AI call. Sorting works offline, so that call can happen without a connection, and the App Check SDK (13.2.0) adds its reCAPTCHA script with no handler for a failed load. Every later cloud request then waited for a token that could not come, until the page was reloaded. The app watches that script and loads it again when the connection returns ([`firebase.ts`](app/src/lib/ai/firebase.ts)), so sorting offline and then asking Cloud AI works in one visit.
+
 **It installs as an app and starts offline.** Private Ledger is an installable web app. A service worker, generated at build time with the exact file list of that build, caches only the app's own files, so the installed app opens without a connection and sorting keeps working. Requests to Firebase AI Logic, App Check, and reCAPTCHA are never cached or touched by the worker.
 
 **The browser enforces the privacy line too.** `firebase.json` sends a Content-Security-Policy whose `connect-src` only allows Firebase AI Logic, App Check, and reCAPTCHA, so the page cannot send data anywhere else. `npm run preview:hosting` serves the production build with the same headers for a local check.

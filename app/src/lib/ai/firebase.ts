@@ -73,4 +73,57 @@ function initAppCheck(app: FirebaseApp): void {
     if (debugToken) (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string }).FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
   }
   initializeAppCheck(app, { provider: appCheckProvider(), isTokenAutoRefreshEnabled: true });
+  watchRecaptchaScript();
+}
+
+// ---------------------------------------------------------------------------
+// App Check has to survive a first AI call made offline.
+//
+// Sorting works offline, so the first AI call of a visit can easily happen
+// without a connection. That call is also what sets up App Check, and the App
+// Check SDK (checked in 13.2.0, `loadReCAPTCHAEnterpriseScript`) adds the
+// reCAPTCHA script with an `onload` handler and nothing for a failed load. When
+// the load fails, the SDK never finishes setting up, and every later cloud
+// request waits for a token that cannot come, until the page is reloaded.
+// So the app watches that script and loads it again once there is a connection.
+
+const RECAPTCHA_SCRIPT = 'script[src^="https://www.google.com/recaptcha/"]';
+
+/** The SDK's reCAPTCHA script, when its last load failed. */
+let failedRecaptchaScript: HTMLScriptElement | undefined;
+
+function rememberIfItFails(script: HTMLScriptElement): void {
+  script.addEventListener(
+    'error',
+    () => {
+      failedRecaptchaScript = script;
+      // A load can also fail on a flaky connection that the browser calls online.
+      if (navigator.onLine) setTimeout(recoverAppCheck, 3_000);
+    },
+    { once: true },
+  );
+}
+
+function watchRecaptchaScript(): void {
+  // The SDK adds the script synchronously, so it is in the page by now. In a
+  // build that only uses the debug token there may be none, and that is fine.
+  const script = document.head.querySelector<HTMLScriptElement>(RECAPTCHA_SCRIPT);
+  if (script) rememberIfItFails(script);
+  window.addEventListener('online', recoverAppCheck);
+}
+
+/**
+ * Loads the reCAPTCHA script again if its last load failed. The new script
+ * gets the SDK's own `onload` handler, so App Check carries on from where it
+ * stopped. Does nothing when there is nothing to recover; safe to call often.
+ */
+export function recoverAppCheck(): void {
+  const failed = failedRecaptchaScript;
+  if (!failed || !navigator.onLine) return;
+  failedRecaptchaScript = undefined;
+  const script = document.createElement('script');
+  script.src = failed.src;
+  script.onload = failed.onload;
+  rememberIfItFails(script);
+  failed.replaceWith(script);
 }
