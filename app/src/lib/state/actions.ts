@@ -1,7 +1,7 @@
-import { db } from './db';
-import { loadDemoData } from './importer';
-import { runOnDeviceLabeling } from './labelingRunner';
-import type { Category, TxType } from './taxonomy';
+import { db } from '../data/db';
+import { loadDemoData } from '../data/importer';
+import { runOnDeviceLabeling } from '../ai/labelingRunner';
+import type { Category, TxType } from '../core/taxonomy';
 
 export type Route = 'welcome' | 'import' | 'transactions' | 'review' | 'summary' | 'advisor' | 'ledger';
 

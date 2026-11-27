@@ -1,21 +1,64 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Wifi, WifiOff } from 'lucide-react';
-import { useEffect, useSyncExternalStore } from 'react';
+import { MonitorDown, Wifi, WifiOff } from 'lucide-react';
+import { lazy, Suspense, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import { DataBoundaryBar } from './components/DataBoundaryBar';
 import { DataBoundaryPanel } from './components/DataBoundaryPanel';
 import { JourneySteps } from './components/JourneySteps';
 import { ModelStatusChip } from './components/ModelStatus';
-import { BrandMark } from './components/ui';
-import { consumeSetupRequest, type Route } from './lib/actions';
-import { db } from './lib/db';
-import { refreshDeviceStatus, useOnline } from './lib/device';
-import { AdvisorView } from './views/AdvisorView';
-import { ImportView } from './views/ImportView';
-import { LedgerView } from './views/LedgerView';
-import { ReviewView } from './views/ReviewView';
-import { SummaryView } from './views/SummaryView';
-import { TransactionsView } from './views/TransactionsView';
+import { BrandMark, Card } from './components/ui';
+import { consumeSetupRequest, type Route } from './lib/state/actions';
+import { db } from './lib/data/db';
+import { refreshDeviceStatus, useOnline } from './lib/state/device';
+import { installStore, promptInstall } from './lib/state/install';
+import { useStore } from './lib/util/store';
 import { WelcomeView } from './views/WelcomeView';
+
+// Home is part of the first download; every other screen is its own chunk.
+const loaders = {
+  import: () => import('./views/ImportView').then((m) => ({ default: m.ImportView })),
+  transactions: () => import('./views/TransactionsView').then((m) => ({ default: m.TransactionsView })),
+  review: () => import('./views/ReviewView').then((m) => ({ default: m.ReviewView })),
+  summary: () => import('./views/SummaryView').then((m) => ({ default: m.SummaryView })),
+  advisor: () => import('./views/AdvisorView').then((m) => ({ default: m.AdvisorView })),
+  ledger: () => import('./views/LedgerView').then((m) => ({ default: m.LedgerView })),
+};
+const ImportView = lazy(loaders.import);
+const TransactionsView = lazy(loaders.transactions);
+const ReviewView = lazy(loaders.review);
+const SummaryView = lazy(loaders.summary);
+const AdvisorView = lazy(loaders.advisor);
+const LedgerView = lazy(loaders.ledger);
+
+/** Fetches the other screens once the first one is idle, so switching screens never waits on the network. */
+function prefetchScreens(): () => void {
+  const run = () => Object.values(loaders).forEach((load) => void load());
+  if ('requestIdleCallback' in window) {
+    const id = window.requestIdleCallback(run, { timeout: 3000 });
+    return () => window.cancelIdleCallback(id);
+  }
+  const timer = setTimeout(run, 1500);
+  return () => clearTimeout(timer);
+}
+
+/** Shown only when Chrome says the app can be installed. */
+function InstallButton() {
+  const { canInstall } = useStore(installStore);
+  if (!canInstall) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => void promptInstall()}
+      title="Install Private Ledger as an app. It opens in its own window and starts without a connection."
+      className="inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-ink-700 ring-1 ring-ink-100 transition-colors hover:bg-ink-50"
+    >
+      <MonitorDown aria-hidden className="size-3.5" /> Install app
+    </button>
+  );
+}
+
+function Screen({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<Card className="text-sm text-slate-600">Loading…</Card>}>{children}</Suspense>;
+}
 
 const ALL_ROUTES: Route[] = ['welcome', 'import', 'transactions', 'review', 'summary', 'advisor', 'ledger'];
 
@@ -49,7 +92,11 @@ export function App() {
     void refreshDeviceStatus();
     const onFocus = () => void refreshDeviceStatus();
     window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
+    const cancelPrefetch = prefetchScreens();
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      cancelPrefetch();
+    };
   }, []);
 
   useEffect(() => {
@@ -95,6 +142,7 @@ export function App() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-3">
+            <InstallButton />
             <ModelStatusChip />
             <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${online ? 'text-slate-600' : 'text-amber-900'}`}>
               {online ? <Wifi aria-hidden className="size-4" /> : <WifiOff aria-hidden className="size-4" />}
@@ -115,16 +163,20 @@ export function App() {
           {route === 'ledger' ? (
             // The ledger is the full version of the panel, so it gets the whole width.
             <main id="main" tabIndex={-1} className="min-w-0 focus:outline-none">
-              <LedgerView />
+              <Screen>
+                <LedgerView />
+              </Screen>
             </main>
           ) : (
             <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
               <main id="main" tabIndex={-1} className="min-w-0 focus:outline-none">
-                {route === 'import' && <ImportView />}
-                {route === 'transactions' && <TransactionsView />}
-                {route === 'review' && <ReviewView />}
-                {route === 'summary' && <SummaryView />}
-                {route === 'advisor' && <AdvisorView />}
+                <Screen>
+                  {route === 'import' && <ImportView />}
+                  {route === 'transactions' && <TransactionsView />}
+                  {route === 'review' && <ReviewView />}
+                  {route === 'summary' && <SummaryView />}
+                  {route === 'advisor' && <AdvisorView />}
+                </Screen>
               </main>
               <div className="lg:sticky lg:top-20 lg:self-start">
                 <DataBoundaryPanel />

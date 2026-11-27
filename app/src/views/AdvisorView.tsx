@@ -4,12 +4,12 @@
 import { ArrowUp, Ban, Cloud, Cpu, LoaderCircle, MessageSquarePlus, ShieldCheck, WifiOff } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Badge, Button, Card } from '../components/ui';
-import { advisorStore, resetAdvisor, sendToAdvisor, type ChatItem } from '../lib/advisorStore';
-import { cloudRetryStore } from '../lib/cloudCall';
-import { useOnline } from '../lib/device';
-import { cloudReady } from '../lib/firebase';
-import { CLOUD_MODEL } from '../lib/models';
-import { useStore } from '../lib/store';
+import { advisorStore, resetAdvisor, sendToAdvisor, type ChatItem } from '../lib/ai/advisorStore';
+import { cloudRetryStore } from '../lib/ai/cloudCall';
+import { useOnline } from '../lib/state/device';
+import { cloudReady } from '../lib/ai/firebase';
+import { CLOUD_MODEL } from '../lib/ai/models';
+import { useStore } from '../lib/util/store';
 
 const SUGGESTIONS = [
   'How much did I spend on business software this month?',

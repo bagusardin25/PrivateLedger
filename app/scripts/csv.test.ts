@@ -1,8 +1,8 @@
-// Tests the pure CSV helpers (src/lib/csv.ts): dates, amounts, column guesses.
+// Tests the pure CSV helpers (src/lib/core/csv.ts): dates, amounts, column guesses.
 //
 // Run: npm run test:csv
 
-import { detectDateOrder, guessMapping, normalizeDate, parseAmount, toRawRows } from '../src/lib/csv.ts';
+import { detectDateOrder, guessMapping, normalizeDate, parseAmount, toRawRows } from '../src/lib/core/csv.ts';
 
 let failures = 0;
 function eq(actual: unknown, expected: unknown, label: string) {

@@ -4,13 +4,13 @@
 
 import { Cloud, Cpu, Download, Hand, LoaderCircle, ShieldAlert } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
-import { labelPendingByHand, openSetup } from '../lib/actions';
-import { getConsentPreview, runCloudLabelingWithConsent, type ConsentPreview } from '../lib/consentLabeling';
-import { deviceStore, enableOnDeviceAi, useOnline } from '../lib/device';
-import { cloudReady } from '../lib/firebase';
-import { plural } from '../lib/format';
-import { CLOUD_MODEL } from '../lib/models';
-import { useStore } from '../lib/store';
+import { labelPendingByHand, openSetup } from '../lib/state/actions';
+import { getConsentPreview, runCloudLabelingWithConsent, type ConsentPreview } from '../lib/ai/consentLabeling';
+import { deviceStore, enableOnDeviceAi, useOnline } from '../lib/state/device';
+import { cloudReady } from '../lib/ai/firebase';
+import { plural } from '../lib/util/format';
+import { CLOUD_MODEL } from '../lib/ai/models';
+import { useStore } from '../lib/util/store';
 import { Badge, Button, ProgressBar } from './ui';
 
 export function NoModelChoices({ waiting }: { waiting: number }) {

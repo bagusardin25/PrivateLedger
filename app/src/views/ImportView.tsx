@@ -4,12 +4,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 import { useId, useState, type DragEvent } from 'react';
 import { Button, Card } from '../components/ui';
-import { navigate } from '../lib/actions';
-import { detectDateOrder, guessMapping, mappingIsComplete, parseCsvFile, toRawRows, type ColumnMapping, type DateOrder, type ParsedCsv } from '../lib/csv';
-import { db } from '../lib/db';
-import { formatMoney, plural } from '../lib/format';
-import { importRows } from '../lib/importer';
-import { runOnDeviceLabeling } from '../lib/labelingRunner';
+import { navigate } from '../lib/state/actions';
+import { detectDateOrder, guessMapping, mappingIsComplete, parseCsvFile, toRawRows, type ColumnMapping, type DateOrder, type ParsedCsv } from '../lib/core/csv';
+import { db } from '../lib/data/db';
+import { formatMoney, plural } from '../lib/util/format';
+import { importRows } from '../lib/data/importer';
+import { runOnDeviceLabeling } from '../lib/ai/labelingRunner';
 
 export function ImportView() {
   const existingCount = useLiveQuery(() => db.transactions.count(), [], 0);

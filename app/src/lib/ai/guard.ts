@@ -2,12 +2,12 @@
 // layer 1 rules always, layer 2 the on-device classifier when Gemini Nano is
 // ready. A blocked message is never sent, and there is no "send anyway" button.
 
-import { db } from './db';
-import { deterministicGuard, merchantPhrases, merchantTokens } from './guardRules';
-import { FEATURE, recordLedger } from './ledger';
+import { db } from '../data/db';
+import { deterministicGuard, merchantPhrases, merchantTokens } from '../core/guardRules';
+import { FEATURE, recordLedger } from '../data/ledger';
 import { getGuardModel, ON_DEVICE_MODEL } from './models';
 import { assertOnDeviceReady, getDeviceStatus } from './onDevice';
-import { withTimeout } from './withTimeout';
+import { withTimeout } from '../util/withTimeout';
 
 /** If Gemini Nano hangs, the rules still decide instead of leaving the chat stuck. */
 const MODEL_TIMEOUT_MS = 15_000;

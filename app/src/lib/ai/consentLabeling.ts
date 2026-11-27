@@ -3,13 +3,13 @@
 // every request is logged as "sent with consent", with demo rows counted apart.
 
 import { cloudRequest, friendlyCloudError } from './cloudCall';
-import { db } from './db';
+import { db } from '../data/db';
 import { buildLabelPrompt } from './labeler';
-import { collectPending, labelingStore, recentArrivals } from './labelingRunner';
-import { FEATURE } from './ledger';
+import { collectPending, labelingStore, markArrived } from './labelingRunner';
+import { FEATURE } from '../data/ledger';
 import { getConsentLabelerModel } from './models';
-import { isCategory, isTxType } from './taxonomy';
-import { CLOUD_TIMEOUT_MS } from './withTimeout';
+import { isCategory, isTxType } from '../core/taxonomy';
+import { CLOUD_TIMEOUT_MS } from '../util/withTimeout';
 
 const CLOUD_BATCH = 20;
 
@@ -85,8 +85,7 @@ export async function runCloudLabelingWithConsent(): Promise<void> {
         if (!key || !isTxType(item.type) || !isCategory(item.category)) continue;
         const { type, category } = item;
         const rows = groups.get(key) ?? [];
-        const arrivedAt = Date.now();
-        for (const r of rows) recentArrivals.set(r.id, arrivedAt);
+        markArrived(rows.map((r) => r.id));
         await db.transactions.bulkUpdate(
           rows.map((r) => ({
             key: r.id,

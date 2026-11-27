@@ -3,8 +3,8 @@ import { ArrowRight, Cloud, Cpu, FileUp, Laptop, ListChecks, Lock, Play, RotateC
 import { useState } from 'react';
 import { ModelStatusCard } from '../components/ModelStatus';
 import { Badge, Button, Card } from '../components/ui';
-import { navigate, startDemo } from '../lib/actions';
-import { db } from '../lib/db';
+import { navigate, startDemo } from '../lib/state/actions';
+import { db } from '../lib/data/db';
 
 const PROMISES = [
   { icon: UploadCloud, text: 'Nothing uploaded' },

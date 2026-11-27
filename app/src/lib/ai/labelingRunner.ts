@@ -1,13 +1,13 @@
 // Runs on-device labeling over every pending merchant and keeps the Privacy Ledger exact:
 // one entry per model call, plus an entry when a call is refused before sending.
 
-import { db, type Transaction } from './db';
+import { db, type Transaction } from '../data/db';
 import { BATCH_SIZE, labelBatch } from './labeler';
-import { FEATURE, recordLedger } from './ledger';
+import { FEATURE, recordLedger } from '../data/ledger';
 import { ON_DEVICE_MODEL } from './models';
 import { getDeviceStatus } from './onDevice';
-import type { ModelMerchant } from './prepare';
-import { createStore } from './store';
+import type { ModelMerchant } from '../core/prepare';
+import { createStore } from '../util/store';
 
 export interface LabelingState {
   status: 'idle' | 'running' | 'done' | 'refused' | 'error';
@@ -25,7 +25,15 @@ export interface LabelingState {
 export const labelingStore = createStore<LabelingState>({ status: 'idle', done: 0, total: 0, batch: 0, batches: 0 });
 
 /** Tracks timestamps of rows newly labeled on-device so arrival animation plays once. */
-export const recentArrivals = new Map<string, number>();
+export const recentArrivals = new Set<string>();
+
+const ARRIVAL_MS = 2000;
+
+/** Rows stay "just arrived" for two seconds, so the table can play the arrival glow once. */
+export function markArrived(ids: string[]): void {
+  for (const id of ids) recentArrivals.add(id);
+  setTimeout(() => ids.forEach((id) => recentArrivals.delete(id)), ARRIVAL_MS);
+}
 
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -93,8 +101,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
       labelingStore.set({ batch: index + 1 });
       const result = await labelBatch(batch, profile, async (label) => {
         const rows = groups.get(label.key) ?? [];
-        const arrivedAt = Date.now();
-        for (const r of rows) recentArrivals.set(r.id, arrivedAt);
+        markArrived(rows.map((r) => r.id));
         await db.transactions.bulkUpdate(
           rows.map((r) => ({
             key: r.id,

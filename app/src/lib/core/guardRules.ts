@@ -38,7 +38,7 @@ const BARE_NUMBER = /\b\d{2,}\b/;
 const DATE =
   /\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\b|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b/i;
 /** Two or more consecutive upper-case tokens, the way statement lines are written. */
-const STATEMENT_STYLE = /\b[A-Z][A-Z0-9&*.'\/-]{2,}(?:\s+[A-Z0-9&*.'\/#-]{2,})+/;
+const STATEMENT_STYLE = /\b[A-Z][A-Z0-9&*.'/-]{2,}(?:\s+[A-Z0-9&*.'/#-]{2,})+/;
 
 /** Distinctive single words from the user's bank descriptions, e.g. ADOBE, RIVERA, COSTCO. */
 export function merchantTokens(descriptions: string[]): Set<string> {

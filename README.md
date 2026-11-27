@@ -23,7 +23,7 @@ Private Ledger does that one job: import a CSV, label every row, review the uncl
 
 ## How it uses Firebase AI Logic
 
-Every AI call goes through the Firebase AI Logic Web SDK. There is one model instance per inference configuration, all defined in [`app/src/lib/models.ts`](app/src/lib/models.ts). The inference mode of each instance follows the sensitivity of the data it handles.
+Every AI call goes through the Firebase AI Logic Web SDK. There is one model instance per inference configuration, all defined in [`app/src/lib/ai/models.ts`](app/src/lib/ai/models.ts). The inference mode of each instance follows the sensitivity of the data it handles.
 
 | Feature | Instance | Inference mode | Data it is given | Why this mode |
 |---|---|---|---|---|
@@ -76,11 +76,13 @@ For the 40-row demo statement, rules label 13 rows and the model sees 27 unique 
 
 ## Engineering notes
 
-**`ONLY_ON_DEVICE` can reach the cloud.** In Firebase JS SDK 13.2.0, when the browser has no `LanguageModel` API (Firefox, Safari, Chrome without the flag), a model created with `ONLY_ON_DEVICE` gets no on-device adapter and the request is sent to the default cloud model. Every on-device call in this app first passes `assertOnDeviceReady()` in [`onDevice.ts`](app/src/lib/onDevice.ts), which refuses the request instead. The ledger records a refusal as "Not sent".
+**`ONLY_ON_DEVICE` can reach the cloud.** In Firebase JS SDK 13.2.0, when the browser has no `LanguageModel` API (Firefox, Safari, Chrome without the flag), a model created with `ONLY_ON_DEVICE` gets no on-device adapter and the request is sent to the default cloud model. Every on-device call in this app first passes `assertOnDeviceReady()` in [`onDevice.ts`](app/src/lib/ai/onDevice.ts), which refuses the request instead. The ledger records a refusal as "Not sent".
 
 **`PREFER_IN_CLOUD` falls back on any failed request, not only offline.** A 429 or 503 from the cloud also makes the SDK fall back to Gemini Nano. The totals were still sent in that case, so the ledger records both the cloud attempt and the on-device call.
 
-**A failed `sendMessage` breaks the SDK's `ChatSession` for good.** Later calls on the same session reject with the old error. The advisor keeps its own copy of the history and builds a fresh session for every request, so a timeout or a retry never corrupts the conversation ([`advisor.ts`](app/src/lib/advisor.ts)).
+**A failed `sendMessage` breaks the SDK's `ChatSession` for good.** Later calls on the same session reject with the old error. The advisor keeps its own copy of the history and builds a fresh session for every request, so a timeout or a retry never corrupts the conversation ([`advisor.ts`](app/src/lib/ai/advisor.ts)).
+
+**It installs as an app and starts offline.** Private Ledger is an installable web app. A service worker, generated at build time with the exact file list of that build, caches only the app's own files, so the installed app opens without a connection and labeling keeps working. Requests to Firebase AI Logic, App Check, and reCAPTCHA are never cached or touched by the worker.
 
 **The browser enforces the boundary too.** `firebase.json` sends a Content-Security-Policy whose `connect-src` only allows Firebase AI Logic, App Check, and reCAPTCHA, so the page cannot send data anywhere else. `npm run preview:hosting` serves the production build with the same headers for a local check.
 
@@ -125,8 +127,11 @@ Checks:
 ```bash
 npm test           # CSV parsing, labeling rules, guard rules; no model needed
 npm run typecheck
+npm run lint       # includes the layer rules for src/lib
 npm run build
 ```
+
+GitHub Actions runs the same checks on every push and pull request ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). It also builds once with a fake App Check debug token in the environment and fails if that token appears in the output.
 
 ## Deploy
 
@@ -150,27 +155,30 @@ npm run preview:hosting   # http://localhost:5180
 
 ## Project structure
 
+`app/src/lib` is split into layers, and each layer may only import from the layers listed after it. ESLint enforces this (`npm run lint`).
+
 ```
-app/
-  src/lib/models.ts          all six Firebase AI Logic model instances
-  src/lib/onDevice.ts        on-device availability and the assertOnDeviceReady() guard
-  src/lib/labeler.ts         streaming on-device labeling
-  src/lib/prepare.ts         normalize, merchant memory, rules, dedupe (no model)
-  src/lib/rules.ts           deterministic rules and the mixed-use list
-  src/lib/guard.ts           outgoing-message guard (rules, then Gemini Nano)
-  src/lib/guardRules.ts      the rule layer of the guard
-  src/lib/explainer.ts       "What is this merchant?" with the consent gate
-  src/lib/reporter.ts        monthly summary from totals
-  src/lib/advisor.ts         cloud chat with local function calling
-  src/lib/localFunctions.ts  the functions the advisor may call
-  src/lib/consentLabeling.ts cloud labeling, only after consent
-  src/lib/cloudCall.ts       timeout, retry with backoff, ledger entry per attempt
-  src/lib/ledger.ts          Privacy Ledger entries and counters
-  src/lib/db.ts              IndexedDB schema (Dexie)
-  src/views/                 Home, Import, Transactions, Review, Summary, Advisor, Privacy Ledger
-  src/components/            Data Boundary panel, consent dialog, shared UI
-  scripts/                   tests that run in Node, and the local hosting preview
-spike/go-no-go/              the test page used to check on-device and cloud inference before building
+app/src/
+  views/          Home, Import, Transactions, Review, Summary, Advisor, Privacy Ledger
+  components/     Data Boundary panel, consent prompts, shared UI
+  lib/state/      navigation, user actions, model status, journey progress
+  lib/ai/         everything that calls Firebase AI Logic
+    firebase.ts       app and App Check
+    models.ts         the six model instances and their inference modes
+    onDevice.ts       on-device availability and assertOnDeviceReady()
+    cloudCall.ts      timeout, retry with backoff, one ledger entry per attempt
+    labeler.ts, labelingRunner.ts   streaming on-device labeling
+    consentLabeling.ts              cloud labeling, only after consent
+    guard.ts          outgoing-message guard (rules, then Gemini Nano)
+    explainer.ts      "What is this merchant?" with the consent gate
+    reporter.ts       monthly summary from totals
+    advisor.ts, advisorStore.ts, localFunctions.ts   cloud chat with local function calling
+  lib/data/       IndexedDB (Dexie), Privacy Ledger, import, export
+  lib/core/       pure logic with no browser API and no model: CSV parsing, merchant
+                  normalization, labeling rules, guard rules, taxonomy, demo data
+  lib/util/       small shared helpers
+app/scripts/      tests that run in Node, and the local hosting preview
+spike/go-no-go/   the test page used to check on-device and cloud inference before building
 ```
 
 There is no backend. Transactions, merchant memory, and the ledger live in IndexedDB in your browser. The only network destinations are Firebase AI Logic and App Check, which loads reCAPTCHA in production.

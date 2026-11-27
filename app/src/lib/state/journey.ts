@@ -3,7 +3,7 @@
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useSyncExternalStore } from 'react';
-import { db } from './db';
+import { db } from '../data/db';
 
 const EXPORT_KEY = 'private-ledger:lastExportAt';
 const exportListeners = new Set<() => void>();

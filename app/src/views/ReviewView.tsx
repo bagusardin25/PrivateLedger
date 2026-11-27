@@ -6,10 +6,10 @@ import { ArrowRight, Briefcase, CircleAlert, CircleCheck, Cpu, House, SkipForwar
 import { useCallback, useEffect, useState } from 'react';
 import { ExplainMerchant } from '../components/ExplainMerchant';
 import { Button, Card, ProgressBar } from '../components/ui';
-import { navigate, setCategoryByUser, setTypeByUser } from '../lib/actions';
-import { db, type Transaction } from '../lib/db';
-import { formatMoney, formatShortDate, plural } from '../lib/format';
-import { CATEGORIES, type Category } from '../lib/taxonomy';
+import { navigate, setCategoryByUser, setTypeByUser } from '../lib/state/actions';
+import { db, type Transaction } from '../lib/data/db';
+import { formatMoney, formatShortDate, plural } from '../lib/util/format';
+import { CATEGORIES, type Category } from '../lib/core/taxonomy';
 
 interface Decision {
   merchant: string;

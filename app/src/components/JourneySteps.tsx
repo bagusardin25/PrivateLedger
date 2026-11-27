@@ -2,10 +2,10 @@
 // Judges and users see the complete arc: import, label on device, review, export.
 
 import { Check } from 'lucide-react';
-import type { Route } from '../lib/actions';
-import { useJourneyCounts, useLastExport } from '../lib/journey';
-import { labelingStore } from '../lib/labelingRunner';
-import { useStore } from '../lib/store';
+import type { Route } from '../lib/state/actions';
+import { useJourneyCounts, useLastExport } from '../lib/state/journey';
+import { labelingStore } from '../lib/ai/labelingRunner';
+import { useStore } from '../lib/util/store';
 
 type StepState = 'done' | 'current' | 'todo';
 
