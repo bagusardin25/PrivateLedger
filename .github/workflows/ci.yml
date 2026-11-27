@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, hybrid-ai]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+      # The build has no Firebase config in CI, so it checks that the app still
+      # builds with cloud features switched off, the way a fresh clone runs.
+      - run: npm run build
+
+      # Builds again with a fake debug token in the environment and fails if the
+      # token shows up anywhere in the output.
+      - name: Debug token never reaches a production bundle
+        env:
+          VITE_APPCHECK_DEBUG_TOKEN: ci-sentinel-debug-token
+        run: |
+          npx vite build --outDir dist-token-check --emptyOutDir
+          if grep -rq "ci-sentinel-debug-token" dist-token-check; then
+            echo "::error::The App Check debug token ended up in the production bundle."
+            exit 1
+          fi

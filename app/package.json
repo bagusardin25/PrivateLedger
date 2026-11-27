@@ -5,6 +5,9 @@
   "description": "Separate business and personal spending from a bank CSV. Raw transactions are labeled on-device; the cloud only gets totals.",
   "license": "Apache-2.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
     "dev": "vite --port 5174 --strictPort",
     "build": "tsc --noEmit && vite build",
