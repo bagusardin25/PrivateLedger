@@ -95,7 +95,7 @@ export async function labelPendingByHand(): Promise<void> {
         category: t.category ?? 'Other',
         source: 'you' as const,
         needsReview: true,
-        reviewReason: 'On-device AI was not available, so you decide',
+        reviewReason: "Laptop AI wasn't available, so you decide",
       },
     })),
   );
