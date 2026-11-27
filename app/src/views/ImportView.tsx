@@ -1,9 +1,9 @@
 // Drag-and-drop CSV, column mapping with automatic guesses, local preview.
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { FileSpreadsheet, Upload, X } from 'lucide-react';
+import { ArrowRight, CircleAlert, FileSpreadsheet, Lock, Upload, X } from 'lucide-react';
 import { useId, useState, type DragEvent } from 'react';
-import { Button, Card } from '../components/ui';
+import { Badge, Button, Card } from '../components/ui';
 import { navigate } from '../lib/state/actions';
 import { detectDateOrder, guessMapping, mappingIsComplete, parseCsvFile, toRawRows, type ColumnMapping, type DateOrder, type ParsedCsv } from '../lib/core/csv';
 import { db } from '../lib/data/db';
@@ -67,8 +67,15 @@ export function ImportView() {
   return (
     <div className="space-y-5">
       <Card>
-        <h1 className="text-xl font-semibold">Import a bank statement</h1>
-        <p className="mt-1 text-sm text-slate-700">Export a CSV from your bank. It is read in this browser; nothing is uploaded.</p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-950">Import a bank statement</h1>
+            <p className="mt-1 text-sm text-slate-600">Export a CSV from your bank. It is parsed locally in this browser; nothing is uploaded.</p>
+          </div>
+          <Badge tone="device">
+            <Lock aria-hidden className="size-3" /> 100% local parsing
+          </Badge>
+        </div>
 
         <label
           htmlFor={inputId}
@@ -78,13 +85,41 @@ export function ImportView() {
           }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
-          className={`mt-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-6 text-center transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink-800 ${
-            file ? 'py-6' : 'py-10'
-          } ${dragging ? 'border-emerald-600 bg-emerald-50' : 'border-slate-300 hover:border-slate-500'}`}
+          className={`group relative mt-5 flex cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-dashed px-6 text-center transition-all duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink-700 ${
+            file ? 'py-7' : 'py-12'
+          } ${
+            dragging
+              ? 'border-emerald-500 bg-emerald-50/70'
+              : 'border-slate-300/90 bg-slate-50/60 hover:border-ink-400 hover:bg-ink-50/30'
+          }`}
         >
-          <Upload aria-hidden className="size-6 text-slate-600" />
-          <span className="font-medium">{file ? 'Drop another CSV file to replace' : 'Drop a CSV file here, or choose one'}</span>
-          <span className="text-xs text-slate-600">Needs columns for date, description, and amount (or debit and credit).</span>
+          <span
+            className={`flex size-12 items-center justify-center rounded-2xl shadow-xs ring-1 transition-all duration-200 ${
+              dragging
+                ? 'scale-105 bg-emerald-600 text-white ring-emerald-700'
+                : 'bg-white text-ink-700 ring-slate-200/90 group-hover:-translate-y-0.5 group-hover:ring-ink-200'
+            }`}
+          >
+            <Upload aria-hidden className="size-5" />
+          </span>
+          <div className="space-y-1">
+            <span className="block text-base font-semibold text-slate-900">
+              {file ? 'Drop another CSV file to replace' : 'Drop a bank CSV file here, or browse'}
+            </span>
+            <span className="block text-xs text-slate-500">
+              Works with standard bank exports containing date, description, and amount (or debit &amp; credit).
+            </span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-1.5 pt-1">
+            {['Date', 'Description', 'Amount / Debit & Credit'].map((col) => (
+              <span
+                key={col}
+                className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200/80"
+              >
+                {col}
+              </span>
+            ))}
+          </div>
           <input
             id={inputId}
             type="file"
@@ -97,27 +132,33 @@ export function ImportView() {
             }}
           />
         </label>
+
         {error && (
-          <p role="alert" className="mt-3 text-sm text-rose-800">
+          <p role="alert" className="mt-4 flex items-center gap-2 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm text-rose-800 ring-1 ring-rose-200">
+            <CircleAlert aria-hidden className="size-4 shrink-0" />
             Could not read the file: {error}
           </p>
         )}
       </Card>
 
       {file && mapping && (
-        <Card>
-          <div className="flex flex-wrap items-center gap-2">
-            <FileSpreadsheet aria-hidden className="size-5 text-slate-600" />
-            <h2 className="font-semibold">{file.name}</h2>
-            <span className="text-sm text-slate-600">{plural(file.parsed.rows.length, 'row')}</span>
-            <Button variant="ghost" className="ml-auto min-h-8 px-2.5 text-xs" onClick={clearFile}>
+        <Card className="fade-up">
+          <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 pb-4">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/80">
+              <FileSpreadsheet aria-hidden className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="truncate font-semibold text-slate-950">{file.name}</h2>
+              <p className="text-xs text-slate-500 tabular-nums">{plural(file.parsed.rows.length, 'row')} detected locally</p>
+            </div>
+            <Button variant="ghost" className="ml-auto min-h-8 rounded-lg px-2.5 text-xs" onClick={clearFile}>
               <X aria-hidden className="size-3.5" /> Clear file
             </Button>
           </div>
 
-          <fieldset className="mt-4">
-            <legend className="text-sm font-medium">Match the columns</legend>
-            <div className="mt-2 grid gap-3 sm:grid-cols-3">
+          <fieldset className="mt-5">
+            <legend className="text-xs font-bold tracking-wider text-slate-500 uppercase">Match the columns</legend>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
               <ColumnSelect
                 label="Date"
                 value={mapping.date}
@@ -139,61 +180,76 @@ export function ImportView() {
                 </div>
               )}
             </div>
-            <label className="mt-3 flex items-center gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={mapping.amountMode === 'split'}
-                onChange={(e) => setMapping({ ...mapping, amountMode: e.target.checked ? 'split' : 'single' })}
-                className="size-4 accent-ink-800"
-              />
-              Money in and money out are in separate columns
-            </label>
-            {mapping.amountMode === 'single' && (
-              <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+
+            <div className="mt-4 flex flex-col gap-2.5 rounded-xl bg-slate-50/80 p-3.5 ring-1 ring-slate-200/75">
+              <label className="flex items-center gap-2.5 text-sm text-slate-700">
                 <input
                   type="checkbox"
-                  checked={mapping.spendingIsPositive}
-                  onChange={(e) => setMapping({ ...mapping, spendingIsPositive: e.target.checked })}
-                  className="size-4 accent-ink-800"
+                  checked={mapping.amountMode === 'split'}
+                  onChange={(e) => setMapping({ ...mapping, amountMode: e.target.checked ? 'split' : 'single' })}
+                  className="size-4 rounded accent-ink-800"
                 />
-                Spending is written as positive numbers (common in card statements)
+                Money in and money out are in separate columns
               </label>
-            )}
-            {dateInfo?.numeric && (
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-700">
-                <label htmlFor={orderId}>Dates like 03/04/2026 are written</label>
-                <select
-                  id={orderId}
-                  value={mapping.dateOrder}
-                  onChange={(e) => setMapping({ ...mapping, dateOrder: e.target.value as DateOrder })}
-                  className="min-h-9 rounded-md border border-slate-300 bg-white px-2 text-sm focus:border-ink-800"
-                >
-                  <option value="mdy">month / day / year</option>
-                  <option value="dmy">day / month / year</option>
-                </select>
-                {dateInfo.ambiguous && <span className="text-xs text-amber-900">Both readings fit this file, so check the preview.</span>}
-              </div>
-            )}
+              {mapping.amountMode === 'single' && (
+                <label className="flex items-center gap-2.5 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={mapping.spendingIsPositive}
+                    onChange={(e) => setMapping({ ...mapping, spendingIsPositive: e.target.checked })}
+                    className="size-4 rounded accent-ink-800"
+                  />
+                  Spending is written as positive numbers (common in card statements)
+                </label>
+              )}
+              {dateInfo?.numeric && (
+                <div className="flex flex-wrap items-center gap-2 border-t border-slate-200/70 pt-2.5 text-sm text-slate-700">
+                  <label htmlFor={orderId}>Dates like 03/04/2026 are written</label>
+                  <select
+                    id={orderId}
+                    value={mapping.dateOrder}
+                    onChange={(e) => setMapping({ ...mapping, dateOrder: e.target.value as DateOrder })}
+                    className="min-h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-sm font-medium text-slate-900 shadow-2xs focus:border-ink-700 focus:outline-none"
+                  >
+                    <option value="mdy">month / day / year</option>
+                    <option value="dmy">day / month / year</option>
+                  </select>
+                  {dateInfo.ambiguous && (
+                    <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900">
+                      Both readings fit — check the preview below
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </fieldset>
 
           {result ? (
             <>
-              <h3 className="mt-5 text-sm font-medium">Preview</h3>
-              <div className="mt-2 overflow-x-auto rounded-md ring-1 ring-slate-200">
+              <div className="mt-6 flex items-center justify-between gap-2">
+                <h3 className="text-xs font-bold tracking-wider text-slate-500 uppercase">Preview (first 5 rows)</h3>
+                <span className="text-xs text-slate-500 tabular-nums">{plural(result.rows.length, 'ready row')}</span>
+              </div>
+
+              <div className="mt-2.5 overflow-x-auto rounded-xl border border-slate-200/80">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50 text-left text-xs text-slate-600">
+                  <thead className="bg-slate-50/90 text-left text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
                     <tr>
-                      <th className="px-3 py-2 font-medium">Date</th>
-                      <th className="px-3 py-2 font-medium">Description</th>
-                      <th className="px-3 py-2 text-right font-medium">Amount</th>
+                      <th className="px-3.5 py-2.5">Date</th>
+                      <th className="px-3.5 py-2.5">Description</th>
+                      <th className="px-3.5 py-2.5 text-right">Amount</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-100 bg-white">
                     {result.rows.slice(0, 5).map((row, i) => (
-                      <tr key={i} className="border-t border-slate-100">
-                        <td className="px-3 py-2 whitespace-nowrap tabular-nums">{row.date}</td>
-                        <td className="px-3 py-2 font-mono text-xs">{row.description}</td>
-                        <td className={`px-3 py-2 text-right whitespace-nowrap tabular-nums ${row.amount > 0 ? 'font-medium text-emerald-800' : ''}`}>
+                      <tr key={i} className="hover:bg-slate-50/70">
+                        <td className="px-3.5 py-2.5 whitespace-nowrap text-slate-600 tabular-nums">{row.date}</td>
+                        <td className="px-3.5 py-2.5 font-mono text-xs text-slate-800">{row.description}</td>
+                        <td
+                          className={`px-3.5 py-2.5 text-right font-semibold whitespace-nowrap tabular-nums ${
+                            row.amount > 0 ? 'text-emerald-700' : 'text-slate-900'
+                          }`}
+                        >
                           {row.amount > 0 ? '+' : ''}
                           {formatMoney(row.amount)}
                         </td>
@@ -202,31 +258,46 @@ export function ImportView() {
                   </tbody>
                 </table>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <Button variant="primary" onClick={() => void onImport()} disabled={importing || result.rows.length === 0}>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <Button variant="primary" className="min-h-11 px-5" onClick={() => void onImport()} disabled={importing || result.rows.length === 0}>
                   {importing ? 'Importing…' : `Import ${plural(result.rows.length, 'transaction')}`}
+                  {!importing && <ArrowRight aria-hidden className="size-4" />}
                 </Button>
                 {existingCount > 0 && (
-                  <span className="text-xs text-slate-600">Adds to your {plural(existingCount, 'existing transaction')}.</span>
+                  <span className="text-xs text-slate-500">Adds to your {plural(existingCount, 'existing transaction')}.</span>
                 )}
                 {result.skipped > 0 && (
-                  <span className="text-sm text-amber-900">{plural(result.skipped, 'row')} skipped (no description or amount).</span>
+                  <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-900 ring-1 ring-amber-200">
+                    {plural(result.skipped, 'row')} skipped (missing description or amount)
+                  </span>
                 )}
               </div>
+
               {(result.unreadDates > 0 || mostlyPositive) && (
-                <ul className="mt-3 space-y-1 text-sm text-amber-900">
+                <ul className="mt-4 space-y-1.5 rounded-xl bg-amber-50/80 p-3.5 text-sm text-amber-950 ring-1 ring-amber-200">
                   {result.unreadDates > 0 && (
-                    <li>
-                      {plural(result.unreadDates, 'row')} {result.unreadDates === 1 ? 'has' : 'have'} a date this app could not read. They are imported, but left
-                      out of monthly totals.
+                    <li className="flex items-start gap-2">
+                      <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700" />
+                      <span>
+                        {plural(result.unreadDates, 'row')} {result.unreadDates === 1 ? 'has' : 'have'} a date this app could not read. They are imported,
+                        but left out of monthly totals.
+                      </span>
                     </li>
                   )}
-                  {mostlyPositive && <li>Most amounts in this file are positive. If they are purchases, tick the positive-numbers box above.</li>}
+                  {mostlyPositive && (
+                    <li className="flex items-start gap-2">
+                      <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700" />
+                      <span>Most amounts in this file are positive. If they are purchases, tick the positive-numbers box above.</span>
+                    </li>
+                  )}
                 </ul>
               )}
             </>
           ) : (
-            <p className="mt-4 text-sm text-amber-900">Choose a column for each field to see a preview.</p>
+            <p className="mt-5 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200">
+              Choose a column for each field above to see a preview.
+            </p>
           )}
         </Card>
       )}
@@ -238,14 +309,14 @@ function ColumnSelect({ label, value, headers, onChange }: { label: string; valu
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-medium text-slate-600">
+      <label htmlFor={id} className="block text-xs font-semibold text-slate-600">
         {label}
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 min-h-10 w-full rounded-md border border-slate-300 bg-white px-2 text-sm focus:border-ink-800"
+        className="mt-1.5 min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 shadow-2xs transition-colors hover:border-slate-300 focus:border-ink-700 focus:outline-none"
       >
         <option value="">Choose a column</option>
         {headers.map((h) => (
