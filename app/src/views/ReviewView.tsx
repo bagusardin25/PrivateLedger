@@ -2,10 +2,21 @@
 // is saved as merchant memory, so the same merchant never needs asking again.
 
 import { useLiveQuery } from 'dexie-react-hooks';
-import { ArrowRight, Briefcase, CircleAlert, CircleCheck, Cpu, House, SkipForward, Undo2 } from 'lucide-react';
+import {
+  ArrowRight,
+  Briefcase,
+  CircleAlert,
+  CircleCheck,
+  Cpu,
+  History,
+  House,
+  SkipForward,
+  Sparkles,
+  Undo2,
+} from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { ExplainMerchant } from '../components/ExplainMerchant';
-import { Button, Card, ProgressBar } from '../components/ui';
+import { Badge, Button, Card, Kbd, ProgressBar } from '../components/ui';
 import { navigate, setCategoryByUser, setTypeByUser } from '../lib/state/actions';
 import { db, type Transaction } from '../lib/data/db';
 import { formatMoney, formatShortDate, plural } from '../lib/util/format';
@@ -61,7 +72,14 @@ export function ReviewView() {
     return () => window.removeEventListener('keydown', onKey);
   }, [decide, skip]);
 
-  if (all === undefined) return <Card>Loading…</Card>;
+  if (all === undefined) {
+    return (
+      <Card className="mx-auto max-w-2xl space-y-4 py-10">
+        <div className="skeleton h-6 w-32" />
+        <div className="skeleton h-48 w-full rounded-xl" />
+      </Card>
+    );
+  }
 
   const remaining = queue.length;
   const totalThisSession = decided + remaining;
@@ -69,37 +87,50 @@ export function ReviewView() {
 
   if (!current) {
     return (
-      <div className="space-y-4">
-        <Card className="flex flex-col items-center px-6 py-12 text-center">
+      <div className="mx-auto max-w-2xl space-y-4">
+        <Card className="relative overflow-hidden px-6 py-14 text-center">
           {remaining === 0 ? (
             <>
-              <span className="flex size-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                <CircleCheck aria-hidden className="size-7" />
-              </span>
-              <h1 className="mt-4 text-2xl font-semibold tracking-tight">{decided > 0 ? 'All sorted' : 'Nothing to review'}</h1>
-              <p className="mt-2 max-w-md text-slate-700">
-                {decided > 0 ? `You made ${plural(decided, 'decision')}. Each one is remembered for that merchant.` : 'Every labeled transaction already has business or personal.'}
-              </p>
-              {waiting > 0 && (
-                <p className="mt-3 flex items-center gap-2 text-sm text-slate-700">
-                  <Cpu aria-hidden className="size-4 text-slate-600" /> {plural(waiting, 'transaction')} still wait for on-device AI.
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-emerald-50/80 to-transparent"
+              />
+              <div className="relative flex flex-col items-center">
+                <span className="flex size-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 shadow-[0_8px_24px_-6px_rgba(16,185,129,0.45)] ring-4 ring-emerald-50">
+                  <CircleCheck aria-hidden className="size-8" />
+                </span>
+                <h1 className="mt-5 text-2xl font-bold tracking-tight text-slate-950">{decided > 0 ? 'All sorted' : 'Nothing to review'}</h1>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-600">
+                  {decided > 0
+                    ? `You made ${plural(decided, 'decision')}. Each one is saved to local merchant memory for future statements.`
+                    : 'Every labeled transaction already has a business or personal label.'}
                 </p>
-              )}
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
-                <Button variant="primary" onClick={() => navigate('summary')}>
-                  See summary &amp; export <ArrowRight aria-hidden className="size-4" />
-                </Button>
-                <Button onClick={() => navigate('transactions')}>Back to transactions</Button>
+                {waiting > 0 && (
+                  <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3.5 py-1.5 text-xs font-medium text-slate-700">
+                    <Cpu aria-hidden className="size-3.5 text-slate-500" /> {plural(waiting, 'transaction')} still wait for on-device AI.
+                  </p>
+                )}
+                <div className="mt-7 flex flex-wrap justify-center gap-3">
+                  <Button variant="primary" className="min-h-11 px-5" onClick={() => navigate('summary')}>
+                    See summary &amp; export <ArrowRight aria-hidden className="size-4" />
+                  </Button>
+                  <Button className="min-h-11" onClick={() => navigate('transactions')}>
+                    Back to transactions
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
-            <>
-              <h1 className="text-2xl font-semibold tracking-tight">You skipped {plural(skipped.length, 'transaction')}</h1>
-              <p className="mt-2 text-slate-700">They are still waiting for a decision.</p>
+            <div className="flex flex-col items-center">
+              <span className="flex size-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-700 ring-1 ring-amber-200">
+                <Undo2 aria-hidden className="size-6" />
+              </span>
+              <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-950">You skipped {plural(skipped.length, 'transaction')}</h1>
+              <p className="mt-2 text-sm text-slate-600">They are still waiting for your business or personal decision.</p>
               <Button variant="primary" className="mt-6" onClick={() => setSkipped([])}>
                 <Undo2 aria-hidden className="size-4" /> Go through them again
               </Button>
-            </>
+            </div>
           )}
         </Card>
       </div>
@@ -108,31 +139,59 @@ export function ReviewView() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Review</h1>
-          <p className="text-sm text-slate-600">
-            {plural(remaining, 'decision')} left{decided > 0 && ` · ${decided} done`}
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950">Review</h1>
+          <p className="mt-0.5 text-sm text-slate-500">
+            <span className="font-semibold text-amber-800 tabular-nums">{plural(remaining, 'decision')} left</span>
+            {decided > 0 && <span className="tabular-nums"> · {decided} done this session</span>}
           </p>
         </div>
-        <Button variant="ghost" onClick={() => navigate('transactions')}>
+        <Button variant="ghost" className="min-h-9 rounded-xl px-3 text-xs" onClick={() => navigate('transactions')}>
           See all in table
         </Button>
       </div>
-      <ProgressBar value={percent} label="Review progress" />
 
-      <ReviewCard key={current.id} tx={current} sameMerchant={sameMerchant} busy={busy} onDecide={(t) => void decide(t)} onSkip={skip} />
+      <ProgressBar value={percent} label="Review progress" tone="device" />
 
-      <p className="text-center text-xs text-slate-600">
-        Keyboard: <Kbd>B</Kbd> business · <Kbd>P</Kbd> personal · <Kbd>S</Kbd> skip
-      </p>
+      {/* Stacked triage deck */}
+      <div className="relative pt-1 pb-2">
+        {remaining > 2 && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-6 bottom-0 h-6 rounded-b-2xl border border-slate-200/60 bg-white/55"
+          />
+        )}
+        {remaining > 1 && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-3 bottom-1 h-6 rounded-b-2xl border border-slate-200/80 bg-white/80 shadow-xs"
+          />
+        )}
+        <ReviewCard key={current.id} tx={current} sameMerchant={sameMerchant} busy={busy} onDecide={(t) => void decide(t)} onSkip={skip} />
+      </div>
 
-      <p aria-live="polite" className="min-h-5 text-center text-sm text-slate-700">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
+        <span className="inline-flex items-center gap-1.5">
+          <Kbd>B</Kbd> Business
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Kbd>P</Kbd> Personal
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Kbd>S</Kbd> Skip
+        </span>
+      </div>
+
+      <p aria-live="polite" className="min-h-6 text-center text-sm text-slate-600">
         {last && (
-          <>
-            <span className="font-medium">{last.merchant}</span> marked {last.type}
-            {last.applied > 1 ? `, applied to ${last.applied} transactions` : ''}.
-          </>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50/90 px-3 py-1 text-xs font-medium text-emerald-900 ring-1 ring-emerald-200/80">
+            <Sparkles aria-hidden className="size-3.5 shrink-0 text-emerald-700" />
+            <span>
+              <strong className="font-semibold">{last.merchant}</strong> marked {last.type}
+              {last.applied > 1 ? ` · applied to ${last.applied} transactions` : ''}.
+            </span>
+          </span>
         )}
       </p>
     </div>
@@ -154,17 +213,29 @@ function ReviewCard({
 }) {
   const moneyIn = tx.amount > 0;
   return (
-    <article aria-label={`Decide: ${tx.cleanMerchant}`} className="card-in overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-slate-900/5">
-      <div className="px-6 pt-6 pb-5 sm:px-8">
+    <article
+      aria-label={`Decide: ${tx.cleanMerchant}`}
+      className="card-in relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_4px_14px_rgba(15,23,42,0.05),0_20px_40px_-14px_rgba(15,23,42,0.12)]"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/75 px-6 py-3 sm:px-8">
+        <time dateTime={tx.date} className="text-xs font-semibold text-slate-500 tabular-nums">
+          {formatShortDate(tx.date)}
+        </time>
+        <Badge tone={sameMerchant > 1 ? 'ink' : 'neutral'}>
+          <History aria-hidden className="size-3" />
+          {sameMerchant > 1 ? `Applies to ${sameMerchant} rows` : 'Saves to merchant memory'}
+        </Badge>
+      </div>
+
+      <div className="px-6 pt-6 pb-6 sm:px-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-sm text-slate-600">{formatShortDate(tx.date)}</p>
-            <h2 className="mt-0.5 text-2xl font-semibold tracking-tight">{tx.cleanMerchant}</h2>
-            <p className="mt-1 truncate font-mono text-xs text-slate-600" title={tx.rawDescription}>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-950">{tx.cleanMerchant}</h2>
+            <p className="mt-1 truncate font-mono text-xs text-slate-500" title={tx.rawDescription}>
               {tx.rawDescription}
             </p>
           </div>
-          <p className={`text-3xl font-semibold tracking-tight tabular-nums ${moneyIn ? 'text-emerald-800' : 'text-slate-900'}`}>
+          <p className={`text-3xl font-bold tracking-tight tabular-nums ${moneyIn ? 'text-emerald-700' : 'text-slate-950'}`}>
             {moneyIn ? '+' : ''}
             {formatMoney(tx.amount)}
           </p>
@@ -173,18 +244,21 @@ function ReviewCard({
         <ExplainMerchant tx={tx} />
 
         {tx.reviewReason && (
-          <p className="mt-5 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
-            <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-            {tx.reviewReason}
-          </p>
+          <div className="mt-5 flex items-start gap-2.5 rounded-xl bg-amber-50/85 px-3.5 py-3 text-sm text-amber-950 ring-1 ring-amber-200/80">
+            <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700" />
+            <span>{tx.reviewReason}</span>
+          </div>
         )}
 
-        <label className="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-700">
-          Category
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <label htmlFor={`cat-${tx.id}`} className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+            Category
+          </label>
           <select
+            id={`cat-${tx.id}`}
             value={tx.category ?? 'Other'}
             onChange={(e) => void setCategoryByUser(tx.id, e.target.value as Category)}
-            className="min-h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-900 focus:border-ink-800"
+            className="min-h-9 rounded-xl border border-slate-200 bg-slate-50/60 px-3 text-sm font-medium text-slate-900 transition-colors hover:border-slate-300 hover:bg-white focus:border-ink-700 focus:bg-white focus:outline-none"
           >
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>
@@ -192,39 +266,49 @@ function ReviewCard({
               </option>
             ))}
           </select>
-        </label>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-5 sm:px-8">
+      <div className="grid grid-cols-2 gap-3 border-t border-slate-100 bg-slate-50/80 px-6 py-5 sm:px-8">
         <button
           type="button"
           disabled={busy}
           onClick={() => onDecide('business')}
-          className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-ink-800 px-4 text-base font-semibold text-white shadow-sm transition hover:bg-ink-700 active:scale-[0.98] disabled:opacity-60"
+          className="group flex min-h-14 items-center justify-center gap-2.5 rounded-xl bg-gradient-to-b from-ink-700 to-ink-800 px-4 text-base font-semibold text-white shadow-[0_2px_8px_-2px_rgba(23,50,86,0.45),inset_0_1px_0_rgba(255,255,255,0.16)] transition-all duration-150 hover:-translate-y-0.5 hover:from-ink-600 hover:to-ink-700 active:translate-y-0 active:scale-[0.985] disabled:opacity-60"
         >
-          <Briefcase aria-hidden className="size-5" /> Business
-          <kbd className="ml-1 rounded bg-white/15 px-1.5 font-mono text-xs">B</kbd>
+          <Briefcase aria-hidden className="size-5" />
+          Business
+          <kbd className="ml-1 rounded-md bg-white/15 px-1.5 py-0.5 font-mono text-xs font-semibold text-white/95 ring-1 ring-white/20">
+            B
+          </kbd>
         </button>
+
         <button
           type="button"
           disabled={busy}
           onClick={() => onDecide('personal')}
-          className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-white px-4 text-base font-semibold text-slate-900 shadow-sm ring-1 ring-slate-300 transition hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60"
+          className="group flex min-h-14 items-center justify-center gap-2.5 rounded-xl bg-white px-4 text-base font-semibold text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/90 transition-all duration-150 hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md hover:ring-slate-300 active:translate-y-0 active:scale-[0.985] disabled:opacity-60"
         >
-          <House aria-hidden className="size-5" /> Personal
-          <kbd className="ml-1 rounded bg-slate-100 px-1.5 font-mono text-xs text-slate-700">P</kbd>
+          <House aria-hidden className="size-5 text-slate-600" />
+          Personal
+          <Kbd className="ml-1">P</Kbd>
         </button>
-        <div className="col-span-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
-          <span>{sameMerchant > 1 ? `Your answer also applies to ${sameMerchant - 1} other ${tx.cleanMerchant} transaction${sameMerchant > 2 ? 's' : ''}.` : 'Your answer is remembered for this merchant.'}</span>
-          <button type="button" onClick={onSkip} className="inline-flex min-h-8 items-center gap-1 rounded px-2 font-medium text-slate-700 hover:bg-slate-200/70">
+
+        <div className="col-span-2 mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+          <span>
+            {sameMerchant > 1
+              ? `Your answer also applies to ${sameMerchant - 1} other ${tx.cleanMerchant} transaction${sameMerchant > 2 ? 's' : ''}.`
+              : 'Your answer is remembered locally for this merchant.'}
+          </span>
+          <button
+            type="button"
+            onClick={onSkip}
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-lg px-2.5 font-semibold text-slate-600 transition-colors hover:bg-slate-200/70 hover:text-slate-900"
+          >
             <SkipForward aria-hidden className="size-3.5" /> Skip
           </button>
         </div>
       </div>
     </article>
   );
-}
-
-function Kbd({ children }: { children: string }) {
-  return <kbd className="rounded border border-slate-300 bg-white px-1 font-mono text-[11px] text-slate-800">{children}</kbd>;
 }

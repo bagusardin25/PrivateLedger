@@ -2,42 +2,94 @@
 
 @theme {
   /* System fonts only: a privacy app should not fetch fonts from a third party. */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
 
   /* Ink: primary actions and "business". Device = emerald, cloud = sky, needs you = amber, blocked = rose. */
-  --color-ink-50: #eef3f9;
-  --color-ink-100: #d9e4f1;
-  --color-ink-600: #2f5687;
-  --color-ink-700: #24466f;
-  --color-ink-800: #1e3a5f;
-  --color-ink-900: #162b47;
+  --color-ink-50: #eef4fb;
+  --color-ink-100: #d9e6f4;
+  --color-ink-200: #b8cfe8;
+  --color-ink-300: #8cb2da;
+  --color-ink-400: #5c8cc2;
+  --color-ink-500: #3a68a0;
+  --color-ink-600: #2a5182;
+  --color-ink-700: #20416b;
+  --color-ink-800: #173256;
+  --color-ink-900: #102440;
+  --color-ink-950: #0a182c;
+
+  --color-canvas: #f5f7fb;
 }
 
 @layer base {
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
   }
   body {
-    @apply bg-slate-100 text-slate-900 antialiased;
+    background-color: var(--color-canvas);
+    color: var(--color-slate-900);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    @apply antialiased selection:bg-ink-100 selection:text-ink-950;
   }
   button:not(:disabled),
   [role='button']:not([aria-disabled='true']),
   select,
-  label[for] {
+  label[for],
+  summary {
     cursor: pointer;
   }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-ink-800;
+    @apply outline-2 outline-offset-2 outline-ink-700;
   }
+}
+
+/* Subtle dot-grid surface texture for hero and featured surfaces. */
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Crisp dark terminal styling for exact cloud payload previews. */
+.code-inspector {
+  background: linear-gradient(180deg, #0d1526 0%, #0a1120 100%);
+  color: #e2ecf8;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+
+.code-inspector::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.code-inspector::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+/* Slim, unobtrusive scrollbars for side panels and tables. */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.45);
+  border-radius: 9999px;
 }
 
 /* A labeled row briefly glows green: it was labeled on this device. */
 @keyframes arrive {
-  from {
-    background-color: var(--color-emerald-100);
+  0% {
+    background-color: rgba(16, 185, 129, 0.16);
   }
-  to {
+  100% {
     background-color: transparent;
   }
 }
@@ -45,26 +97,51 @@
 /* Data Boundary panel: a section pulses when an AI call lands in it. */
 @keyframes pulse-device {
   0% {
-    box-shadow: inset 0 0 0 2px var(--color-emerald-500);
+    box-shadow: inset 0 0 0 2px var(--color-emerald-500), inset 0 0 24px rgba(16, 185, 129, 0.16);
   }
   100% {
-    box-shadow: inset 0 0 0 2px transparent;
-  }
-}
-@keyframes pulse-cloud {
-  0% {
-    box-shadow: inset 0 0 0 2px var(--color-sky-500);
-  }
-  100% {
-    box-shadow: inset 0 0 0 2px transparent;
+    box-shadow: inset 0 0 0 2px transparent, inset 0 0 24px transparent;
   }
 }
 
-/* Review mode: the next decision card slides in. */
+@keyframes pulse-cloud {
+  0% {
+    box-shadow: inset 0 0 0 2px var(--color-sky-500), inset 0 0 24px rgba(14, 165, 233, 0.16);
+  }
+  100% {
+    box-shadow: inset 0 0 0 2px transparent, inset 0 0 24px transparent;
+  }
+}
+
+@keyframes pulse-blocked {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+  }
+}
+
+/* Review mode: the next decision card glides smoothly into place. */
 @keyframes card-in {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.99);
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Subtle screen/section entry. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -75,35 +152,58 @@
 /* Placeholder while the on-device model has not labeled a row yet. */
 @keyframes shimmer {
   0% {
-    background-position: -200px 0;
+    background-position: -240px 0;
   }
   100% {
-    background-position: calc(200px + 100%) 0;
+    background-position: calc(240px + 100%) 0;
+  }
+}
+
+@keyframes indeterminate-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(260%);
   }
 }
 
 .skeleton {
-  border-radius: 4px;
+  border-radius: 6px;
   background-color: var(--color-slate-200);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .row-arrive {
-    animation: arrive 1.2s ease-out;
+    animation: arrive 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-device {
-    animation: pulse-device 1.4s ease-out;
-  }
-  .card-in {
-    animation: card-in 0.28s ease-out;
+    animation: pulse-device 1.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pulse-cloud {
-    animation: pulse-cloud 1.4s ease-out;
+    animation: pulse-cloud 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .pulse-blocked {
+    animation: pulse-blocked 1.3s ease-out;
+  }
+  .card-in {
+    animation: card-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fade-up {
+    animation: fade-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .skeleton {
-    background-image: linear-gradient(90deg, var(--color-slate-200) 0, var(--color-slate-100) 40px, var(--color-slate-200) 80px);
-    background-size: 200px 100%;
+    background-image: linear-gradient(
+      90deg,
+      var(--color-slate-200) 0%,
+      var(--color-slate-100) 45%,
+      var(--color-slate-200) 90%
+    );
+    background-size: 240px 100%;
     background-repeat: no-repeat;
-    animation: shimmer 1.6s ease-in-out infinite;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+  .indeterminate-bar {
+    animation: indeterminate-bar 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 }
