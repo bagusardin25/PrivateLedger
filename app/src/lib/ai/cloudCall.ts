@@ -3,11 +3,11 @@
 // attempt, and error messages a person can act on.
 
 import { AIError } from 'firebase/ai';
-import type { LedgerEntry } from './db';
-import { recordLedger } from './ledger';
+import type { LedgerEntry } from '../data/db';
+import { recordLedger } from '../data/ledger';
 import { CLOUD_MODEL } from './models';
-import { createStore } from './store';
-import { CLOUD_TIMEOUT_MS, TimeoutError, withTimeout } from './withTimeout';
+import { createStore } from '../util/store';
+import { CLOUD_TIMEOUT_MS, TimeoutError, withTimeout } from '../util/withTimeout';
 
 const MAX_ATTEMPTS = 3;
 /** Wait before attempt 2 and attempt 3; a little jitter is added to each. */

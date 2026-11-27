@@ -22,20 +22,20 @@ import {
 } from 'lucide-react';
 import { useState, type KeyboardEvent } from 'react';
 import { Badge, Button, Card, ProgressBar } from '../components/ui';
-import { navigate, setCategoryByUser, setTypeByUser, startDemo } from '../lib/actions';
-import { clearAllData, db, type Transaction } from '../lib/db';
-import { deviceStore } from '../lib/device';
-import { formatMoney, formatSeconds, formatShortDate, plural } from '../lib/format';
-import { resetAdvisor } from '../lib/advisorStore';
-import { cloudRetryStore } from '../lib/cloudCall';
-import { runCloudLabelingWithConsent } from '../lib/consentLabeling';
-import { resetExplanations } from '../lib/explainer';
-import { resetSummary } from '../lib/reporter';
-import { labelingStore, recentArrivals, runOnDeviceLabeling } from '../lib/labelingRunner';
+import { navigate, setCategoryByUser, setTypeByUser, startDemo } from '../lib/state/actions';
+import { clearAllData, db, type Transaction } from '../lib/data/db';
+import { deviceStore } from '../lib/state/device';
+import { formatMoney, formatSeconds, formatShortDate, plural } from '../lib/util/format';
+import { resetAdvisor } from '../lib/ai/advisorStore';
+import { cloudRetryStore } from '../lib/ai/cloudCall';
+import { runCloudLabelingWithConsent } from '../lib/ai/consentLabeling';
+import { resetExplanations } from '../lib/ai/explainer';
+import { resetSummary } from '../lib/ai/reporter';
+import { labelingStore, recentArrivals, runOnDeviceLabeling } from '../lib/ai/labelingRunner';
 import { NoModelChoices } from '../components/ConsentFallback';
-import { useStore } from '../lib/store';
-import { useCountUp } from '../lib/useCountUp';
-import { CATEGORIES, type Category } from '../lib/taxonomy';
+import { useStore } from '../lib/util/store';
+import { useCountUp } from '../lib/util/useCountUp';
+import { CATEGORIES, type Category } from '../lib/core/taxonomy';
 
 type Filter = 'all' | 'review' | 'business' | 'personal' | 'waiting';
 

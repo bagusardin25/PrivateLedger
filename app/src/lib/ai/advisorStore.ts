@@ -5,7 +5,7 @@ import { askAdvisor, newAdvisorSession } from './advisor';
 import { friendlyCloudError } from './cloudCall';
 import { describeCall } from './localFunctions';
 import { checkOutgoingMessage } from './guard';
-import { createStore } from './store';
+import { createStore } from '../util/store';
 
 export type ChatItem =
   | { id: number; kind: 'user'; text: string; status: 'checking' | 'sent' | 'blocked' }

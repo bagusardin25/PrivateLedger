@@ -4,11 +4,11 @@
 
 import type { Content, EnhancedGenerateContentResponse, FunctionCall, Part } from 'firebase/ai';
 import { cloudRequest } from './cloudCall';
-import { db } from './db';
-import { FEATURE } from './ledger';
+import { db } from '../data/db';
+import { FEATURE } from '../data/ledger';
 import { runLocalFunction } from './localFunctions';
 import { getAdvisorModel } from './models';
-import { CLOUD_TIMEOUT_MS } from './withTimeout';
+import { CLOUD_TIMEOUT_MS } from '../util/withTimeout';
 
 export interface CallTrace {
   name: string;

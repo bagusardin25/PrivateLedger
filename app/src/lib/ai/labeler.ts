@@ -4,8 +4,8 @@
 
 import { getLabelerModel } from './models';
 import { assertOnDeviceReady } from './onDevice';
-import type { ModelMerchant } from './prepare';
-import { CATEGORIES, isCategory, isTxType, type Category, type TxType } from './taxonomy';
+import type { ModelMerchant } from '../core/prepare';
+import { CATEGORIES, isCategory, isTxType, type Category, type TxType } from '../core/taxonomy';
 
 export const BATCH_SIZE = 10;
 

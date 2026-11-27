@@ -1,6 +1,6 @@
 import { db, type Transaction } from './db';
-import { DEMO_PROFILE, DEMO_ROWS } from './demoData';
-import { prepareRows, type MemoryRule, type RawRow } from './prepare';
+import { DEMO_PROFILE, DEMO_ROWS } from '../core/demoData';
+import { prepareRows, type MemoryRule, type RawRow } from '../core/prepare';
 
 export async function importRows(rows: RawRow[], meta: { fileName: string; isDemo: boolean }): Promise<string> {
   const importId = crypto.randomUUID();

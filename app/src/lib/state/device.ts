@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from 'react';
-import { initializeOnDeviceModel } from './labeler';
-import { runOnDeviceLabeling } from './labelingRunner';
-import { getDeviceStatus, type DeviceStatus } from './onDevice';
-import { createStore } from './store';
+import { initializeOnDeviceModel } from '../ai/labeler';
+import { runOnDeviceLabeling } from '../ai/labelingRunner';
+import { getDeviceStatus, type DeviceStatus } from '../ai/onDevice';
+import { createStore } from '../util/store';
 
 export interface DeviceState {
   status: DeviceStatus | 'checking';

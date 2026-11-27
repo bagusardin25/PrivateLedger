@@ -19,7 +19,7 @@ import { getGenerativeModel, InferenceMode, Schema, type GenerativeModel } from 
 import { getFirebase } from './firebase';
 import { FUNCTION_DECLARATIONS } from './localFunctions';
 import { TEXT_EN } from './onDevice';
-import { CATEGORIES } from './taxonomy';
+import { CATEGORIES } from '../core/taxonomy';
 
 /** The only "billing not required" model that answered quickly and reliably in our tests (2 to 7 s). */
 export const CLOUD_MODEL = 'gemini-3.5-flash-lite';

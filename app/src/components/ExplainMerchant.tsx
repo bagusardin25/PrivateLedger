@@ -3,9 +3,9 @@
 // only the merchant name goes to the cloud.
 
 import { CircleHelp, Cloud, Cpu, LoaderCircle } from 'lucide-react';
-import type { Transaction } from '../lib/db';
-import { explainMerchant, explainStore } from '../lib/explainer';
-import { useStore } from '../lib/store';
+import type { Transaction } from '../lib/data/db';
+import { explainMerchant, explainStore } from '../lib/ai/explainer';
+import { useStore } from '../lib/util/store';
 import { Badge, Button } from './ui';
 
 export function ExplainMerchant({ tx }: { tx: Transaction }) {

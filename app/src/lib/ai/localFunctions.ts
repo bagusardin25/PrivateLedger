@@ -3,7 +3,7 @@
 // name, description, date of a single transaction, or account detail leaves.
 
 import { Schema, type FunctionDeclaration } from 'firebase/ai';
-import { db, type Transaction } from './db';
+import { db, type Transaction } from '../data/db';
 
 type Kind = 'business' | 'personal' | 'all';
 

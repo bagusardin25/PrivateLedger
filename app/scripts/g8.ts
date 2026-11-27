@@ -1,4 +1,4 @@
-// Tests the labeling steps that need no model (src/lib/prepare.ts):
+// Tests the labeling steps that need no model (src/lib/core/prepare.ts):
 // - every mixed-use row lands in the review queue;
 // - transfers, P2P payments, and savings are never labeled business;
 // - how many unique merchants are left for the on-device model.
@@ -6,8 +6,8 @@
 //
 // Run: npm run test:g8
 
-import { DEMO_ROWS } from '../src/lib/demoData.ts';
-import { prepareRows } from '../src/lib/prepare.ts';
+import { DEMO_ROWS } from '../src/lib/core/demoData.ts';
+import { prepareRows } from '../src/lib/core/prepare.ts';
 
 const { rows, modelMerchants } = prepareRows(DEMO_ROWS, new Map());
 let failures = 0;

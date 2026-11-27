@@ -3,8 +3,8 @@
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowRight, Ban, Cloud, Laptop } from 'lucide-react';
-import { db } from '../lib/db';
-import { countLedger } from '../lib/ledger';
+import { db } from '../lib/data/db';
+import { countLedger } from '../lib/data/ledger';
 
 export function DataBoundaryBar() {
   const rows = useLiveQuery(() => db.transactions.count(), [], 0);

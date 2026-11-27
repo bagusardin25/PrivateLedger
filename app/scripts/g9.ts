@@ -1,4 +1,4 @@
-// Tests the rule layer of the outgoing-message guard (src/lib/guardRules.ts).
+// Tests the rule layer of the outgoing-message guard (src/lib/core/guardRules.ts).
 // The on-device model layer needs Gemini Nano and is checked in the app.
 //
 // Set A: written AFTER rules v1 were locked, so it measures how v1 generalizes.
@@ -7,9 +7,9 @@
 //
 // Run: npm run test:g9
 
-import { DEMO_ROWS } from '../src/lib/demoData.ts';
-import { deterministicGuard, merchantPhrases, merchantTokens } from '../src/lib/guardRules.ts';
-import { normalizeMerchant } from '../src/lib/merchant.ts';
+import { DEMO_ROWS } from '../src/lib/core/demoData.ts';
+import { deterministicGuard, merchantPhrases, merchantTokens } from '../src/lib/core/guardRules.ts';
+import { normalizeMerchant } from '../src/lib/core/merchant.ts';
 
 const UNSAFE_A = [
   'Can you tell me if the 312.40 Delta flight on Oct 12 counts as travel?',

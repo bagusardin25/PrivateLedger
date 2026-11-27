@@ -1,7 +1,7 @@
 import { CircleCheck, Cpu, Download, LoaderCircle, TriangleAlert } from 'lucide-react';
-import { openSetup } from '../lib/actions';
-import { deviceStore, enableOnDeviceAi, type DeviceState } from '../lib/device';
-import { useStore } from '../lib/store';
+import { openSetup } from '../lib/state/actions';
+import { deviceStore, enableOnDeviceAi, type DeviceState } from '../lib/state/device';
+import { useStore } from '../lib/util/store';
 import { Badge, Button, ProgressBar } from './ui';
 
 const CHIP: Record<DeviceState['status'], { text: string; tone: 'device' | 'review' | 'neutral' }> = {

@@ -1,13 +1,13 @@
 // Runs on-device labeling over every pending merchant and keeps the Privacy Ledger exact:
 // one entry per model call, plus an entry when a call is refused before sending.
 
-import { db, type Transaction } from './db';
+import { db, type Transaction } from '../data/db';
 import { BATCH_SIZE, labelBatch } from './labeler';
-import { FEATURE, recordLedger } from './ledger';
+import { FEATURE, recordLedger } from '../data/ledger';
 import { ON_DEVICE_MODEL } from './models';
 import { getDeviceStatus } from './onDevice';
-import type { ModelMerchant } from './prepare';
-import { createStore } from './store';
+import type { ModelMerchant } from '../core/prepare';
+import { createStore } from '../util/store';
 
 export interface LabelingState {
   status: 'idle' | 'running' | 'done' | 'refused' | 'error';

@@ -5,11 +5,11 @@
 
 import { errorText, friendlyCloudError } from './cloudCall';
 import { cloudReady } from './firebase';
-import { FEATURE, recordLedger } from './ledger';
+import { FEATURE, recordLedger } from '../data/ledger';
 import { CLOUD_MODEL, getExplainerModel, ON_DEVICE_MODEL } from './models';
 import { getDeviceStatus } from './onDevice';
-import { createStore } from './store';
-import { CLOUD_TIMEOUT_MS, withTimeout } from './withTimeout';
+import { createStore } from '../util/store';
+import { CLOUD_TIMEOUT_MS, withTimeout } from '../util/withTimeout';
 
 export interface Explanation {
   known: boolean;

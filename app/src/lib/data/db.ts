@@ -2,8 +2,8 @@
 // Nothing in these tables is ever synced to a server.
 
 import Dexie, { type EntityTable } from 'dexie';
-import type { LabelSource } from './prepare';
-import type { Category, TxType } from './taxonomy';
+import type { LabelSource } from '../core/prepare';
+import type { Category, TxType } from '../core/taxonomy';
 
 export interface Transaction {
   id: string;

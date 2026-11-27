@@ -6,9 +6,9 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowRight, Ban, ChevronDown, ChevronUp, Cloud, Laptop, Lock, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { db } from '../lib/db';
-import { formatTime, plural } from '../lib/format';
-import { countLedger } from '../lib/ledger';
+import { db } from '../lib/data/db';
+import { formatTime, plural } from '../lib/util/format';
+import { countLedger } from '../lib/data/ledger';
 import { SOURCE_META } from './sourceMeta';
 
 const FRESH_MS = 4_000;
