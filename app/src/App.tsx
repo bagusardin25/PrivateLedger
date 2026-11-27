@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Wifi, WifiOff } from 'lucide-react';
+import { MonitorDown, Wifi, WifiOff } from 'lucide-react';
 import { lazy, Suspense, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import { DataBoundaryBar } from './components/DataBoundaryBar';
 import { DataBoundaryPanel } from './components/DataBoundaryPanel';
@@ -9,6 +9,8 @@ import { BrandMark, Card } from './components/ui';
 import { consumeSetupRequest, type Route } from './lib/state/actions';
 import { db } from './lib/data/db';
 import { refreshDeviceStatus, useOnline } from './lib/state/device';
+import { installStore, promptInstall } from './lib/state/install';
+import { useStore } from './lib/util/store';
 import { WelcomeView } from './views/WelcomeView';
 
 // Home is part of the first download; every other screen is its own chunk.
@@ -36,6 +38,22 @@ function prefetchScreens(): () => void {
   }
   const timer = setTimeout(run, 1500);
   return () => clearTimeout(timer);
+}
+
+/** Shown only when Chrome says the app can be installed. */
+function InstallButton() {
+  const { canInstall } = useStore(installStore);
+  if (!canInstall) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => void promptInstall()}
+      title="Install Private Ledger as an app. It opens in its own window and starts without a connection."
+      className="inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-ink-700 ring-1 ring-ink-100 transition-colors hover:bg-ink-50"
+    >
+      <MonitorDown aria-hidden className="size-3.5" /> Install app
+    </button>
+  );
 }
 
 function Screen({ children }: { children: ReactNode }) {
@@ -124,6 +142,7 @@ export function App() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-3">
+            <InstallButton />
             <ModelStatusChip />
             <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${online ? 'text-slate-600' : 'text-amber-900'}`}>
               {online ? <Wifi aria-hidden className="size-4" /> : <WifiOff aria-hidden className="size-4" />}

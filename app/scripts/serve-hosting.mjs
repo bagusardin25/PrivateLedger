@@ -20,18 +20,16 @@ const TYPES = {
   '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.json': 'application/json',
+  '.webmanifest': 'application/manifest+json',
   '.png': 'image/png',
   '.ico': 'image/x-icon',
 };
 
 /** Firebase Hosting globs: "**" crosses folders, "*" stays inside one. */
 function globToRegExp(glob) {
-  const pattern = glob
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*\*/g, '\u0000')
-    .replace(/\*/g, '[^/]*')
-    .replace(/\u0000/g, '.*');
-  return new RegExp(`^/?${pattern.replace(/^\//, '')}$`);
+  const part = (text) => text.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*');
+  const pattern = glob.replace(/^\//, '').split('**').map(part).join('.*');
+  return new RegExp(`^/?${pattern}$`);
 }
 
 const rules = (hosting.headers ?? []).map((rule) => ({ test: globToRegExp(rule.source), headers: rule.headers }));
