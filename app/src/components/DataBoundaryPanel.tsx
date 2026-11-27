@@ -38,16 +38,17 @@ export function DataBoundaryPanel() {
   const lastCloud = entries.findLast((e) => e.inferenceSource === 'in_cloud');
   const latest = entries.at(-1);
 
+  // `now` only moves forward when a highlight should end. An entry newer than
+  // `now` counts as fresh, so a new call lights up without a synchronous update.
+  const latestTimestamp = latest?.timestamp;
+  const latestBlocked = latest?.inferenceSource === 'blocked';
   useEffect(() => {
-    if (!latest) return;
-    const current = Date.now();
-    setNow(current);
-    const ttl = latest.inferenceSource === 'blocked' ? BLOCKED_MS : FRESH_MS;
-    const remaining = latest.timestamp + ttl - current;
+    if (latestTimestamp === undefined) return;
+    const remaining = latestTimestamp + (latestBlocked ? BLOCKED_MS : FRESH_MS) - Date.now();
     if (remaining <= 0) return;
     const timer = window.setTimeout(() => setNow(Date.now()), remaining + 20);
     return () => window.clearTimeout(timer);
-  }, [latest?.id, latest?.timestamp, latest?.inferenceSource]);
+  }, [latestTimestamp, latestBlocked]);
 
   const fresh = latest && now - latest.timestamp < FRESH_MS ? latest : undefined;
   const justBlocked = latest?.inferenceSource === 'blocked' && now - latest.timestamp < BLOCKED_MS;

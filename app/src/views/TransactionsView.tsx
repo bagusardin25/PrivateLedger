@@ -301,8 +301,7 @@ function Stat({ label, value, note, accent }: { label: string; value: number; no
 function Row({ tx, filter }: { tx: Transaction; filter: Filter }) {
   const labeled = tx.source !== 'pending';
   const badge = labeled ? SOURCE_BADGE[tx.source as Exclude<Transaction['source'], 'pending'>] : undefined;
-  const arrivedAt = recentArrivals.get(tx.id);
-  const justArrived = tx.source === 'on-device' && arrivedAt !== undefined && Date.now() - arrivedAt < 2000;
+  const justArrived = tx.source === 'on-device' && recentArrivals.has(tx.id);
 
   return (
     <tr className={`border-t border-slate-100 align-top transition-colors hover:bg-slate-50/70 ${justArrived ? 'row-arrive' : ''}`}>
