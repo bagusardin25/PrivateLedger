@@ -1,7 +1,7 @@
 // Zero-dependency crisp SVG donut chart for business spending by category.
 // Syncs hovered/focused slice state with the adjacent ranked bar list.
 
-import { formatMoney } from '../lib/util/format';
+import { formatMoney, plural } from '../lib/util/format';
 
 export const CATEGORY_COLORS = [
   'var(--chart-0)',
@@ -108,7 +108,7 @@ export function CategoryDonut({
           {formatMoney(focused ? focused.amount : total)}
         </span>
         <span className="mt-0.5 text-[11px] text-fg-muted tabular-nums">
-          {focused ? `${Math.round(focused.share * 100)}% of spend` : `${rows.length} categories`}
+          {focused ? `${Math.round(focused.share * 100)}% of spend` : plural(rows.length, 'category', 'categories')}
         </span>
       </div>
     </div>
