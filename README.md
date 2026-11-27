@@ -6,7 +6,7 @@ Private Ledger helps freelancers separate business from personal spending in a b
 
 Built for [#BuildHybridAI 2026](https://firebasehybridaihackathon.devpost.com/) with **Firebase AI Logic** hybrid inference. Platform: Web (Chrome desktop).
 
-- Live app: _link added at submission_
+- Live app: https://private-ledger.web.app
 - Demo video: _link added at submission_
 
 ## The problem
