@@ -1,0 +1,116 @@
+// Zero-dependency crisp SVG donut chart for business spending by category.
+// Syncs hovered/focused slice state with the adjacent ranked bar list.
+
+import { formatMoney } from '../lib/util/format';
+
+export const CATEGORY_COLORS = [
+  'var(--chart-0)',
+  'var(--chart-1)',
+  'var(--chart-2)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'var(--chart-6)',
+  'var(--chart-7)',
+];
+
+export interface CategorySlice {
+  category: string;
+  amount: number;
+  count: number;
+}
+
+export function CategoryDonut({
+  rows,
+  total,
+  active,
+  onHover,
+}: {
+  rows: CategorySlice[];
+  total: number;
+  active?: string;
+  onHover: (category?: string) => void;
+}) {
+  const size = 188;
+  const stroke = 22;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const gap = rows.length > 1 ? 3 : 0;
+
+  const slices = rows.reduce<
+    (CategorySlice & { share: number; length: number; dashOffset: number; color: string; nextOffset: number })[]
+  >((acc, row, index) => {
+    const startOffset = acc.at(-1)?.nextOffset ?? 0;
+    const share = total > 0 ? row.amount / total : 0;
+    const rawLen = share * circumference;
+    const length = Math.max(0, rawLen - gap);
+    acc.push({
+      ...row,
+      share,
+      length,
+      dashOffset: -startOffset,
+      color: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+      nextOffset: startOffset + rawLen,
+    });
+    return acc;
+  }, []);
+
+  const focused = slices.find((s) => s.category === active);
+
+  return (
+    <div className="relative mx-auto flex size-[188px] shrink-0 items-center justify-center">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90 overflow-visible"
+        role="img"
+        aria-label={`Business spending breakdown totaling ${formatMoney(total)}`}
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={stroke}
+          className="text-stone-100 dark:text-white/[0.06]"
+        />
+        {slices.map((slice) => {
+          const isFocused = active === slice.category;
+          const isDimmed = Boolean(active && !isFocused);
+          return (
+            <circle
+              key={slice.category}
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={slice.color}
+              strokeWidth={isFocused ? stroke + 4 : stroke}
+              strokeDasharray={`${slice.length} ${circumference}`}
+              strokeDashoffset={slice.dashOffset}
+              strokeLinecap="butt"
+              opacity={isDimmed ? 0.35 : 1}
+              className="cursor-pointer transition-all duration-200"
+              onMouseEnter={() => onHover(slice.category)}
+              onMouseLeave={() => onHover(undefined)}
+            />
+          );
+        })}
+      </svg>
+
+      <div className="pointer-events-none absolute inset-7 flex flex-col items-center justify-center text-center">
+        <span className="max-w-[7.5rem] truncate text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+          {focused ? focused.category : 'Total business'}
+        </span>
+        <span className="mt-0.5 text-lg font-bold tracking-tight text-zinc-950 tabular-nums dark:text-white">
+          {formatMoney(focused ? focused.amount : total)}
+        </span>
+        <span className="mt-0.5 text-[11px] font-medium text-zinc-400 tabular-nums dark:text-zinc-500">
+          {focused ? `${Math.round(focused.share * 100)}% of spend` : `${rows.length} categories`}
+        </span>
+      </div>
+    </div>
+  );
+}

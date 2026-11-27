@@ -16,7 +16,7 @@ import { DataBoundaryBar } from './components/DataBoundaryBar';
 import { DataBoundaryPanel } from './components/DataBoundaryPanel';
 import { JourneySteps } from './components/JourneySteps';
 import { ModelStatusChip } from './components/ModelStatus';
-import { BrandMark, Card } from './components/ui';
+import { BrandMark, Card, ThemeToggle } from './components/ui';
 import { consumeSetupRequest, type Route } from './lib/state/actions';
 import { db } from './lib/data/db';
 import { refreshDeviceStatus, useOnline } from './lib/state/device';
@@ -60,9 +60,9 @@ function InstallButton() {
       type="button"
       onClick={() => void promptInstall()}
       title="Install Private Ledger as an app. It opens in its own window and starts without a connection."
-      className="inline-flex min-h-8 items-center gap-1.5 rounded-full bg-ink-50 px-3 text-xs font-semibold text-ink-800 ring-1 ring-ink-200/80 transition-colors hover:bg-ink-100/80"
+      className="inline-flex min-h-8 items-center gap-1.5 rounded-full bg-ink-50 px-3 text-xs font-semibold text-ink-800 ring-1 ring-ink-200/80 transition-colors hover:bg-ink-100/80 dark:bg-indigo-950/70 dark:text-indigo-200 dark:ring-indigo-700/70 dark:hover:bg-indigo-900/70"
     >
-      <MonitorDown aria-hidden className="size-3.5" /> Install app
+      <MonitorDown aria-hidden className="size-3.5" /> Install
     </button>
   );
 }
@@ -135,21 +135,21 @@ export function App() {
           e.preventDefault();
           document.getElementById('main')?.focus();
         }}
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-xl focus:bg-white focus:px-3.5 focus:py-2 focus:text-sm font-medium focus:shadow-lg focus:ring-1 focus:ring-slate-200"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-xl focus:bg-white focus:px-3.5 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:ring-1 focus:ring-stone-200 dark:focus:bg-[#12131c] dark:focus:text-white"
       >
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-30 border-b border-slate-200/75 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/75">
+      <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-[#fdfcfa]/85 backdrop-blur-xl supports-[backdrop-filter]:bg-[#fdfcfa]/78 dark:border-white/[0.08] dark:bg-[#090a0f]/82 dark:supports-[backdrop-filter]:bg-[#090a0f]/75">
         <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:px-6 lg:flex-nowrap xl:gap-x-5">
-          <a href="#/welcome" className="group flex shrink-0 items-center gap-2 rounded-lg pr-0.5">
-            <BrandMark className="transition-transform duration-200 group-hover:scale-[1.03]" />
-            <span className="text-[15px] font-semibold tracking-tight whitespace-nowrap text-slate-900">Private Ledger</span>
+          <a href="#/welcome" className="group flex shrink-0 items-center gap-2.5 rounded-lg pr-0.5">
+            <BrandMark className="transition-transform duration-200 group-hover:scale-[1.04]" />
+            <span className="text-[15px] font-bold tracking-tight whitespace-nowrap text-zinc-950 dark:text-white">Private Ledger</span>
           </a>
 
           <nav
             aria-label="Main"
-            className="order-last -mx-1 flex w-full items-center gap-0.5 overflow-x-auto rounded-xl bg-slate-100/85 p-1 ring-1 ring-slate-200/70 lg:order-none lg:mx-0 lg:w-auto lg:overflow-visible"
+            className="order-last -mx-1 flex w-full items-center gap-0.5 overflow-x-auto rounded-xl bg-stone-100/95 p-1 ring-1 ring-stone-200/80 lg:order-none lg:mx-0 lg:w-auto lg:overflow-visible dark:bg-white/[0.04] dark:ring-white/[0.08]"
           >
             {NAV.map((r) => {
               const active = route === r.id;
@@ -158,18 +158,18 @@ export function App() {
                   key={r.id}
                   href={`#/${r.id}`}
                   aria-current={active ? 'page' : undefined}
-                  className={`inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-medium whitespace-nowrap transition-all duration-150 xl:px-2.5 xl:text-[13px] ${
+                  className={`inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold whitespace-nowrap transition-all duration-150 xl:px-2.5 xl:text-[13px] ${
                     active
-                      ? 'bg-white text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/5'
-                      : 'text-slate-600 hover:bg-white/60 hover:text-slate-900'
+                      ? 'bg-white text-zinc-950 shadow-[0_1px_3px_rgba(24,24,27,0.08)] ring-1 ring-stone-900/5 dark:bg-white/[0.1] dark:text-white dark:ring-white/10'
+                      : 'text-zinc-600 hover:bg-white/60 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-white/[0.05] dark:hover:text-zinc-100'
                   }`}
                 >
-                  <r.icon aria-hidden className={`size-3.5 ${active ? 'text-ink-700' : 'text-slate-500'}`} />
+                  <r.icon aria-hidden className={`size-3.5 ${active ? 'text-ink-700 dark:text-indigo-300' : 'text-zinc-400 dark:text-zinc-500'}`} />
                   {r.label}
                   {r.id === 'review' && reviewCount > 0 && (
                     <span
                       aria-label={`${reviewCount} to review`}
-                      className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] leading-none font-semibold text-amber-900 tabular-nums ring-1 ring-amber-300/70"
+                      className="rounded-full bg-amber-100/95 px-1.5 py-0.5 text-[10px] leading-none font-bold text-amber-900 tabular-nums ring-1 ring-amber-300/80 dark:bg-amber-950/90 dark:text-amber-300 dark:ring-amber-700/70"
                     >
                       {reviewCount}
                     </span>
@@ -179,28 +179,29 @@ export function App() {
             })}
           </nav>
 
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <InstallButton />
             <ModelStatusChip />
             <span
               className={`inline-flex min-h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-semibold whitespace-nowrap ring-1 ring-inset ${
                 online
-                  ? 'bg-slate-50 text-slate-600 ring-slate-200/80'
-                  : 'bg-amber-50 text-amber-900 ring-amber-300/90'
+                  ? 'bg-stone-50 text-zinc-600 ring-stone-200/85 dark:bg-white/[0.04] dark:text-zinc-300 dark:ring-white/10'
+                  : 'bg-amber-50 text-amber-900 ring-amber-300/90 dark:bg-amber-950/80 dark:text-amber-300 dark:ring-amber-700/80'
               }`}
             >
               {online ? (
                 <>
-                  <span aria-hidden className="size-1.5 rounded-full bg-emerald-500" />
+                  <span aria-hidden className="size-1.5 rounded-full bg-teal-500 dark:bg-teal-400" />
                   Online
                 </>
               ) : (
                 <>
-                  <WifiOff aria-hidden className="size-3.5 text-amber-700" />
+                  <WifiOff aria-hidden className="size-3.5 text-amber-700 dark:text-amber-400" />
                   Offline
                 </>
               )}
             </span>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -222,7 +223,7 @@ export function App() {
                 </Screen>
               </main>
             ) : (
-              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_344px]">
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_310px] xl:grid-cols-[minmax(0,1fr)_356px]">
                 <main id="main" tabIndex={-1} className="fade-up min-w-0 focus:outline-none">
                   <Screen>
                     {route === 'import' && <ImportView />}
@@ -241,11 +242,11 @@ export function App() {
         )}
       </div>
 
-      <footer className="mt-auto border-t border-slate-200/70 bg-white/50">
-        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-slate-500 sm:px-6">
-          <span className="inline-flex items-center gap-1.5">
-            <Lock aria-hidden className="size-3.5 text-emerald-700" />
-            Private Ledger · Local-first in your browser
+      <footer className="mt-auto border-t border-stone-200/80 bg-[#fdfcfa]/70 dark:border-white/[0.07] dark:bg-[#090a0f]/70">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-zinc-500 sm:px-6 dark:text-zinc-400">
+          <span className="inline-flex items-center gap-1.5 font-medium">
+            <Lock aria-hidden className="size-3.5 text-teal-700 dark:text-teal-400" />
+            Private Ledger · Local-first in Chrome · Built with Firebase AI Logic
           </span>
           <span>Labels are suggestions you confirm. Not financial or tax advice.</span>
         </div>

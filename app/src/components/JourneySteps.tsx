@@ -55,7 +55,7 @@ export function JourneySteps({ route }: { route: Route }) {
   return (
     <nav
       aria-label="Progress"
-      className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03),0_4px_14px_-4px_rgba(15,23,42,0.05)]"
+      className="relative overflow-hidden rounded-2xl border border-stone-200/85 bg-white shadow-[0_1px_2px_rgba(24,24,27,0.03),0_6px_18px_-6px_rgba(24,24,27,0.05)] dark:border-white/[0.08] dark:bg-[#12131c]"
     >
       <ol className="grid grid-cols-2 gap-1 p-1.5 md:grid-cols-4 md:gap-0">
         {steps.map((step, i) => {
@@ -67,30 +67,32 @@ export function JourneySteps({ route }: { route: Route }) {
                 aria-current={here ? 'step' : undefined}
                 className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150 ${
                   here
-                    ? 'bg-ink-50/80 ring-1 ring-ink-200/80 ring-inset'
-                    : 'hover:bg-slate-50'
+                    ? 'bg-ink-50/90 ring-1 ring-ink-200/80 ring-inset dark:bg-indigo-500/10 dark:ring-indigo-400/25'
+                    : 'hover:bg-stone-50 dark:hover:bg-white/[0.04]'
                 }`}
               >
                 <span
                   className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all ${
                     step.state === 'done'
-                      ? 'bg-emerald-600 text-white shadow-[0_2px_6px_-1px_rgba(5,150,105,0.45)]'
+                      ? 'bg-teal-700 text-white shadow-[0_2px_8px_-1px_rgba(15,118,110,0.45)] dark:bg-teal-500 dark:text-zinc-950'
                       : step.state === 'current'
-                        ? 'bg-ink-800 text-white shadow-[0_2px_6px_-1px_rgba(23,50,86,0.35)] ring-4 ring-ink-100'
-                        : 'bg-slate-100 text-slate-500 ring-1 ring-slate-200/90'
+                        ? 'bg-ink-800 text-white shadow-[0_2px_8px_-1px_rgba(30,32,88,0.38)] ring-4 ring-ink-100 dark:bg-indigo-400 dark:text-zinc-950 dark:ring-indigo-400/25'
+                        : 'bg-stone-100 text-zinc-500 ring-1 ring-stone-200/90 dark:bg-white/[0.06] dark:text-zinc-400 dark:ring-white/10'
                   }`}
                 >
                   {step.state === 'done' ? <Check aria-hidden className="size-4" strokeWidth={2.75} /> : i + 1}
                 </span>
                 <span className="min-w-0 leading-tight">
-                  <span className={`block text-sm font-semibold ${here ? 'text-ink-900' : 'text-slate-900'}`}>{step.title}</span>
+                  <span className={`block text-sm font-semibold ${here ? 'text-ink-900 dark:text-indigo-200' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                    {step.title}
+                  </span>
                   <span
                     className={`mt-0.5 block truncate text-xs ${
                       step.state === 'current' && step.id === 'review'
-                        ? 'font-semibold text-amber-800'
+                        ? 'font-semibold text-amber-800 dark:text-amber-300'
                         : step.state === 'done'
-                          ? 'text-emerald-800/90'
-                          : 'text-slate-500'
+                          ? 'text-teal-800 dark:text-teal-400'
+                          : 'text-zinc-500 dark:text-zinc-400'
                     }`}
                   >
                     {step.status}
@@ -99,15 +101,15 @@ export function JourneySteps({ route }: { route: Route }) {
                 <span className="sr-only">{step.state === 'done' ? '(done)' : step.state === 'current' ? '(next step)' : ''}</span>
               </a>
               {i < steps.length - 1 && (
-                <ChevronRight aria-hidden className="hidden size-4 shrink-0 text-slate-300 md:block" />
+                <ChevronRight aria-hidden className="hidden size-4 shrink-0 text-stone-300 md:block dark:text-zinc-700" />
               )}
             </li>
           );
         })}
       </ol>
-      <div aria-hidden className="h-[3px] w-full bg-slate-100">
+      <div aria-hidden className="h-[3px] w-full bg-stone-100 dark:bg-white/[0.05]">
         <div
-          className="h-full bg-gradient-to-r from-emerald-500 via-emerald-500 to-ink-700 transition-[width] duration-500 ease-out"
+          className="h-full bg-gradient-to-r from-teal-600 via-ink-600 to-indigo-500 transition-[width] duration-500 ease-out dark:from-teal-400 dark:via-indigo-400 dark:to-violet-400"
           style={{ width: `${(completedCount / steps.length) * 100}%` }}
         />
       </div>

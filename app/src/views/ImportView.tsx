@@ -69,8 +69,8 @@ export function ImportView() {
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-950">Import a bank statement</h1>
-            <p className="mt-1 text-sm text-slate-600">Export a CSV from your bank. It is parsed locally in this browser; nothing is uploaded.</p>
+            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-950 dark:text-white">Import a bank statement</h1>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">Export a CSV from your bank. It is parsed locally in this browser; nothing is uploaded.</p>
           </div>
           <Badge tone="device">
             <Lock aria-hidden className="size-3" /> 100% local parsing
@@ -85,28 +85,28 @@ export function ImportView() {
           }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
-          className={`group relative mt-5 flex cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-dashed px-6 text-center transition-all duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink-700 ${
-            file ? 'py-7' : 'py-12'
+          className={`bg-dot-grid group relative mt-5 flex cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border-2 border-dashed px-6 text-center transition-all duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink-700 ${
+            file ? 'py-7' : 'py-14'
           } ${
             dragging
-              ? 'border-emerald-500 bg-emerald-50/70'
-              : 'border-slate-300/90 bg-slate-50/60 hover:border-ink-400 hover:bg-ink-50/30'
+              ? 'border-teal-600 bg-teal-50/70 dark:bg-teal-950/35'
+              : 'border-stone-300/90 bg-stone-50/70 hover:border-ink-400 hover:bg-ink-50/35 dark:border-white/15 dark:bg-[#0b0c14]/60 dark:hover:border-indigo-400/70 dark:hover:bg-indigo-950/20'
           }`}
         >
           <span
-            className={`flex size-12 items-center justify-center rounded-2xl shadow-xs ring-1 transition-all duration-200 ${
+            className={`flex size-13 items-center justify-center rounded-2xl shadow-sm ring-1 transition-all duration-200 ${
               dragging
-                ? 'scale-105 bg-emerald-600 text-white ring-emerald-700'
-                : 'bg-white text-ink-700 ring-slate-200/90 group-hover:-translate-y-0.5 group-hover:ring-ink-200'
+                ? 'scale-105 bg-teal-700 text-white ring-teal-800'
+                : 'bg-white text-ink-700 ring-stone-200/90 group-hover:-translate-y-0.5 group-hover:ring-ink-300 dark:bg-[#12131c] dark:text-indigo-300 dark:ring-white/10'
             }`}
           >
             <Upload aria-hidden className="size-5" />
           </span>
           <div className="space-y-1">
-            <span className="block text-base font-semibold text-slate-900">
+            <span className="block text-base font-bold text-zinc-950 dark:text-white">
               {file ? 'Drop another CSV file to replace' : 'Drop a bank CSV file here, or browse'}
             </span>
-            <span className="block text-xs text-slate-500">
+            <span className="block text-xs text-zinc-500 dark:text-zinc-400">
               Works with standard bank exports containing date, description, and amount (or debit &amp; credit).
             </span>
           </div>
@@ -114,7 +114,7 @@ export function ImportView() {
             {['Date', 'Description', 'Amount / Debit & Credit'].map((col) => (
               <span
                 key={col}
-                className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200/80"
+                className="rounded-full bg-white/95 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-600 ring-1 ring-stone-200/85 dark:bg-[#12131c] dark:text-zinc-300 dark:ring-white/10"
               >
                 {col}
               </span>
@@ -134,7 +134,10 @@ export function ImportView() {
         </label>
 
         {error && (
-          <p role="alert" className="mt-4 flex items-center gap-2 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm text-rose-800 ring-1 ring-rose-200">
+          <p
+            role="alert"
+            className="mt-4 flex items-center gap-2 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm text-rose-800 ring-1 ring-rose-200 dark:bg-rose-950/60 dark:text-rose-200 dark:ring-rose-800"
+          >
             <CircleAlert aria-hidden className="size-4 shrink-0" />
             Could not read the file: {error}
           </p>
@@ -143,13 +146,13 @@ export function ImportView() {
 
       {file && mapping && (
         <Card className="fade-up">
-          <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 pb-4">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/80">
+          <div className="flex flex-wrap items-center gap-3 border-b border-stone-100 pb-4 dark:border-white/[0.07]">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-teal-50 text-teal-800 ring-1 ring-teal-200/80 dark:bg-teal-950/70 dark:text-teal-300 dark:ring-teal-700/60">
               <FileSpreadsheet aria-hidden className="size-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="truncate font-semibold text-slate-950">{file.name}</h2>
-              <p className="text-xs text-slate-500 tabular-nums">{plural(file.parsed.rows.length, 'row')} detected locally</p>
+              <h2 className="truncate font-bold text-zinc-950 dark:text-white">{file.name}</h2>
+              <p className="text-xs text-zinc-500 tabular-nums dark:text-zinc-400">{plural(file.parsed.rows.length, 'row')} detected locally</p>
             </div>
             <Button variant="ghost" className="ml-auto min-h-8 rounded-lg px-2.5 text-xs" onClick={clearFile}>
               <X aria-hidden className="size-3.5" /> Clear file
@@ -157,7 +160,7 @@ export function ImportView() {
           </div>
 
           <fieldset className="mt-5">
-            <legend className="text-xs font-bold tracking-wider text-slate-500 uppercase">Match the columns</legend>
+            <legend className="text-xs font-bold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">Match the columns</legend>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               <ColumnSelect
                 label="Date"
@@ -181,8 +184,8 @@ export function ImportView() {
               )}
             </div>
 
-            <div className="mt-4 flex flex-col gap-2.5 rounded-xl bg-slate-50/80 p-3.5 ring-1 ring-slate-200/75">
-              <label className="flex items-center gap-2.5 text-sm text-slate-700">
+            <div className="mt-4 flex flex-col gap-2.5 rounded-xl bg-stone-50/85 p-3.5 ring-1 ring-stone-200/80 dark:bg-white/[0.03] dark:ring-white/[0.08]">
+              <label className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-200">
                 <input
                   type="checkbox"
                   checked={mapping.amountMode === 'split'}
@@ -192,7 +195,7 @@ export function ImportView() {
                 Money in and money out are in separate columns
               </label>
               {mapping.amountMode === 'single' && (
-                <label className="flex items-center gap-2.5 text-sm text-slate-700">
+                <label className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-200">
                   <input
                     type="checkbox"
                     checked={mapping.spendingIsPositive}
@@ -203,19 +206,19 @@ export function ImportView() {
                 </label>
               )}
               {dateInfo?.numeric && (
-                <div className="flex flex-wrap items-center gap-2 border-t border-slate-200/70 pt-2.5 text-sm text-slate-700">
+                <div className="flex flex-wrap items-center gap-2 border-t border-stone-200/75 pt-2.5 text-sm text-zinc-700 dark:border-white/[0.08] dark:text-zinc-200">
                   <label htmlFor={orderId}>Dates like 03/04/2026 are written</label>
                   <select
                     id={orderId}
                     value={mapping.dateOrder}
                     onChange={(e) => setMapping({ ...mapping, dateOrder: e.target.value as DateOrder })}
-                    className="min-h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-sm font-medium text-slate-900 shadow-2xs focus:border-ink-700 focus:outline-none"
+                    className="min-h-9 rounded-lg border border-stone-200 bg-white px-2.5 text-sm font-medium text-zinc-900 shadow-2xs focus:border-ink-700 focus:outline-none dark:border-white/10 dark:bg-[#12131c] dark:text-zinc-100"
                   >
                     <option value="mdy">month / day / year</option>
                     <option value="dmy">day / month / year</option>
                   </select>
                   {dateInfo.ambiguous && (
-                    <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900">
+                    <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-300">
                       Both readings fit — check the preview below
                     </span>
                   )}
@@ -227,27 +230,27 @@ export function ImportView() {
           {result ? (
             <>
               <div className="mt-6 flex items-center justify-between gap-2">
-                <h3 className="text-xs font-bold tracking-wider text-slate-500 uppercase">Preview (first 5 rows)</h3>
-                <span className="text-xs text-slate-500 tabular-nums">{plural(result.rows.length, 'ready row')}</span>
+                <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">Preview (first 5 rows)</h3>
+                <span className="text-xs text-zinc-500 tabular-nums dark:text-zinc-400">{plural(result.rows.length, 'ready row')}</span>
               </div>
 
-              <div className="mt-2.5 overflow-x-auto rounded-xl border border-slate-200/80">
+              <div className="mt-2.5 overflow-x-auto rounded-xl border border-stone-200/85 dark:border-white/[0.08]">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50/90 text-left text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
+                  <thead className="bg-stone-50/90 text-left text-[11px] font-bold tracking-wider text-zinc-500 uppercase dark:bg-white/[0.03] dark:text-zinc-400">
                     <tr>
                       <th className="px-3.5 py-2.5">Date</th>
                       <th className="px-3.5 py-2.5">Description</th>
                       <th className="px-3.5 py-2.5 text-right">Amount</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 bg-white">
+                  <tbody className="divide-y divide-stone-100 bg-white dark:divide-white/[0.06] dark:bg-[#12131c]">
                     {result.rows.slice(0, 5).map((row, i) => (
-                      <tr key={i} className="hover:bg-slate-50/70">
-                        <td className="px-3.5 py-2.5 whitespace-nowrap text-slate-600 tabular-nums">{row.date}</td>
-                        <td className="px-3.5 py-2.5 font-mono text-xs text-slate-800">{row.description}</td>
+                      <tr key={i} className="hover:bg-stone-50/75 dark:hover:bg-white/[0.03]">
+                        <td className="px-3.5 py-2.5 whitespace-nowrap text-zinc-600 tabular-nums dark:text-zinc-400">{row.date}</td>
+                        <td className="px-3.5 py-2.5 font-mono text-xs text-zinc-800 dark:text-zinc-200">{row.description}</td>
                         <td
-                          className={`px-3.5 py-2.5 text-right font-semibold whitespace-nowrap tabular-nums ${
-                            row.amount > 0 ? 'text-emerald-700' : 'text-slate-900'
+                          className={`px-3.5 py-2.5 text-right font-bold whitespace-nowrap tabular-nums ${
+                            row.amount > 0 ? 'text-teal-700 dark:text-teal-400' : 'text-zinc-900 dark:text-zinc-100'
                           }`}
                         >
                           {row.amount > 0 ? '+' : ''}
@@ -265,20 +268,20 @@ export function ImportView() {
                   {!importing && <ArrowRight aria-hidden className="size-4" />}
                 </Button>
                 {existingCount > 0 && (
-                  <span className="text-xs text-slate-500">Adds to your {plural(existingCount, 'existing transaction')}.</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Adds to your {plural(existingCount, 'existing transaction')}.</span>
                 )}
                 {result.skipped > 0 && (
-                  <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-900 ring-1 ring-amber-200">
+                  <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:ring-amber-800">
                     {plural(result.skipped, 'row')} skipped (missing description or amount)
                   </span>
                 )}
               </div>
 
               {(result.unreadDates > 0 || mostlyPositive) && (
-                <ul className="mt-4 space-y-1.5 rounded-xl bg-amber-50/80 p-3.5 text-sm text-amber-950 ring-1 ring-amber-200">
+                <ul className="mt-4 space-y-1.5 rounded-xl bg-amber-50/80 p-3.5 text-sm text-amber-950 ring-1 ring-amber-200 dark:bg-amber-950/50 dark:text-amber-200 dark:ring-amber-800">
                   {result.unreadDates > 0 && (
                     <li className="flex items-start gap-2">
-                      <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700" />
+                      <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-400" />
                       <span>
                         {plural(result.unreadDates, 'row')} {result.unreadDates === 1 ? 'has' : 'have'} a date this app could not read. They are imported,
                         but left out of monthly totals.
@@ -287,7 +290,7 @@ export function ImportView() {
                   )}
                   {mostlyPositive && (
                     <li className="flex items-start gap-2">
-                      <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700" />
+                      <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-400" />
                       <span>Most amounts in this file are positive. If they are purchases, tick the positive-numbers box above.</span>
                     </li>
                   )}
@@ -295,7 +298,7 @@ export function ImportView() {
               )}
             </>
           ) : (
-            <p className="mt-5 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200">
+            <p className="mt-5 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-200 dark:ring-amber-800">
               Choose a column for each field above to see a preview.
             </p>
           )}
@@ -309,14 +312,14 @@ function ColumnSelect({ label, value, headers, onChange }: { label: string; valu
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="block text-xs font-semibold text-slate-600">
+      <label htmlFor={id} className="block text-xs font-semibold text-zinc-600 dark:text-zinc-300">
         {label}
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1.5 min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 shadow-2xs transition-colors hover:border-slate-300 focus:border-ink-700 focus:outline-none"
+        className="mt-1.5 min-h-10 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-medium text-zinc-900 shadow-2xs transition-colors hover:border-stone-300 focus:border-ink-700 focus:outline-none dark:border-white/10 dark:bg-[#12131c] dark:text-zinc-100 dark:hover:border-white/20 dark:focus:border-indigo-400"
       >
         <option value="">Choose a column</option>
         {headers.map((h) => (
