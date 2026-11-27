@@ -27,10 +27,16 @@ const TYPES = {
   '.woff': 'font/woff',
 };
 
-/** Firebase Hosting globs: "**" crosses folders, "*" stays inside one. */
+/** Firebase Hosting globs: "**" crosses folders, "*" stays inside one, "@(a|b)" is one of a list. */
 function globToRegExp(glob) {
-  const part = (text) => text.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*');
-  const pattern = glob.replace(/^\//, '').split('**').map(part).join('.*');
+  const escape = (text) => text.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  const lists = [];
+  const marked = glob.replace(/@\(([^)]*)\)/g, (_, options) => {
+    lists.push(`(?:${options.split('|').map(escape).join('|')})`);
+    return `${lists.length - 1}`;
+  });
+  const part = (text) => escape(text).replace(/\*/g, '[^/]*').replace(/(\d+)/g, (_, i) => lists[Number(i)]);
+  const pattern = marked.replace(/^\//, '').split('**').map(part).join('.*');
   return new RegExp(`^/?${pattern}$`);
 }
 

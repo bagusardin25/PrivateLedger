@@ -21,7 +21,7 @@ export function ModelStatusChip() {
 
   return (
     <a
-      href="#/welcome"
+      href="/"
       title="Set up Laptop AI"
       onClick={(event) => {
         event.preventDefault();

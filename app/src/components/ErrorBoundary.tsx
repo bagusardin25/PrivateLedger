@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
               Reload the app
             </button>
             <a
-              href="#/welcome"
+              href="/"
               onClick={() => this.setState({ error: undefined })}
               className="inline-flex min-h-9 items-center rounded-lg border border-line bg-raised px-3.5 text-[13px] font-medium text-fg transition-colors hover:bg-subtle"
             >

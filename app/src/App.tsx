@@ -17,7 +17,7 @@ import { DataBoundaryPanel } from './components/DataBoundaryPanel';
 import { JourneySteps } from './components/JourneySteps';
 import { ModelStatusChip } from './components/ModelStatus';
 import { BrandMark, Card, ThemeToggle } from './components/ui';
-import { consumeSetupRequest, type Route } from './lib/state/actions';
+import { consumeSetupRequest, currentRoute, handleLinkClick, routePath, subscribeRoute, type Route } from './lib/state/actions';
 import { db } from './lib/data/db';
 import { refreshDeviceStatus, useOnline } from './lib/state/device';
 import { installStore, promptInstall } from './lib/state/install';
@@ -85,8 +85,6 @@ function Screen({ children }: { children: ReactNode }) {
   );
 }
 
-const ALL_ROUTES: Route[] = ['welcome', 'import', 'transactions', 'review', 'summary', 'advisor', 'ledger'];
-
 const NAV: { id: Route; label: string; icon: LucideIcon }[] = [
   { id: 'welcome', label: 'Home', icon: House },
   { id: 'transactions', label: 'Transactions', icon: ReceiptText },
@@ -96,15 +94,8 @@ const NAV: { id: Route; label: string; icon: LucideIcon }[] = [
   { id: 'ledger', label: 'Privacy Ledger', icon: ShieldCheck },
 ];
 
-function subscribeHash(listener: () => void) {
-  window.addEventListener('hashchange', listener);
-  return () => window.removeEventListener('hashchange', listener);
-}
-
 function useRoute(): Route {
-  const hash = useSyncExternalStore(subscribeHash, () => window.location.hash, () => '');
-  const id = hash.replace(/^#\//, '') as Route;
-  return ALL_ROUTES.includes(id) ? id : 'welcome';
+  return useSyncExternalStore(subscribeRoute, currentRoute, () => 'welcome' as const);
 }
 
 export function App() {
@@ -117,9 +108,11 @@ export function App() {
     void refreshDeviceStatus();
     const onFocus = () => void refreshDeviceStatus();
     window.addEventListener('focus', onFocus);
+    document.addEventListener('click', handleLinkClick);
     const cancelPrefetch = prefetchScreens();
     return () => {
       window.removeEventListener('focus', onFocus);
+      document.removeEventListener('click', handleLinkClick);
       cancelPrefetch();
     };
   }, []);
@@ -144,7 +137,7 @@ export function App() {
 
       <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/75">
         <div className="mx-auto flex max-w-[1380px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6 xl:min-h-14 xl:flex-nowrap xl:py-0">
-          <a href="#/welcome" className="group flex shrink-0 items-center gap-2.5 rounded-lg pr-1">
+          <a href="/" className="group flex shrink-0 items-center gap-2.5 rounded-lg pr-1">
             <BrandMark />
             <span className="text-sm font-semibold tracking-tight whitespace-nowrap text-fg">Private Ledger</span>
           </a>
@@ -160,7 +153,7 @@ export function App() {
               return (
                 <a
                   key={r.id}
-                  href={`#/${r.id}`}
+                  href={routePath(r.id)}
                   aria-current={active ? 'page' : undefined}
                   className={`inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[13px] font-medium whitespace-nowrap transition-colors duration-150 ${
                     active
