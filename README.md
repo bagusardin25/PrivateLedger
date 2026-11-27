@@ -134,7 +134,7 @@ Then write the monthly summary, ask the advisor a question, and paste a line fro
 
 ## Run it locally
 
-Requires Node.js 22.12 or newer.
+Requires Node.js 22.13 or newer.
 
 ```bash
 cd app
