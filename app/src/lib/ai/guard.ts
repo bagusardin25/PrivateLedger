@@ -36,12 +36,12 @@ export async function checkOutgoingMessage(message: string): Promise<GuardResult
     try {
       await assertOnDeviceReady();
       const start = performance.now();
-      const result = await withTimeout(getGuardModel().generateContent(`Message:\n"""\n${message}\n"""`), MODEL_TIMEOUT_MS, 'The on-device guard');
+      const result = await withTimeout(getGuardModel().generateContent(`Message:\n"""\n${message}\n"""`), MODEL_TIMEOUT_MS, 'The privacy check');
       modelMs = Math.round(performance.now() - start);
       const verdict = (JSON.parse(result.response.text()) as { verdict?: unknown }).verdict;
       modelBlock = verdict === 'contains_transaction_data';
       layers.push('on-device model');
-      if (modelBlock) reasons.push('the on-device model found transaction details');
+      if (modelBlock) reasons.push('Laptop AI found transaction details');
     } catch {
       // Layer 1 still decides when the model fails or times out.
     }
@@ -57,8 +57,8 @@ export async function checkOutgoingMessage(message: string): Promise<GuardResult
     inferenceSource: allowed ? 'on_device' : 'blocked',
     model: layers.includes('on-device model') ? ON_DEVICE_MODEL : 'Rules only',
     payloadPreview: allowed
-      ? `Message checked on this device (${layers.join(' + ')}): no transaction data.`
-      : `Not sent. The message was stopped on this device: ${reasons.join('; ')}.`,
+      ? `Message checked on your laptop (${layers.join(' + ')}): no transaction details.`
+      : `Not sent. The message was stopped on your laptop: ${reasons.join('; ')}.`,
     bytes: 0,
     rawRowCount: 0,
     merchantNameCount: 0,

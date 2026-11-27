@@ -2,7 +2,7 @@
 // scan cleanly without visual clutter (Mercury / Ramp style).
 
 const PALETTES = [
-  'bg-zinc-100 text-zinc-700 border-zinc-200/80 dark:bg-white/[0.06] dark:text-zinc-300 dark:border-white/[0.08]',
+  'bg-subtle text-fg-secondary border-line',
   'bg-stone-100 text-stone-700 border-stone-200/80 dark:bg-white/[0.05] dark:text-zinc-300 dark:border-white/[0.08]',
   'bg-slate-100 text-slate-700 border-slate-200/80 dark:bg-white/[0.07] dark:text-zinc-200 dark:border-white/[0.09]',
 ];

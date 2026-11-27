@@ -4,6 +4,9 @@
 
 import type { Category } from './taxonomy.ts';
 
+/** The demo statement is a US freelancer's, in US dollars. */
+export const DEMO_CURRENCY = 'USD';
+
 export const DEMO_PROFILE =
   'Freelance graphic designer working from home. Business tools: design software, stock assets, ' +
   'a coworking membership, a portfolio website, and email marketing. Clients pay through Stripe, PayPal, and Wise.';

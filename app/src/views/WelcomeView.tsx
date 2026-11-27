@@ -28,8 +28,8 @@ import { db } from '../lib/data/db';
 const PROMISES = [
   { icon: UploadCloud, text: 'Nothing uploaded' },
   { icon: Lock, text: 'No account needed' },
-  { icon: WifiOff, text: 'Labeling works offline' },
-  { icon: ScrollText, text: 'Every cloud call logged' },
+  { icon: WifiOff, text: 'Sorting works offline' },
+  { icon: ScrollText, text: 'Every cloud request logged' },
 ];
 
 export function WelcomeView() {
@@ -60,22 +60,22 @@ export function WelcomeView() {
   return (
     <div>
       {/* MINIMALIST EDITORIAL HERO */}
-      <section className="border-b border-zinc-200/80 bg-white dark:border-white/[0.07] dark:bg-[#09090b]">
+      <section className="border-b border-line bg-white dark:bg-canvas">
         <div className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] lg:gap-16 lg:py-20">
           <div className="fade-up min-w-0">
-            <p className="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-white/[0.09] dark:bg-white/[0.03] dark:text-zinc-300">
-              <span aria-hidden className="size-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-              On-device Gemini Nano · Firebase AI Logic
+            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-sunken px-3 py-1 text-xs font-medium text-fg-secondary">
+              <span aria-hidden className="size-1.5 rounded-full bg-device" />
+              For freelancers · Powered by Gemini Nano in Chrome
             </p>
 
-            <h1 className="mt-6 text-3xl leading-[1.08] font-semibold tracking-[-0.035em] text-zinc-950 text-balance sm:text-[2.85rem] dark:text-white">
+            <h1 className="mt-6 text-3xl leading-[1.08] font-semibold tracking-[-0.035em] text-fg text-balance sm:text-[2.85rem]">
               Sort business from personal spending.{' '}
-              <span className="text-zinc-500 dark:text-zinc-400">Your bank statement never leaves your laptop.</span>
+              <span className="text-fg-muted">Your bank statement never leaves your laptop.</span>
             </h1>
 
-            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400">
-              Gemini Nano labels every row locally inside Chrome. The cloud model only ever receives totals — and a live Data Boundary lets you inspect
-              every byte that leaves.
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-fg-secondary sm:text-base">
+              AI built into Chrome sorts each transaction right on your laptop. The cloud only ever sees totals, and the Privacy panel shows you
+              exactly what was sent.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-2.5">
@@ -98,7 +98,7 @@ export function WelcomeView() {
                     {!starting && <ArrowRight aria-hidden className="size-4 transition-transform group-hover:translate-x-0.5" />}
                   </Button>
                   <Button className="min-h-11 px-4 text-sm" onClick={() => navigate('import')}>
-                    <FileUp aria-hidden className="size-3.5 text-zinc-500 dark:text-zinc-400" /> Import your CSV
+                    <FileUp aria-hidden className="size-3.5 text-fg-muted" /> Import your CSV
                   </Button>
                 </>
               )}
@@ -107,16 +107,16 @@ export function WelcomeView() {
             {error && (
               <p
                 role="alert"
-                className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200"
+                className="mt-3 rounded-lg border border-danger-line bg-danger-soft px-3.5 py-2 text-xs text-danger-ink"
               >
-                Could not load the demo: {error}
+                Couldn't load the demo: {error}
               </p>
             )}
 
-            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2.5 border-t border-zinc-100 pt-6 text-xs text-zinc-500 dark:border-white/[0.06] dark:text-zinc-400">
+            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2.5 border-t border-line-soft pt-6 text-xs text-fg-muted">
               {PROMISES.map((p) => (
                 <li key={p.text} className="inline-flex items-center gap-1.5">
-                  <p.icon aria-hidden className="size-3.5 text-zinc-400 dark:text-zinc-500" />
+                  <p.icon aria-hidden className="size-3.5 text-fg-faint" />
                   <span>{p.text}</span>
                 </li>
               ))}
@@ -132,8 +132,8 @@ export function WelcomeView() {
 
         <section aria-labelledby="setup" className="space-y-5">
           <div>
-            <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Local setup</p>
-            <h2 id="setup" className="mt-1 text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">
+            <p className="text-xs font-medium text-fg-muted">Before you start</p>
+            <h2 id="setup" className="mt-1 text-xl font-semibold tracking-tight text-fg sm:text-2xl">
               Ready in a minute
             </h2>
           </div>
@@ -154,9 +154,9 @@ export function WelcomeView() {
 type ShowcaseTab = 'local' | 'cloud' | 'guard';
 
 const DEMO_PREVIEW_ROWS = [
-  { merchant: 'Adobe Creative Cloud', category: 'Software & Subscriptions', amount: '−$59.99', type: 'business' as const, by: 'On-device AI' },
-  { merchant: 'Whole Foods Market', category: 'Groceries', amount: '−$86.42', type: 'personal' as const, by: 'On-device AI' },
-  { merchant: 'Stripe · Acme Studio', category: 'Income', amount: '+$2,400.00', type: 'business' as const, by: 'Rule' },
+  { merchant: 'Adobe Creative Cloud', category: 'Software & Subscriptions', amount: '−$59.99', type: 'business' as const, by: 'Laptop AI' },
+  { merchant: 'Whole Foods Market', category: 'Groceries', amount: '−$86.42', type: 'personal' as const, by: 'Laptop AI' },
+  { merchant: 'Stripe · Acme Studio', category: 'Income', amount: '+$2,400.00', type: 'business' as const, by: 'Saved rule' },
 ];
 
 // Same text and field names as summaryPrompt() in lib/ai/reporter.ts builds; only the figures are examples.
@@ -184,27 +184,27 @@ function InteractiveShowcase() {
 
   return (
     <figure className="relative min-w-0">
-      <div className="overflow-hidden rounded-xl border border-zinc-200/90 bg-white shadow-[0_12px_36px_-16px_rgba(0,0,0,0.08)] dark:border-white/[0.09] dark:bg-[#111114] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75)]">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-[0_12px_36px_-16px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75)]">
         {/* Clean architectural window bar + mode tabs */}
-        <div className="border-b border-zinc-100 bg-zinc-50/70 px-4 pt-3 pb-2.5 dark:border-white/[0.06] dark:bg-white/[0.02]">
+        <div className="border-b border-line-soft bg-sunken px-4 pt-3 pb-2.5">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
-              <Lock aria-hidden className="size-3 text-emerald-600 dark:text-emerald-400" />
+            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-fg-muted">
+              <Lock aria-hidden className="size-3 text-device-fg" />
               private-ledger · local
             </span>
-            <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Interactive preview</span>
+            <span className="text-[11px] font-medium text-fg-muted">Interactive preview</span>
           </div>
 
           <div
             role="tablist"
-            aria-label="Product capability preview"
-            className="mt-2.5 grid grid-cols-3 gap-1 rounded-lg bg-zinc-200/60 p-0.5 dark:bg-white/[0.05]"
+            aria-label="Feature preview"
+            className="mt-2.5 grid grid-cols-3 gap-1 rounded-lg bg-emphasis p-0.5"
           >
             {(
               [
-                ['local', 'On-device AI', Cpu],
+                ['local', 'Laptop AI', Cpu],
                 ['cloud', 'Totals only', Cloud],
-                ['guard', 'Leak guard', Ban],
+                ['guard', 'Privacy check', Ban],
               ] as const
             ).map(([id, label, Icon]) => {
               const active = tab === id;
@@ -215,22 +215,22 @@ function InteractiveShowcase() {
                   type="button"
                   aria-selected={active}
                   onClick={() => setTab(id)}
-                  className={`inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors ${
+                  className={`inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md px-2 text-xs font-medium whitespace-nowrap transition-colors ${
                     active
-                      ? 'bg-white text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:bg-[#1b1b20] dark:text-white'
-                      : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
+                      ? 'bg-white text-fg shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:bg-[#1b1b20]'
+                      : 'text-fg-secondary hover:text-fg'
                   }`}
                 >
                   <Icon
                     aria-hidden
-                    className={`size-3.5 ${
+                    className={`size-3.5 shrink-0 max-sm:hidden ${
                       active
                         ? id === 'local'
-                          ? 'text-emerald-700 dark:text-emerald-400'
+                          ? 'text-device-fg'
                           : id === 'cloud'
-                            ? 'text-indigo-600 dark:text-indigo-400'
-                            : 'text-rose-600 dark:text-rose-400'
-                        : 'text-zinc-400 dark:text-zinc-500'
+                            ? 'text-cloud-fg'
+                            : 'text-danger-fg'
+                        : 'text-fg-faint'
                     }`}
                   />
                   {label}
@@ -241,21 +241,21 @@ function InteractiveShowcase() {
         </div>
 
         {/* Interactive Tab Body */}
-        <div className="min-h-[16.75rem] bg-white dark:bg-[#111114]">
+        <div className="min-h-[16.75rem] bg-surface">
           {tab === 'local' && (
-            <ul className="divide-y divide-zinc-100 dark:divide-white/[0.05]">
+            <ul className="divide-y divide-line-soft">
               {DEMO_PREVIEW_ROWS.map((row) => (
                 <li key={row.merchant} className="flex items-center gap-3 px-4 py-3">
                   <MerchantAvatar name={row.merchant} size="md" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium text-zinc-950 dark:text-zinc-100">{row.merchant}</p>
-                    <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="truncate text-[13px] font-medium text-fg">{row.merchant}</p>
+                    <p className="truncate text-xs text-fg-muted">
                       {row.category} · {row.by}
                     </p>
                   </div>
                   <span
                     className={`text-[13px] font-medium tabular-nums ${
-                      row.amount.startsWith('+') ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-900 dark:text-zinc-100'
+                      row.amount.startsWith('+') ? 'text-device-fg' : 'text-fg'
                     }`}
                   >
                     {row.amount}
@@ -263,8 +263,8 @@ function InteractiveShowcase() {
                   <span
                     className={`w-[4.5rem] rounded-md py-1 text-center text-[11px] font-medium ${
                       row.type === 'business'
-                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
-                        : 'bg-zinc-100 text-zinc-600 dark:bg-white/[0.07] dark:text-zinc-300'
+                        ? 'bg-inverse text-on-inverse'
+                        : 'bg-subtle text-fg-secondary'
                     }`}
                   >
                     {row.type === 'business' ? 'Business' : 'Personal'}
@@ -273,28 +273,28 @@ function InteractiveShowcase() {
               ))}
               <li
                 className={`flex flex-wrap items-center gap-3 px-4 py-3 transition-colors ${
-                  coffeeChoice === 'unsure' ? 'bg-amber-50/40 dark:bg-amber-500/[0.05]' : ''
+                  coffeeChoice === 'unsure' ? 'bg-review-soft/50' : ''
                 }`}
               >
                 <MerchantAvatar name="Starbucks" size="md" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-medium text-zinc-950 dark:text-zinc-100">Starbucks</p>
-                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                    {coffeeChoice === 'unsure' ? 'Mixed-use · try sorting' : 'Remembered locally for Starbucks'}
+                  <p className="truncate text-[13px] font-medium text-fg">Starbucks</p>
+                  <p className="truncate text-xs text-fg-muted">
+                    {coffeeChoice === 'unsure' ? 'Could be either · you decide' : 'Remembered for next time'}
                   </p>
                 </div>
-                <span className="text-[13px] font-medium text-zinc-900 tabular-nums dark:text-zinc-100">−$6.45</span>
-                <div className="inline-flex gap-0.5 rounded-md border border-zinc-200/80 bg-zinc-50 p-0.5 dark:border-white/[0.08] dark:bg-white/[0.04]">
+                <span className="text-[13px] font-medium text-fg tabular-nums">−$6.45</span>
+                <div className="inline-flex gap-0.5 rounded-md border border-line bg-sunken p-0.5">
                   <button
                     type="button"
                     onClick={() => setCoffeeChoice('business')}
                     className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
                       coffeeChoice === 'business'
-                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
-                        : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white'
+                        ? 'bg-inverse text-on-inverse'
+                        : 'text-fg-secondary hover:text-fg'
                     }`}
                   >
-                    Biz
+                    Business
                   </button>
                   <button
                     type="button"
@@ -302,10 +302,10 @@ function InteractiveShowcase() {
                     className={`rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
                       coffeeChoice === 'personal'
                         ? 'bg-zinc-700 text-white dark:bg-zinc-500'
-                        : 'text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white'
+                        : 'text-fg-secondary hover:text-fg'
                     }`}
                   >
-                    Pers
+                    Personal
                   </button>
                 </div>
               </li>
@@ -315,19 +315,19 @@ function InteractiveShowcase() {
           {tab === 'cloud' && (
             <div className="space-y-3 p-4">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">What the cloud receives for a monthly summary</p>
-                <Badge tone="cloud">PREFER_IN_CLOUD</Badge>
+                <p className="text-xs font-medium text-fg-secondary">What the cloud gets for a monthly summary</p>
+                <Badge tone="cloud">Cloud AI</Badge>
               </div>
               <PayloadViewer
-                title="Example request, in the same format as the real one"
+                title="Example request (same format as the real one)"
                 content={CLOUD_TOTALS_SAMPLE}
                 accent="cloud"
                 maxHeightClass="max-h-44"
                 showCopy={false}
               />
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                No bank description, transaction date, client name, or line item is in this request. After a real run, the Privacy Ledger
-                shows the exact one.
+              <p className="text-xs text-fg-muted">
+                No bank descriptions, dates, client names, or single transactions. After a real run, the Privacy Ledger shows the exact
+                request.
               </p>
             </div>
           )}
@@ -335,51 +335,51 @@ function InteractiveShowcase() {
           {tab === 'guard' && (
             <div className="space-y-3 p-4">
               <div className="flex flex-col items-end gap-1">
-                <p className="max-w-[92%] rounded-xl rounded-br-sm border border-rose-200 bg-rose-50/70 px-3 py-2 font-mono text-xs text-rose-950 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
+                <p className="max-w-[92%] rounded-xl rounded-br-sm border border-danger-line bg-danger-soft px-3 py-2 font-mono text-xs text-danger-ink">
                   10/12 DELTA AIR LINES -312.40 — is this deductible?
                 </p>
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-600 dark:text-rose-400">
-                  <Ban aria-hidden className="size-3" /> Not sent · 0 bytes left device
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-danger-fg">
+                  <Ban aria-hidden className="size-3" /> Not sent · nothing left your laptop
                 </span>
               </div>
-              <div className="flex items-start gap-2.5 rounded-lg border border-rose-200/80 bg-rose-50/50 p-3 text-xs leading-relaxed text-rose-950 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
-                <Ban aria-hidden className="mt-0.5 size-4 shrink-0 text-rose-600 dark:text-rose-400" />
+              <div className="flex items-start gap-2.5 rounded-lg border border-danger-line bg-danger-soft p-3 text-xs leading-relaxed text-danger-ink">
+                <Ban aria-hidden className="mt-0.5 size-4 shrink-0 text-danger-fg" />
                 <div>
-                  <p className="font-semibold">Blocked on this device by the outgoing guard.</p>
-                  <p className="mt-0.5 opacity-90">Detected amount with date and merchant from your data. Ask about category totals instead.</p>
+                  <p className="font-semibold">Stopped on your laptop before sending.</p>
+                  <p className="mt-0.5 opacity-90">It had an amount, a date, and a merchant from your statement. Ask about category totals instead.</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-zinc-200/80 bg-zinc-50/70 px-3 py-2 text-[11px] text-zinc-600 dark:border-white/[0.08] dark:bg-white/[0.02] dark:text-zinc-400">
-                <span>Guard runs locally with rules + Gemini Nano</span>
-                <Badge tone="device">ONLY_ON_DEVICE</Badge>
+              <div className="flex items-center justify-between rounded-lg border border-line bg-sunken px-3 py-2 text-[11px] text-fg-secondary">
+                <span>Checked on your laptop by saved rules and Laptop AI</span>
+                <Badge tone="device">On your laptop</Badge>
               </div>
             </div>
           )}
         </div>
 
         {/* Clean hairline split boundary footer */}
-        <div className="relative grid grid-cols-2 divide-x divide-zinc-200/80 border-t border-zinc-200/80 bg-zinc-50/60 dark:divide-white/[0.07] dark:border-white/[0.07] dark:bg-white/[0.02]">
+        <div className="relative grid grid-cols-2 divide-x divide-line border-t border-line bg-sunken">
           <div className="flex items-center gap-2.5 px-4 py-3">
-            <Laptop aria-hidden className="size-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
+            <Laptop aria-hidden className="size-4 shrink-0 text-device-fg" />
             <div className="leading-tight">
-              <span className="block text-sm font-semibold text-zinc-950 tabular-nums dark:text-white">40</span>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">kept on device</span>
+              <span className="block text-sm font-semibold text-fg tabular-nums">40</span>
+              <span className="text-[11px] text-fg-muted">kept on your laptop</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5 px-4 py-3">
-            <Cloud aria-hidden className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
+            <Cloud aria-hidden className="size-4 shrink-0 text-cloud-fg" />
             <div className="leading-tight">
-              <span className="block text-sm font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">0</span>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">raw rows sent</span>
+              <span className="block text-sm font-semibold text-device-fg tabular-nums">0</span>
+              <span className="text-[11px] text-fg-muted">transactions sent</span>
             </div>
           </div>
         </div>
       </div>
 
-      <figcaption className="mt-3 flex items-center justify-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-        <ShieldCheck aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" />
-        Switch tabs above to inspect how local data stays separated from cloud math
+      <figcaption className="mt-3 flex items-center justify-center gap-1.5 text-xs text-fg-muted">
+        <ShieldCheck aria-hidden className="size-3.5 text-device-fg" />
+        Switch tabs to see what stays on your laptop and what the cloud gets
       </figcaption>
     </figure>
   );
@@ -387,16 +387,16 @@ function InteractiveShowcase() {
 
 const PIPELINE_STEPS = [
   { icon: FileUp, label: 'Bank CSV' },
-  { icon: ListChecks, label: 'Local rules' },
-  { icon: Cpu, label: 'Gemini Nano' },
-  { icon: Database, label: 'IndexedDB' },
+  { icon: ListChecks, label: 'Saved rules' },
+  { icon: Cpu, label: 'Laptop AI' },
+  { icon: Database, label: 'Browser storage' },
 ];
 
 // The function name, arguments, and answer use the real format from lib/ai/localFunctions.ts; the figures are examples.
-const LOCAL_TOOL_SNIPPET = `// The cloud model asks for a function that runs in your browser
+const LOCAL_TOOL_SNIPPET = `// Cloud AI asks your laptop for a total
 get_spending_by_category({ "period": "2026-10", "type": "business" })
 
-// Your device reads IndexedDB and answers with totals only
+// Your laptop looks it up and answers with totals only
 { "period": "2026-10", "type": "business", "currency": "USD", "totals": [
   { "category": "Office & Coworking", "total": 350, "count": 1 },
   { "category": "Travel", "total": 312.4, "count": 1 } ] }`;
@@ -407,39 +407,39 @@ function ArchitectureSection() {
     <section aria-labelledby="how-it-works">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Hybrid architecture</p>
-          <h2 id="how-it-works" className="mt-1 text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">
-            How the data boundary works
+          <p className="text-xs font-medium text-fg-muted">How it works</p>
+          <h2 id="how-it-works" className="mt-1 text-xl font-semibold tracking-tight text-fg sm:text-2xl">
+            What stays on your laptop, and what doesn&apos;t
           </h2>
         </div>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Every AI model mode follows the sensitivity of the data it handles.</p>
+        <p className="text-sm text-fg-muted">The more private the data, the closer it stays to you.</p>
       </div>
 
       <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-12">
         {/* Card 1: Local pipeline (7 cols) */}
-        <article className="min-w-0 rounded-xl border border-zinc-200/80 bg-white p-6 lg:col-span-7 dark:border-white/[0.08] dark:bg-[#111114]">
+        <article className="min-w-0 rounded-xl border border-line bg-surface p-6 lg:col-span-7">
           <div className="flex items-center justify-between gap-2">
             <Badge tone="device">
               <Laptop aria-hidden className="size-3" /> Stays on your laptop
             </Badge>
-            <code className="font-mono text-[11px] font-medium text-zinc-500 dark:text-zinc-400">ONLY_ON_DEVICE</code>
+            <code className="font-mono text-[11px] font-medium text-fg-muted">ONLY_ON_DEVICE</code>
           </div>
-          <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">
-            Parse, normalize, and label rows inside Chrome
+          <h3 className="mt-4 text-lg font-semibold tracking-tight text-fg">
+            Your transactions are sorted inside Chrome
           </h3>
-          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Deterministic rules settle transfers, fees, and mixed-use stores immediately. Unique merchants stream through Gemini Nano in Chrome and
-            never leave IndexedDB.
+          <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-fg-secondary">
+            Saved rules handle transfers, fees, and stores you use for both right away. Gemini Nano, the AI built into Chrome, sorts the rest.
+            Nothing leaves your browser&apos;s storage.
           </p>
           <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {PIPELINE_STEPS.map((step, i) => (
               <div
                 key={step.label}
-                className="flex items-center gap-2 rounded-lg border border-zinc-200/75 bg-zinc-50/70 px-3 py-2 text-xs font-medium text-zinc-800 dark:border-white/[0.07] dark:bg-white/[0.03] dark:text-zinc-200"
+                className="flex items-center gap-2 rounded-lg border border-line bg-sunken px-3 py-2 text-xs font-medium text-fg-secondary"
               >
-                <step.icon aria-hidden className="size-3.5 shrink-0 text-emerald-700 dark:text-emerald-400" />
+                <step.icon aria-hidden className="size-3.5 shrink-0 text-device-fg" />
                 <span className="truncate">
-                  <span className="mr-1 text-zinc-500 dark:text-zinc-400">{i + 1}.</span>
+                  <span className="mr-1 text-fg-muted">{i + 1}.</span>
                   {step.label}
                 </span>
               </div>
@@ -448,49 +448,48 @@ function ArchitectureSection() {
         </article>
 
         {/* Card 2: Auditable proof (5 cols) */}
-        <article className="flex flex-col justify-between rounded-xl border border-zinc-200/80 bg-white p-6 lg:col-span-5 dark:border-white/[0.08] dark:bg-[#111114]">
+        <article className="flex flex-col justify-between rounded-xl border border-line bg-surface p-6 lg:col-span-5">
           <div>
             <div className="flex items-center justify-between gap-2">
               <Badge tone="neutral">
-                <ShieldCheck aria-hidden className="size-3 text-emerald-700 dark:text-emerald-400" /> Auditable proof
+                <ShieldCheck aria-hidden className="size-3 text-device-fg" /> Proof you can check
               </Badge>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Not a promise</span>
+              <span className="text-[11px] text-fg-muted">Not a promise</span>
             </div>
-            <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">A boundary you can inspect</h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Every AI request writes a record to the Privacy Ledger with its exact payload, mode, model, and size — exportable as JSON.
+            <h3 className="mt-4 text-lg font-semibold tracking-tight text-fg">A record you can check</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-fg-secondary">
+              Every AI request is written to the Privacy Ledger: what was sent, where it ran, and how big it was. You can export it.
             </p>
           </div>
-          <div className="mt-5 flex items-center gap-4 border-t border-zinc-100 pt-4 dark:border-white/[0.06]">
-            <span className="text-3xl leading-none font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">0</span>
-            <div className="text-xs leading-snug text-zinc-500 dark:text-zinc-400">
-              <strong className="block font-semibold text-zinc-900 dark:text-white">Raw transactions sent</strong>
-              Counted from the Privacy Ledger records. On the hosted app, a content security policy also limits which servers the page can
-              reach.
+          <div className="mt-5 flex items-center gap-4 border-t border-line-soft pt-4">
+            <span className="text-3xl leading-none font-semibold text-device-fg tabular-nums">0</span>
+            <div className="text-xs leading-snug text-fg-muted">
+              <strong className="block font-semibold text-fg">Transactions sent</strong>
+              Counted from the Privacy Ledger. The online version also blocks the page from contacting any server it doesn&apos;t need.
             </div>
           </div>
         </article>
 
         {/* Card 3: Local function calling bridge (12 cols) */}
-        <article className="min-w-0 rounded-xl border border-zinc-200/80 bg-white p-6 lg:col-span-12 dark:border-white/[0.08] dark:bg-[#111114]">
+        <article className="min-w-0 rounded-xl border border-line bg-surface p-6 lg:col-span-12">
           <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <div>
               <div className="flex flex-wrap items-center gap-2.5">
                 <Badge tone="cloud">
-                  <Cloud aria-hidden className="size-3" /> Cloud thinks · Device holds data
+                  <Cloud aria-hidden className="size-3" /> Cloud thinks · your laptop keeps the data
                 </Badge>
-                <code className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">ONLY_IN_CLOUD + Local Functions</code>
+                <code className="font-mono text-[11px] text-fg-muted">ONLY_IN_CLOUD + Local Functions</code>
               </div>
-              <h3 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 sm:text-xl dark:text-white">
-                Ask the Advisor anything about your totals
+              <h3 className="mt-4 text-lg font-semibold tracking-tight text-fg sm:text-xl">
+                Ask the Advisor about your totals
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                The cloud advisor cannot read your bank statement. It invokes local functions inside your browser that query IndexedDB and return
-                aggregated totals only — while an on-device guard blocks accidentally pasted statement rows before they leave.
+              <p className="mt-2 text-sm leading-relaxed text-fg-secondary">
+                Cloud AI can&apos;t read your bank statement. When it needs a number, it asks your laptop, and your laptop answers with totals only. If
+                you paste a statement line by mistake, a privacy check on your laptop stops it before it&apos;s sent.
               </p>
             </div>
             <PayloadViewer
-              title="Local function calling bridge"
+              title="How Cloud AI asks your laptop for totals"
               content={LOCAL_TOOL_SNIPPET}
               accent="cloud"
               showCopy={false}
@@ -534,17 +533,17 @@ function ProfileEditor() {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3">
-        <span className="flex size-9 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-zinc-700 dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-zinc-300">
+        <span className="flex size-9 items-center justify-center rounded-lg border border-line bg-sunken text-fg-secondary">
           <Laptop aria-hidden className="size-4" />
         </span>
         <div>
-          <h3 className="text-sm font-semibold text-zinc-950 dark:text-white">Your business</h3>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Private context for the on-device model</p>
+          <h3 className="text-sm font-semibold text-fg">Your business</h3>
+          <p className="text-xs text-fg-muted">Helps Laptop AI sort your spending</p>
         </div>
       </div>
 
-      <label htmlFor="profile" className="mt-4 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
-        What does your business pay for? Pick a starter or describe your work:
+      <label htmlFor="profile" className="mt-4 block text-xs font-medium text-fg-secondary">
+        What does your business pay for? Pick an example or describe your work:
       </label>
 
       <div className="mt-2 flex flex-wrap gap-1.5">
@@ -553,7 +552,7 @@ function ProfileEditor() {
             key={preset.label}
             type="button"
             onClick={() => void persist(preset.text)}
-            className="rounded-md border border-zinc-200/80 bg-zinc-50/70 px-2.5 py-1 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-100 hover:text-zinc-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300 dark:hover:border-white/[0.15] dark:hover:bg-white/[0.07] dark:hover:text-white"
+            className="rounded-md border border-line bg-sunken px-2.5 py-1 text-xs font-medium text-fg-secondary transition-colors hover:border-line-strong hover:bg-subtle hover:text-fg"
           >
             + {preset.label}
           </button>
@@ -570,12 +569,12 @@ function ProfileEditor() {
         }}
         onBlur={() => void save()}
         placeholder="Freelance graphic designer. Business tools: design software, stock photos, coworking desk, portfolio website."
-        className="mt-3 w-full rounded-lg border border-zinc-200/90 bg-zinc-50/50 p-3 text-sm leading-relaxed text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-white focus:outline-none dark:border-white/[0.09] dark:bg-white/[0.02] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-400 dark:focus:bg-[#111114]"
+        className="mt-3 w-full rounded-lg border border-line bg-sunken p-3 text-sm leading-relaxed text-fg transition-colors placeholder:text-fg-faint focus:border-focus focus:bg-surface focus:outline-none"
       />
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <p className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
-          <Lock aria-hidden className="size-3 text-emerald-700 dark:text-emerald-400" /> Stays on this device. Never sent to the cloud.
+        <p className="flex items-center gap-1.5 text-xs text-fg-muted">
+          <Lock aria-hidden className="size-3 text-device-fg" /> Stays on your laptop. Never sent to the cloud.
         </p>
         <Button
           variant={saved ? 'device' : dirty ? 'primary' : 'ghost'}

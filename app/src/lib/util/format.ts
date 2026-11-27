@@ -1,7 +1,41 @@
-const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+import { currencyDisplay, fractionDigits } from './currency';
+import { getLedgerCurrency } from './ledgerCurrency';
 
-export function formatMoney(amount: number): string {
-  return money.format(amount);
+/** Digit grouping follows the browser's language, so "Rp 1.500.000" for id-ID and "Rp 1,500,000" for en-US. */
+function numberLocale(): string {
+  const preferred = typeof navigator === 'undefined' ? undefined : navigator.language;
+  try {
+    return preferred && Intl.NumberFormat.supportedLocalesOf(preferred).length ? preferred : 'en-US';
+  } catch {
+    return 'en-US';
+  }
+}
+
+const formatters = new Map<string, Intl.NumberFormat>();
+
+function moneyFormat(currency: string): Intl.NumberFormat {
+  let format = formatters.get(currency);
+  if (!format) {
+    const digits = fractionDigits(currency);
+    try {
+      format = new Intl.NumberFormat(numberLocale(), {
+        style: 'currency',
+        currency,
+        currencyDisplay: currencyDisplay(currency),
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits,
+      });
+    } catch {
+      format = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+    }
+    formatters.set(currency, format);
+  }
+  return format;
+}
+
+/** Formats in the ledger's currency unless another one is given (the import preview). */
+export function formatMoney(amount: number, currency: string = getLedgerCurrency()): string {
+  return moneyFormat(currency).format(amount);
 }
 
 const shortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });

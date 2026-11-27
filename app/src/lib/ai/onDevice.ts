@@ -32,6 +32,6 @@ export async function getDeviceStatus(): Promise<DeviceStatus> {
 export async function assertOnDeviceReady(): Promise<void> {
   const status = await getDeviceStatus();
   if (status !== 'available') {
-    throw new Error(`On-device model is not ready (${status}). Request refused so it cannot fall back to the cloud.`);
+    throw new Error(`Laptop AI isn't ready (${status}), so the request was stopped instead of going to the cloud.`);
   }
 }

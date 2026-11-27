@@ -41,19 +41,20 @@ export function errorText(error: unknown): string {
   return message.replace(/^.*?Error fetching from \S+:\s*/, '').trim() || message;
 }
 
-export function friendlyCloudError(error: unknown, subject = 'The cloud model'): string {
+export function friendlyCloudError(error: unknown, subject = 'Cloud AI'): string {
   const status = httpStatus(error);
   const message = errorText(error);
   if (error instanceof TimeoutError || /timeout|timed out|abort/i.test(message)) {
-    return `${subject} did not answer in time. Your data is unchanged; try again in a moment.`;
+    return `${subject} took too long to answer. Nothing changed; try again in a moment.`;
   }
-  if (status === 429 || /quota|resource.?exhausted/i.test(message)) return 'The free cloud quota is used up for now. Try again in a minute.';
+  if (status === 429 || /quota|resource.?exhausted/i.test(message)) return 'Cloud AI has reached its free limit for now. Try again in a minute.';
   if (status === 500 || status === 503 || /overloaded|high demand/i.test(message)) return `${subject} is busy right now. Try again in a moment.`;
   if (status === 401 || status === 403 || /app.?check/i.test(message)) {
-    return 'The request was rejected by App Check, so nothing was processed. Cloud features are not set up for this build.';
+    // App Check is the Firebase security check that refused the request.
+    return 'Cloud AI refused this request, so nothing was processed. Sorting and review still work on your laptop.';
   }
-  if (!navigator.onLine || /failed to fetch|network/i.test(message)) return 'No connection. Cloud features need to be online; labeling and review still work offline.';
-  return `${subject} could not answer. ${message}`;
+  if (!navigator.onLine || /failed to fetch|network/i.test(message)) return "You're offline. Cloud AI needs a connection; sorting and review still work on your laptop.";
+  return `${subject} couldn't answer. ${message}`;
 }
 
 export type CloudLedgerMeta = Pick<LedgerEntry, 'feature' | 'mode' | 'payloadPreview' | 'bytes' | 'rawRowCount' | 'merchantNameCount' | 'consent' | 'isDemo'>;

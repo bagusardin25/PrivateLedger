@@ -58,39 +58,39 @@ export function DataBoundaryPanel() {
 
   return (
     <aside
-      aria-label="Data boundary"
-      className={`flex flex-col overflow-hidden rounded-xl border bg-white transition-all duration-200 lg:max-h-[calc(100vh-5.5rem)] dark:bg-[#111114] ${
+      aria-label="Privacy"
+      className={`flex flex-col overflow-hidden rounded-xl border bg-surface transition-all duration-200 lg:max-h-[calc(100vh-5.5rem)] ${
         justBlocked
           ? 'pulse-blocked border-rose-500 ring-1 ring-rose-500/40'
-          : 'border-zinc-200/80 dark:border-white/[0.08]'
+          : 'border-line'
       }`}
     >
       {/* CLEAN ARCHITECTURAL HEADER */}
-      <header className="flex shrink-0 items-center gap-2.5 border-b border-zinc-100 px-4 py-3 dark:border-white/[0.06]">
+      <header className="flex shrink-0 items-center gap-2.5 border-b border-line-soft px-4 py-3">
         <span
           className={`flex size-6 shrink-0 items-center justify-center rounded-md ${
             justBlocked
-              ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400'
-              : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400'
+              ? 'bg-danger-soft text-danger-fg'
+              : 'bg-device-soft text-device-fg'
           }`}
         >
           {justBlocked ? <Ban aria-hidden className="size-3.5" /> : <ShieldCheck aria-hidden className="size-3.5" />}
         </span>
         <div className="min-w-0 leading-tight">
-          <h2 className="text-[13px] font-semibold tracking-tight text-zinc-950 dark:text-white">Data boundary</h2>
-          <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-            <span aria-hidden className={`size-1.5 rounded-full ${justBlocked ? 'bg-rose-500' : 'bg-emerald-600 dark:bg-emerald-400'}`} />
-            {justBlocked ? 'Guard intercepted leak' : nothingSent ? 'Live · 0 raw rows leaked' : 'Live · consent logged'}
+          <h2 className="text-[13px] font-semibold tracking-tight text-fg">Privacy</h2>
+          <p className="mt-0.5 flex items-center gap-1.5 text-[11px] text-fg-muted">
+            <span aria-hidden className={`size-1.5 rounded-full ${justBlocked ? 'bg-rose-500' : 'bg-device'}`} />
+            {justBlocked ? 'Message stopped on your laptop' : nothingSent ? 'Live · no transactions sent' : 'Live · sent only with your OK'}
           </p>
         </div>
-        <span className="ml-auto text-[11px] font-medium text-zinc-500 tabular-nums dark:text-zinc-400">{plural(entries.length, 'log')}</span>
+        <span className="ml-auto text-[11px] font-medium text-fg-muted tabular-nums">{plural(entries.length, 'record')}</span>
         <button
           type="button"
           aria-expanded={!collapsed}
           aria-controls="data-boundary-body"
           onClick={() => setCollapsed((v) => !v)}
-          title={collapsed ? 'Expand data boundary panel' : 'Collapse data boundary panel'}
-          className="inline-flex size-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-white/[0.06] dark:hover:text-zinc-100"
+          title={collapsed ? 'Expand privacy panel' : 'Collapse privacy panel'}
+          className="inline-flex size-7 items-center justify-center rounded-md text-fg-muted transition-colors hover:bg-subtle hover:text-fg"
         >
           {collapsed ? <ChevronDown aria-hidden className="size-4" /> : <ChevronUp aria-hidden className="size-4" />}
           <span className="sr-only">{collapsed ? 'Expand panel' : 'Collapse panel'}</span>
@@ -99,141 +99,141 @@ export function DataBoundaryPanel() {
 
       {collapsed ? (
         <div id="data-boundary-body" className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-xs">
-          <span className="inline-flex items-center gap-1.5 font-medium text-zinc-700 tabular-nums dark:text-zinc-300">
-            <Laptop aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" /> {stats.rows.toLocaleString('en-US')} local
+          <span className="inline-flex items-center gap-1.5 font-medium text-fg-secondary tabular-nums">
+            <Laptop aria-hidden className="size-3.5 text-device-fg" /> {stats.rows.toLocaleString('en-US')} on laptop
           </span>
-          <span className="text-zinc-300 dark:text-zinc-700" aria-hidden>
+          <span className="text-line-strong" aria-hidden>
             ·
           </span>
           <span
             className={`inline-flex items-center gap-1.5 font-medium tabular-nums ${
-              nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-700 dark:text-indigo-400'
+              nothingSent ? 'text-device-fg' : 'text-cloud-fg'
             }`}
           >
-            <Cloud aria-hidden className="size-3.5" /> {counters.rawSentUser} raw sent
+            <Cloud aria-hidden className="size-3.5" /> {counters.rawSentUser} sent
           </span>
           {justBlocked && (
             <span
               role="alert"
-              className="w-full rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 font-medium text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300"
+              className="w-full rounded-lg border border-danger-line bg-danger-soft px-2.5 py-1.5 font-medium text-danger-fg"
             >
-              Message blocked on device
+              Message stopped on your laptop
             </span>
           )}
         </div>
       ) : (
         <div id="data-boundary-body" className="thin-scroll min-h-0 flex-1 overflow-y-auto">
           {/* LOCAL ZONE */}
-          <section aria-label="On this device" className="relative px-4 py-4">
+          <section aria-label="On your laptop" className="relative px-4 py-4">
             {fresh?.inferenceSource === 'on_device' && <span key={fresh.id} aria-hidden className="pulse-device pointer-events-none absolute inset-0" />}
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-emerald-700 uppercase dark:text-emerald-400">
-                <span aria-hidden className="size-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-                On this device
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-device-fg uppercase">
+                <span aria-hidden className="size-1.5 rounded-full bg-device" />
+                On your laptop
               </p>
               {stats.demoRows > 0 && (
-                <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Demo data</span>
+                <span className="text-[11px] font-medium text-fg-muted">Demo data</span>
               )}
             </div>
 
-            <dl className="mt-3 grid grid-cols-2 divide-x divide-zinc-100 dark:divide-white/[0.06]">
+            <dl className="mt-3 grid grid-cols-2 divide-x divide-line-soft">
               <div className="pr-3">
-                <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">Kept locally</dt>
-                <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-zinc-950 tabular-nums dark:text-white">
+                <dt className="text-[11px] text-fg-muted">Transactions kept</dt>
+                <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-fg tabular-nums">
                   {stats.rows.toLocaleString('en-US')}
                 </dd>
               </div>
               <div className="pl-3.5">
-                <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">On-device calls</dt>
-                <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-emerald-700 tabular-nums dark:text-emerald-400">
+                <dt className="text-[11px] text-fg-muted">Laptop AI tasks</dt>
+                <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-device-fg tabular-nums">
                   {counters.onDeviceCalls}
                 </dd>
               </div>
             </dl>
 
-            <p className="mt-2.5 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-              <span className="font-medium text-zinc-800 dark:text-zinc-200">{plural(stats.byModel, 'row')}</span> by Gemini Nano ·{' '}
-              <span className="font-medium text-zinc-800 dark:text-zinc-200">{plural(stats.byRules, 'row')}</span> by rules or you
-              {stats.byCloud > 0 && <span className="font-medium text-indigo-700 dark:text-indigo-400"> · {plural(stats.byCloud, 'row')} by cloud AI</span>}
+            <p className="mt-2.5 text-[11px] leading-relaxed text-fg-muted">
+              Sorted: <span className="font-medium text-fg-secondary">{stats.byModel}</span> by Laptop AI ·{' '}
+              <span className="font-medium text-fg-secondary">{stats.byRules}</span> by your rules or you
+              {stats.byCloud > 0 && <span className="font-medium text-cloud-fg"> · {stats.byCloud} by Cloud AI</span>}
             </p>
           </section>
 
           {/* ARCHITECTURAL BOUNDARY SEAM */}
-          <div className="relative flex items-center gap-2 px-4 py-0.5" role="separator" aria-label="Device boundary">
-            <span className="h-px flex-1 border-t border-dashed border-zinc-200 dark:border-white/[0.1]" />
+          <div className="relative flex items-center gap-2 px-4 py-0.5" role="separator" aria-label="Line between your laptop and the cloud">
+            <span className="h-px flex-1 border-t border-dashed border-line" />
             <span
               className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${
                 justBlocked
                   ? 'border-rose-500 bg-rose-600 text-white'
-                  : 'border-zinc-200/90 bg-zinc-50 text-zinc-600 dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-zinc-300'
+                  : 'border-line bg-sunken text-fg-secondary'
               }`}
             >
-              <Lock aria-hidden className={`size-2.5 ${justBlocked ? 'text-white' : 'text-emerald-700 dark:text-emerald-400'}`} />
-              Boundary
+              <Lock aria-hidden className={`size-2.5 ${justBlocked ? 'text-white' : 'text-device-fg'}`} />
+              Privacy line
             </span>
-            <span className="h-px flex-1 border-t border-dashed border-zinc-200 dark:border-white/[0.1]" />
+            <span className="h-px flex-1 border-t border-dashed border-line" />
           </div>
 
           {justBlocked && (
             <div
               role="alert"
-              className="mx-4 mt-3 flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs leading-relaxed text-rose-900 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200"
+              className="mx-4 mt-3 flex items-start gap-2 rounded-lg border border-danger-line bg-danger-soft px-3 py-2 text-xs leading-relaxed text-danger-ink"
             >
-              <Ban aria-hidden className="mt-0.5 size-3.5 shrink-0 text-rose-600 dark:text-rose-400" />
+              <Ban aria-hidden className="mt-0.5 size-3.5 shrink-0 text-danger-fg" />
               <span>
-                <strong className="font-semibold">Blocked on this device.</strong> That message contained transaction data and was never sent.
+                <strong className="font-semibold">Stopped on your laptop.</strong> That message included transaction details, so it was never sent.
               </span>
             </div>
           )}
 
           {/* CLOUD ZONE */}
-          <section aria-label="Sent to cloud" className="relative px-4 py-4">
+          <section aria-label="Sent to the cloud" className="relative px-4 py-4">
             {fresh?.inferenceSource === 'in_cloud' && <span key={fresh.id} aria-hidden className="pulse-cloud pointer-events-none absolute inset-0" />}
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-indigo-700 uppercase dark:text-indigo-400">
-                <span aria-hidden className="size-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-                Sent to cloud
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-cloud-fg uppercase">
+                <span aria-hidden className="size-1.5 rounded-full bg-cloud" />
+                Sent to the cloud
               </p>
               {totalAiCalls > 0 && (
-                <span className="text-[11px] font-medium text-zinc-500 tabular-nums dark:text-zinc-400">{localShare}% local AI</span>
+                <span className="text-[11px] font-medium text-fg-muted tabular-nums">{localShare}% AI on laptop</span>
               )}
             </div>
 
             <div className="mt-3 flex items-baseline gap-2.5">
               <p
                 className={`text-3xl leading-none font-semibold tracking-tight tabular-nums ${
-                  nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-700 dark:text-indigo-400'
+                  nothingSent ? 'text-device-fg' : 'text-cloud-fg'
                 }`}
                 aria-live="polite"
               >
                 {counters.rawSentUser}
               </p>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">raw transactions sent</p>
+              <p className="text-xs text-fg-secondary">transactions sent</p>
             </div>
 
-            <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-              <ShieldCheck aria-hidden className={`size-3.5 shrink-0 ${nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400'}`} />
-              {nothingSent ? 'Verified from every ledger entry' : 'Each one was sent with your consent'}
+            <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-fg-muted">
+              <ShieldCheck aria-hidden className={`size-3.5 shrink-0 ${nothingSent ? 'text-device-fg' : 'text-cloud-fg'}`} />
+              {nothingSent ? 'Checked against every Privacy Ledger record' : 'Each one was sent with your OK'}
             </p>
             {counters.rawSentDemo > 0 && (
-              <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">+ {plural(counters.rawSentDemo, 'demo row')} sent with consent</p>
+              <p className="mt-1 text-[11px] text-fg-muted">+ {plural(counters.rawSentDemo, 'demo transaction')} sent with your OK</p>
             )}
 
-            <dl className="mt-3.5 grid grid-cols-2 divide-x divide-zinc-100 border-y border-zinc-100 py-2.5 dark:divide-white/[0.06] dark:border-white/[0.06]">
+            <dl className="mt-3.5 grid grid-cols-2 divide-x divide-line-soft border-y border-line-soft py-2.5">
               <div className="pr-3">
-                <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">Merchant names</dt>
-                <dd className="mt-0.5 text-sm font-semibold text-zinc-950 tabular-nums dark:text-white">{counters.merchantNamesShared}</dd>
+                <dt className="text-[11px] text-fg-muted">Merchant names</dt>
+                <dd className="mt-0.5 text-sm font-semibold text-fg tabular-nums">{counters.merchantNamesShared}</dd>
               </div>
               <div className="pl-3.5">
-                <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">Cloud requests</dt>
-                <dd className="mt-0.5 text-sm font-semibold text-zinc-950 tabular-nums dark:text-white">{counters.cloudRequests}</dd>
+                <dt className="text-[11px] text-fg-muted">Cloud AI requests</dt>
+                <dd className="mt-0.5 text-sm font-semibold text-fg tabular-nums">{counters.cloudRequests}</dd>
               </div>
             </dl>
 
             <PayloadViewer
-              title="Last cloud payload"
+              title="Last message to the cloud"
               content={lastCloud?.payloadPreview}
-              emptyText="Nothing has left this device yet."
+              emptyText="Nothing has left your laptop yet."
               accent="cloud"
               maxHeightClass="max-h-32"
               className="mt-3.5"
@@ -241,12 +241,12 @@ export function DataBoundaryPanel() {
           </section>
 
           {/* RECENT ACTIVITY */}
-          <section aria-label="Recent activity" className="border-t border-zinc-100 px-4 py-3.5 dark:border-white/[0.06]">
-            <h3 className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400">Recent activity</h3>
+          <section aria-label="Recent activity" className="border-t border-line-soft px-4 py-3.5">
+            <h3 className="text-[11px] font-semibold tracking-wide text-fg-muted uppercase">Recent activity</h3>
             {recent.length === 0 ? (
-              <p className="mt-2 py-2 text-xs text-zinc-500 dark:text-zinc-400">No AI calls yet. Every call appears here live.</p>
+              <p className="mt-2 py-2 text-xs text-fg-muted">No AI activity yet. Each step shows up here as it happens.</p>
             ) : (
-              <ol className="mt-2.5 divide-y divide-zinc-100 dark:divide-white/[0.05]">
+              <ol className="mt-2.5 divide-y divide-line-soft">
                 {recent.map((e) => {
                   const source = SOURCE_META[e.inferenceSource];
                   return (
@@ -254,10 +254,10 @@ export function DataBoundaryPanel() {
                       <span aria-hidden className={`mt-1.5 size-1.5 shrink-0 rounded-full ${source.dot}`} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-1.5">
-                          <span className="truncate font-medium text-zinc-900 dark:text-zinc-100">{e.feature}</span>
-                          <time className="ml-auto shrink-0 text-[11px] text-zinc-500 tabular-nums dark:text-zinc-400">{formatTime(e.timestamp)}</time>
+                          <span className="truncate font-medium text-fg">{e.feature}</span>
+                          <time className="ml-auto shrink-0 text-[11px] text-fg-muted tabular-nums">{formatTime(e.timestamp)}</time>
                         </div>
-                        <p className="mt-0.5 truncate font-mono text-[10.5px] text-zinc-500 dark:text-zinc-400">{e.payloadPreview}</p>
+                        <p className="mt-0.5 truncate font-mono text-[10.5px] text-fg-muted">{e.payloadPreview}</p>
                       </div>
                     </li>
                   );
@@ -266,7 +266,7 @@ export function DataBoundaryPanel() {
             )}
             <a
               href="#/ledger"
-              className="mt-3 flex items-center justify-between rounded-lg border border-zinc-200/80 px-3 py-2 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950 dark:border-white/[0.08] dark:text-zinc-300 dark:hover:border-white/[0.15] dark:hover:bg-white/[0.04] dark:hover:text-white"
+              className="mt-3 flex items-center justify-between rounded-lg border border-line px-3 py-2 text-xs font-medium text-fg-secondary transition-colors hover:border-line-strong hover:bg-sunken hover:text-fg"
             >
               <span>Open Privacy Ledger</span>
               <ArrowRight aria-hidden className="size-3.5 text-zinc-400" />

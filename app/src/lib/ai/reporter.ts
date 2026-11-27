@@ -8,12 +8,14 @@ import type { Transaction } from '../data/db';
 import { FEATURE, recordLedger } from '../data/ledger';
 import { LOCAL_FUNCTIONS } from './localFunctions';
 import { CLOUD_MODEL, getReporterModel, ON_DEVICE_MODEL } from './models';
+import { getLedgerCurrency } from '../util/ledgerCurrency';
 import { createStore } from '../util/store';
 import { CLOUD_TIMEOUT_MS, withTimeout } from '../util/withTimeout';
 
 export interface SummaryPayload {
   period: string;
-  currency: 'USD';
+  /** ISO 4217 code of the ledger, e.g. "IDR". */
+  currency: string;
   totals: object;
   business_spending_by_category: object;
   previous_period?: { period: string; totals: object };
@@ -52,7 +54,7 @@ export function buildSummaryPayload(rows: Transaction[]): SummaryPayload {
   const categories = (LOCAL_FUNCTIONS.get_spending_by_category(rows, { period, type: 'business' }) as { totals: object }).totals;
   return {
     period,
-    currency: 'USD',
+    currency: getLedgerCurrency(),
     totals: totalsOf(period),
     business_spending_by_category: categories,
     ...(previous ? { previous_period: { period: previous, totals: totalsOf(previous) } } : {}),

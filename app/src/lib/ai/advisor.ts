@@ -22,7 +22,7 @@ export interface AdvisorSession {
 }
 
 const MAX_ROUNDS = 4;
-const CONTEXT_NOTE = '(The request also carries earlier turns of this chat, the system instruction, and the function definitions.)';
+const CONTEXT_NOTE = "(The request also includes earlier messages in this chat, the Advisor's standing instructions, and the list of totals it can ask your laptop for.)";
 
 export function newAdvisorSession(): AdvisorSession {
   return { history: [] };
@@ -53,7 +53,7 @@ async function send(session: AdvisorSession, content: string | Part[], preview: 
       const result = await chat.sendMessage(content, { timeout: CLOUD_TIMEOUT_MS });
       return { response: result.response, history: await chat.getHistory() };
     },
-    'The cloud advisor',
+    'Cloud AI',
   );
   session.history = history;
   return response;
@@ -82,7 +82,7 @@ export async function askAdvisor(session: AdvisorSession, message: string, onCal
         sent[call.name] = result;
         parts.push({ type: 'functionResponse', functionResponse: { id: call.id, name: call.name, response: result } });
       }
-      response = await send(session, parts, `Function results computed on this device:\n${JSON.stringify(sent, null, 2)}`, isDemo);
+      response = await send(session, parts, `Totals computed on your laptop and sent back:\n${JSON.stringify(sent, null, 2)}`, isDemo);
     }
 
     if ((response.functionCalls() ?? []).length > 0) {

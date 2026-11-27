@@ -60,11 +60,11 @@ export function SummaryView() {
   if (transactions.length === 0) {
     return (
       <Card className="flex flex-col items-center py-14 text-center">
-        <span className="flex size-11 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-500 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-400">
+        <span className="flex size-11 items-center justify-center rounded-xl border border-line bg-sunken text-fg-muted">
           <Inbox aria-hidden className="size-5" />
         </span>
-        <h1 className="mt-4 text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">Nothing to summarize yet</h1>
-        <p className="mt-1.5 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">Import a bank CSV or load the demo first.</p>
+        <h1 className="mt-4 text-lg font-semibold tracking-tight text-fg">Nothing to summarize yet</h1>
+        <p className="mt-1.5 max-w-sm text-sm text-fg-muted">Import a bank CSV file or try the demo first.</p>
         <Button variant="primary" className="mt-6" onClick={() => navigate('welcome')}>
           Get started
         </Button>
@@ -106,9 +106,9 @@ export function SummaryView() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-zinc-950 sm:text-2xl dark:text-white">Summary &amp; export</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-fg sm:text-2xl">Summary &amp; export</h1>
           {period && (
-            <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
+            <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-fg-muted sm:text-sm">
               <Calendar aria-hidden className="size-3.5 text-zinc-400" />
               {period}
             </p>
@@ -117,19 +117,19 @@ export function SummaryView() {
       </div>
 
       {ready ? (
-        <div className="flex items-start gap-2.5 rounded-xl border border-emerald-200/75 bg-white px-4 py-3.5 dark:border-emerald-500/20 dark:bg-[#111114]">
-          <CircleCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-emerald-700 dark:text-emerald-400" />
+        <div className="flex items-start gap-2.5 rounded-xl border border-device-line bg-surface px-4 py-3.5">
+          <CircleCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-device-fg" />
           <div>
-            <p className="text-[13px] font-semibold text-zinc-950 dark:text-white">Every transaction is sorted. Your business list is ready.</p>
-            <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Totals below are computed locally in this browser from your labels.</p>
+            <p className="text-[13px] font-semibold text-fg">Every transaction is sorted. Your business list is ready.</p>
+            <p className="mt-0.5 text-xs text-fg-muted">These totals were added up on your laptop from your choices.</p>
           </div>
         </div>
       ) : (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200/80 bg-white px-4 py-3 dark:border-amber-500/20 dark:bg-[#111114]">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-review-line bg-surface px-4 py-3">
           <div className="flex min-w-[16rem] flex-1 items-center gap-2.5">
-            <span aria-hidden className="size-2 shrink-0 rounded-full bg-amber-500 dark:bg-amber-400" />
-            <p className="text-[13px] text-zinc-700 dark:text-zinc-300">
-              <span className="font-semibold text-zinc-950 dark:text-white">{plural(unsorted.length, 'transaction')} not sorted yet</span> (
+            <span aria-hidden className="size-2 shrink-0 rounded-full bg-review" />
+            <p className="text-[13px] text-fg-secondary">
+              <span className="font-semibold text-fg">{plural(unsorted.length, 'transaction')} not sorted yet</span> (
               {formatMoney(total(unsorted))}). They stay out of the business list until you decide.
             </p>
           </div>
@@ -140,7 +140,7 @@ export function SummaryView() {
       )}
 
       {/* UNIFIED 3-COLUMN HAIRLINE KPI BAR */}
-      <dl className="grid divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200/80 bg-white sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-white/[0.06] dark:border-white/[0.08] dark:bg-[#111114]">
+      <dl className="grid divide-y divide-line-soft overflow-hidden rounded-xl border border-line bg-surface sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         <Figure label="Business spending" value={expenseTotal} note={plural(expenses.length, 'expense')} />
         <Figure label="Business income" value={total(income)} note={plural(income.length, 'payment')} positive />
         <Figure label="Net business" value={total(income) - expenseTotal} note="Income minus spending" signed />
@@ -151,14 +151,14 @@ export function SummaryView() {
       <div className="grid grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,20rem)]">
         <Card>
           <div>
-            <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-white">Business spending by category</h2>
-            <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+            <h2 className="text-sm font-semibold tracking-tight text-fg">Business spending by category</h2>
+            <p className="mt-0.5 text-xs text-fg-muted">
               {plural(expenses.length, 'expense')} · {personal.length} personal transactions excluded
             </p>
           </div>
 
           {byCategory.length === 0 ? (
-            <p className="mt-6 rounded-lg border border-zinc-200/80 bg-zinc-50/70 px-4 py-8 text-center text-xs text-zinc-500 dark:border-white/[0.07] dark:bg-white/[0.02] dark:text-zinc-400">
+            <p className="mt-6 rounded-lg border border-line bg-sunken px-4 py-8 text-center text-xs text-fg-muted">
               No business expenses yet. Mark transactions as business to see them here.
             </p>
           ) : (
@@ -172,21 +172,21 @@ export function SummaryView() {
         <Card className="flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-white">Export for your accountant</h2>
+              <h2 className="text-sm font-semibold tracking-tight text-fg">Export for your accountant</h2>
               <Badge tone="device">
-                <Lock aria-hidden className="size-3" /> Local
+                <Lock aria-hidden className="size-3" /> Private
               </Badge>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-              {plural(business.length, 'business transaction')} with date, merchant, category, and amount. Generated locally and saved straight to your
-              laptop.
+            <p className="mt-2 text-xs leading-relaxed text-fg-muted">
+              {plural(business.length, 'business transaction')} with date, merchant, category, and amount. Created and saved on your laptop.
+              Nothing is uploaded.
             </p>
 
-            <div className="mt-4 rounded-lg border border-zinc-200/80 bg-zinc-50/70 p-3 dark:border-white/[0.07] dark:bg-white/[0.02]">
-              <p className="truncate font-mono text-xs font-medium text-zinc-800 dark:text-zinc-200" title={fileName}>
+            <div className="mt-4 rounded-lg border border-line bg-sunken p-3">
+              <p className="truncate font-mono text-xs font-medium text-fg-secondary" title={fileName}>
                 {fileName}
               </p>
-              <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">Columns: Date · Merchant · Category · Amount</p>
+              <p className="mt-1 text-[11px] text-fg-muted">Columns: Date · Merchant · Category · Amount · Currency</p>
             </div>
           </div>
 
@@ -194,20 +194,20 @@ export function SummaryView() {
             <Button variant="primary" className="min-h-10 w-full" onClick={onExport} disabled={business.length === 0}>
               <Download aria-hidden className="size-4" /> Download CSV
             </Button>
-            <p className="mt-2.5 text-center text-xs text-zinc-500 dark:text-zinc-400" aria-live="polite">
+            <p className="mt-2.5 text-center text-xs text-fg-muted" aria-live="polite">
               {saved ? (
-                <span className="inline-flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-400">
+                <span className="inline-flex items-center gap-1 font-medium text-device-fg">
                   <Check aria-hidden className="size-3.5" /> Saved {saved}
                 </span>
               ) : lastExport ? (
                 `Last saved at ${formatTime(lastExport)}.`
               ) : (
-                'Zero data uploaded during export.'
+                'Nothing is uploaded when you export.'
               )}
             </p>
             {!ready && (
-              <p className="mt-2.5 rounded-lg border border-amber-200/80 bg-amber-50/60 px-3 py-2 text-center text-xs font-medium text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
-                {plural(unsorted.length, 'unsorted transaction')} will not be included in the file.
+              <p className="mt-2.5 rounded-lg border border-review-line bg-review-soft px-3 py-2 text-center text-xs font-medium text-review-ink">
+                {plural(unsorted.length, 'unsorted transaction')} won&apos;t be in the file.
               </p>
             )}
           </div>
@@ -236,7 +236,7 @@ function PeriodSummaryCard({ rows }: { rows: Transaction[] }) {
       const result = await writePeriodSummary(payload, isDemo);
       summaryStore.set({ result, busy: false, sentFor: prompt });
     } catch (error) {
-      summaryStore.set({ busy: false, error: friendlyCloudError(error, 'The summary model') });
+      summaryStore.set({ busy: false, error: friendlyCloudError(error, 'Cloud AI') });
     }
   };
 
@@ -244,43 +244,43 @@ function PeriodSummaryCard({ rows }: { rows: Transaction[] }) {
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-white">Monthly summary</h2>
-          <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-            Written by Gemini from category totals only. No transaction, merchant name, or date is sent.
+          <h2 className="text-sm font-semibold tracking-tight text-fg">Monthly summary</h2>
+          <p className="mt-0.5 text-xs text-fg-muted">
+            Written by Cloud AI from category totals only. No transactions, merchant names, or dates are sent.
           </p>
         </div>
         <Button variant={state.result ? 'secondary' : 'primary'} className="min-h-8.5 px-3 text-xs" onClick={() => void run()} disabled={!canRun || state.busy}>
           {state.busy ? <LoaderCircle aria-hidden className="size-3.5 animate-spin motion-reduce:animate-none" /> : <Sparkles aria-hidden className="size-3.5" />}
-          {state.busy ? (retrying ? 'Cloud is busy, trying again…' : 'Writing…') : state.result ? 'Write again' : 'Write summary'}
+          {state.busy ? (retrying ? 'Cloud AI is busy, trying again…' : 'Writing…') : state.result ? 'Write again' : 'Write summary'}
         </Button>
       </div>
 
       {state.result && (
         <div
-          className="mt-4 rounded-lg border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-white/[0.07] dark:bg-white/[0.02]"
+          className="mt-4 rounded-lg border border-line bg-sunken p-4"
           aria-live="polite"
         >
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone={state.result.source === 'in_cloud' ? 'cloud' : 'device'}>
               {state.result.source === 'in_cloud' ? <Cloud aria-hidden className="size-3" /> : <Cpu aria-hidden className="size-3" />}
-              {state.result.source === 'in_cloud' ? `Cloud · ${CLOUD_MODEL}` : 'On this device · Gemini Nano'}
+              {state.result.source === 'in_cloud' ? `Cloud AI · ${CLOUD_MODEL}` : 'Laptop AI · Gemini Nano'}
             </Badge>
-            <span className="text-[11px] text-zinc-500 tabular-nums dark:text-zinc-400">{(state.result.ms / 1000).toFixed(1)} s</span>
+            <span className="text-[11px] text-fg-muted tabular-nums">{(state.result.ms / 1000).toFixed(1)} s</span>
             {state.result.fallback && (
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                {state.result.fallback === 'offline' ? 'You are offline, so it was written locally.' : 'The cloud did not answer, so it was written locally.'}
+              <span className="text-xs text-fg-muted">
+                {state.result.fallback === 'offline' ? "You're offline, so Laptop AI wrote it." : "Cloud AI didn't answer, so Laptop AI wrote it."}
               </span>
             )}
-            {stale && <Badge tone="review">Labels changed since this was written</Badge>}
+            {stale && <Badge tone="review">Your sorting changed since this was written</Badge>}
           </div>
 
-          <p className="mt-3 text-base font-semibold tracking-tight text-zinc-950 dark:text-white">{state.result.headline}</p>
+          <p className="mt-3 text-base font-semibold tracking-tight text-fg">{state.result.headline}</p>
 
           {state.result.highlights.length > 0 && (
-            <ul className="mt-2.5 space-y-1.5 text-[13px] text-zinc-600 dark:text-zinc-300">
+            <ul className="mt-2.5 space-y-1.5 text-[13px] text-fg-secondary">
               {state.result.highlights.map((h) => (
                 <li key={h} className="flex items-start gap-2">
-                  <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-zinc-400 dark:bg-zinc-500" />
+                  <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-fg-faint" />
                   <span className="leading-relaxed">{h}</span>
                 </li>
               ))}
@@ -292,9 +292,9 @@ function PeriodSummaryCard({ rows }: { rows: Transaction[] }) {
               {state.result.warnings.map((w) => (
                 <li
                   key={w}
-                  className="flex items-start gap-2 rounded-lg border border-amber-200/80 bg-amber-50/60 px-3 py-2 text-xs text-amber-950 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
+                  className="flex items-start gap-2 rounded-lg border border-review-line bg-review-soft px-3 py-2 text-xs text-review-ink"
                 >
-                  <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0 text-amber-700 dark:text-amber-400" />
+                  <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0 text-review-fg" />
                   <span>{w}</span>
                 </li>
               ))}
@@ -304,26 +304,26 @@ function PeriodSummaryCard({ rows }: { rows: Transaction[] }) {
       )}
 
       {state.error && (
-        <p role="alert" className="mt-4 rounded-lg border border-amber-200 bg-amber-50/70 px-3.5 py-2.5 text-xs text-amber-950 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+        <p role="alert" className="mt-4 rounded-lg border border-review-line bg-review-soft px-3.5 py-2.5 text-xs text-review-ink">
           {state.error}
         </p>
       )}
 
       {!canRun && (
-        <p className="mt-4 rounded-lg border border-zinc-200/80 bg-zinc-50/70 px-3.5 py-2.5 text-xs text-zinc-500 dark:border-white/[0.07] dark:bg-white/[0.02] dark:text-zinc-400">
+        <p className="mt-4 rounded-lg border border-line bg-sunken px-3.5 py-2.5 text-xs text-fg-muted">
           {!cloudReady
-            ? 'Cloud features are not configured in this build.'
-            : 'Offline, and on-device AI is not ready, so the summary cannot be written right now.'}
+            ? "Cloud AI isn't set up for this copy of the app."
+            : "You're offline and Laptop AI isn't ready, so the summary can't be written right now."}
         </p>
       )}
 
-      <details className="group mt-4 overflow-hidden rounded-lg border border-zinc-200/80 dark:border-white/[0.08]">
-        <summary className="flex list-none items-center justify-between bg-zinc-50/70 px-3.5 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100/70 hover:text-zinc-950 dark:bg-white/[0.02] dark:text-zinc-400 dark:hover:bg-white/[0.05] dark:hover:text-zinc-200">
-          <span>{state.result ? 'Inspect exactly what was sent' : 'Inspect exactly what will be sent'}</span>
+      <details className="group mt-4 overflow-hidden rounded-lg border border-line">
+        <summary className="flex list-none items-center justify-between bg-sunken px-3.5 py-2 text-xs font-medium text-fg-secondary transition-colors hover:bg-subtle hover:text-fg">
+          <span>{state.result ? 'See exactly what was sent' : 'See exactly what will be sent'}</span>
           <ChevronDown aria-hidden className="size-3.5 text-zinc-400 transition-transform group-open:rotate-180" />
         </summary>
         <PayloadViewer
-          title="Totals-only prompt payload"
+          title="Totals-only request to Cloud AI"
           content={shownPayload}
           accent="cloud"
           maxHeightClass="max-h-60"
@@ -351,15 +351,15 @@ function Figure({
   const text = signed && value > 0 ? `+${formatMoney(shown)}` : formatMoney(shown);
   return (
     <div className="px-5 py-4">
-      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</dt>
+      <dt className="text-xs font-medium text-fg-muted">{label}</dt>
       <dd
         className={`mt-1.5 text-2xl font-semibold tracking-tight tabular-nums sm:text-[1.65rem] ${
-          positive ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-950 dark:text-white'
+          positive ? 'text-device-fg' : 'text-fg'
         }`}
       >
         {text}
       </dd>
-      <dd className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{note}</dd>
+      <dd className="mt-0.5 text-xs text-fg-muted">{note}</dd>
     </div>
   );
 }
@@ -396,20 +396,20 @@ function CategoryBars({
               onBlur={() => onHover(undefined)}
               aria-label={`${row.category}: ${formatMoney(row.amount)}, ${plural(row.count, 'transaction')}, ${share}% of business spending`}
               className={`rounded-lg px-2.5 py-2 transition-colors duration-150 ${
-                isActive ? 'bg-zinc-100/90 dark:bg-white/[0.06]' : 'hover:bg-zinc-50 dark:hover:bg-white/[0.03]'
+                isActive ? 'bg-subtle' : 'hover:bg-sunken'
               } ${isDimmed ? 'opacity-45' : ''}`}
             >
               <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="flex min-w-0 items-center gap-2 font-medium text-zinc-800 dark:text-zinc-200">
+                <span className="flex min-w-0 items-center gap-2 font-medium text-fg-secondary">
                   <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                   <span className="truncate">{row.category}</span>
                 </span>
                 <span className="flex shrink-0 items-baseline gap-2.5 tabular-nums">
-                  <span className="font-semibold text-zinc-950 dark:text-white">{formatMoney(row.amount)}</span>
-                  <span className="w-7 text-right text-zinc-500 dark:text-zinc-400">{share}%</span>
+                  <span className="font-semibold text-fg">{formatMoney(row.amount)}</span>
+                  <span className="w-7 text-right text-fg-muted">{share}%</span>
                 </span>
               </div>
-              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-white/[0.06]">
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-subtle">
                 <div
                   className="h-full rounded-full transition-[width] duration-500 ease-out"
                   style={{ width: `${width}%`, backgroundColor: color }}

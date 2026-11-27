@@ -8,6 +8,9 @@
 //   merchant or payee from the user's data ("What did I pay Adobe?") was sent.
 //   Set B was written before that rule, so it proves the gap is closed, not
 //   that the rule generalizes. The README lists what the guard still misses.
+// - v3 widens what counts as an amount to other currencies ("Rp 85.000",
+//   "1.234,56 €", "IDR 54.990") when the app learned to import them. Set C was
+//   written together with v3, so it shows the patterns work, nothing more.
 
 /**
  * Words that appear in bank descriptions but do not identify a merchant. They
@@ -32,8 +35,20 @@ const GENERIC_WORDS = new Set(
   JANUARY FEBRUARY MARCH APRIL AUGUST SEPTEMBER OCTOBER NOVEMBER DECEMBER`.split(/\s+/),
 );
 
-const CURRENCY_AMOUNT = /[$€£]\s?\d[\d,]*(?:\.\d{1,2})?/;
-const DECIMAL_AMOUNT = /(?<![\d.])[-+]?\d{1,3}(?:,\d{3})*\.\d{2}(?!\d)|(?<![\d.])[-+]?\d+\.\d{2}(?!\d)/;
+const SYMBOL = String.raw`(?:[$€£¥₹₱₫฿₩₦₺৳₴]|(?<![A-Za-z])(?:Rp|RM|zł)\.?)`;
+const CODE = String.raw`(?<![A-Za-z])(?:USD|EUR|GBP|IDR|INR|PHP|VND|THB|MYR|SGD|JPY|KRW|CNY|HKD|AUD|NZD|CAD|MXN|BRL|NGN|KES|ZAR|EGP|PKR|BDT|PLN|UAH|CHF|SEK|NOK|DKK|AED|SAR)(?![A-Za-z])`;
+/** A symbol or code before or after a number: "$29", "Rp 85.000", "1.234,56 €", "450,00 EUR". */
+const CURRENCY_AMOUNT = new RegExp(String.raw`(?:${SYMBOL}|${CODE})\s?\d|\d[\d.,]*\s?(?:${SYMBOL}|${CODE})`);
+const DECIMAL_AMOUNT = new RegExp(
+  [
+    // 1,234.56 and 30.00
+    String.raw`(?<![\d.])[-+]?\d{1,3}(?:,\d{3})*\.\d{2}(?!\d)|(?<![\d.])[-+]?\d+\.\d{2}(?!\d)`,
+    // 1.234,56 and 12,50
+    String.raw`(?<![\d.,])[-+]?\d{1,3}(?:\.\d{3})*,\d{2}(?!\d)`,
+    // 85.000 and 1.500.000: thousands grouped with dots, as rupiah and euro statements write them
+    String.raw`(?<![\d.,])[-+]?\d{1,3}(?:\.\d{3})+(?![\d.,])`,
+  ].join('|'),
+);
 const BARE_NUMBER = /\b\d{2,}\b/;
 const DATE =
   /\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\b|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b/i;

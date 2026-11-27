@@ -1,7 +1,19 @@
 import { db } from '../data/db';
 import { loadDemoData } from '../data/importer';
-import { runOnDeviceLabeling } from '../ai/labelingRunner';
+import { resetAdvisor } from '../ai/advisorStore';
+import { resetExplanations } from '../ai/explainer';
+import { labelingStore, recentArrivals, runOnDeviceLabeling } from '../ai/labelingRunner';
+import { resetSummary } from '../ai/reporter';
 import type { Category, TxType } from '../core/taxonomy';
+
+/** Forgets in-memory results about the old transactions: chat, summary, explanations, sorting progress. */
+export function resetSessionState(): void {
+  resetAdvisor();
+  resetSummary();
+  resetExplanations();
+  recentArrivals.clear();
+  labelingStore.set({ status: 'idle', done: 0, total: 0, batch: 0, batches: 0, firstItemMs: undefined, message: undefined });
+}
 
 export type Route = 'welcome' | 'import' | 'transactions' | 'review' | 'summary' | 'advisor' | 'ledger';
 
@@ -83,7 +95,7 @@ export async function labelPendingByHand(): Promise<void> {
         category: t.category ?? 'Other',
         source: 'you' as const,
         needsReview: true,
-        reviewReason: 'On-device AI was not available, so you decide',
+        reviewReason: "Laptop AI wasn't available, so you decide",
       },
     })),
   );

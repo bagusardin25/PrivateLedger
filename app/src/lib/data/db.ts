@@ -4,6 +4,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { LabelSource } from '../core/prepare';
 import type { Category, TxType } from '../core/taxonomy';
+import { resetLedgerCurrency } from '../util/ledgerCurrency';
 
 export interface Transaction {
   id: string;
@@ -64,6 +65,8 @@ export interface ImportRecord {
   rowCount: number;
   importedAt: number;
   isDemo: boolean;
+  /** ISO 4217 code. Missing on imports made before currencies were tracked, which were USD. */
+  currency?: string;
 }
 
 class LedgerDb extends Dexie {
@@ -87,10 +90,25 @@ class LedgerDb extends Dexie {
 
 export const db = new LedgerDb();
 
+/**
+ * Removes the transactions and their imports, but keeps what is still true for
+ * new ones: merchants you sorted (memory) and the Privacy Ledger, the record of
+ * what left this device. Used when a file in another currency replaces the old one.
+ */
+export async function clearTransactions(): Promise<void> {
+  await db.transaction('rw', [db.transactions, db.imports], async () => {
+    await Promise.all([db.transactions.clear(), db.imports.clear()]);
+  });
+  localStorage.removeItem('private-ledger:lastExportAt');
+  resetLedgerCurrency();
+  window.dispatchEvent(new Event('private-ledger:export-changed'));
+}
+
 export async function clearAllData(): Promise<void> {
   await db.transaction('rw', [db.transactions, db.merchantRules, db.ledgerEntries, db.imports], async () => {
     await Promise.all([db.transactions.clear(), db.merchantRules.clear(), db.ledgerEntries.clear(), db.imports.clear()]);
   });
   localStorage.removeItem('private-ledger:lastExportAt');
+  resetLedgerCurrency();
   window.dispatchEvent(new Event('private-ledger:export-changed'));
 }
