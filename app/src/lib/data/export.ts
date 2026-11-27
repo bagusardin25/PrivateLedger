@@ -1,13 +1,15 @@
 // Export: files are built and saved entirely in the browser. No AI, no network.
 
 import type { Transaction } from './db';
+import { fractionDigits } from '../util/currency';
+import { getLedgerCurrency } from '../util/ledgerCurrency';
 
 const SOURCE_TEXT: Record<Transaction['source'], string> = {
-  pending: 'Not labeled',
-  rule: 'Rule',
+  pending: 'Not sorted',
+  rule: 'Saved rule',
   memory: 'Remembered',
-  'on-device': 'On-device AI',
-  cloud: 'Cloud AI (with consent)',
+  'on-device': 'Laptop AI',
+  cloud: 'Cloud AI (with your OK)',
   you: 'You',
 };
 
@@ -16,10 +18,21 @@ function cell(value: string | number): string {
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
-export function businessCsv(rows: Transaction[]): string {
-  const header = ['Date', 'Merchant', 'Bank description', 'Category', 'Kind', 'Amount', 'Labeled by'];
+/** Amounts are plain numbers (dot decimal, no grouping) so spreadsheets read them; the Currency column says what they are. */
+export function businessCsv(rows: Transaction[], currency: string = getLedgerCurrency()): string {
+  const digits = fractionDigits(currency);
+  const header = ['Date', 'Merchant', 'Bank description', 'Category', 'Kind', 'Amount', 'Currency', 'Sorted by'];
   const lines = rows.map((t) =>
-    [t.date, t.cleanMerchant, t.rawDescription, t.category ?? 'Other', t.amount < 0 ? 'Expense' : 'Income', t.amount.toFixed(2), SOURCE_TEXT[t.source]]
+    [
+      t.date,
+      t.cleanMerchant,
+      t.rawDescription,
+      t.category ?? 'Other',
+      t.amount < 0 ? 'Expense' : 'Income',
+      t.amount.toFixed(digits),
+      currency,
+      SOURCE_TEXT[t.source],
+    ]
       .map(cell)
       .join(','),
   );

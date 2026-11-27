@@ -43,18 +43,157 @@
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, monospace;
 
-  /*
-   * Quiet Precision Fintech Palette (inspired by Mercury, Linear & Ramp):
-   * - Canvas: Soft Alabaster (#f8f8f7) / Deep Obsidian (#09090b)
-   * - Surface: Pure White (#ffffff) / Elevated Charcoal (#111114)
-   * - Primary Ink: Architectural Near-Black (#18181b) / Crisp Porcelain (#fafafa)
-   * - Semantic accents reserved strictly for meaning:
-   *     Local/Verified (Emerald), Cloud Totals (Indigo), Review (Amber), Blocked (Rose)
-   */
-  --color-canvas: #f8f8f7;
-  --color-surface: #ffffff;
-  --color-obsidian: #09090b;
-  --color-obsidian-card: #111114;
+}
+
+/*
+ * Design tokens. Components use these names (bg-surface, text-fg-muted, border-device-line, ...)
+ * instead of raw palette classes, so a palette change happens here, once, for both themes.
+ * Each token reads a --pl-* variable that the light and dark blocks below define.
+ *
+ * Neutrals
+ *   canvas        page background           surface     cards and panels
+ *   raised        controls sitting on cards sunken      inset areas, table heads
+ *   subtle        chips, tracks, hover fill emphasis    selected nav, segmented track
+ *   line          default border            line-soft   dividers inside a card
+ *   line-strong   hover border, separators  focus       focused input border
+ *   fg            headings, primary text    fg-secondary body copy, labels
+ *   fg-muted      meta text                 fg-faint    placeholders, disabled
+ *   inverse       solid dark-on-light fill  on-inverse  text on inverse or solid fills
+ *
+ * Meaning (each has: solid, -fg text, -ink strong text, -soft fill, -line border)
+ *   device   stays on this laptop (emerald)     cloud    totals sent to the cloud (indigo)
+ *   review   needs a human decision (amber)     danger   blocked or destructive (rose)
+ */
+@theme inline {
+  --color-canvas: var(--pl-canvas);
+  --color-surface: var(--pl-surface);
+  --color-raised: var(--pl-raised);
+  --color-sunken: var(--pl-sunken);
+  --color-subtle: var(--pl-subtle);
+  --color-emphasis: var(--pl-emphasis);
+  --color-line: var(--pl-line);
+  --color-line-soft: var(--pl-line-soft);
+  --color-line-strong: var(--pl-line-strong);
+  --color-focus: var(--pl-focus);
+  --color-fg: var(--pl-fg);
+  --color-fg-secondary: var(--pl-fg-secondary);
+  --color-fg-muted: var(--pl-fg-muted);
+  --color-fg-faint: var(--pl-fg-faint);
+  --color-inverse: var(--pl-inverse);
+  --color-inverse-hover: var(--pl-inverse-hover);
+  --color-on-inverse: var(--pl-on-inverse);
+
+  --color-device: var(--pl-device);
+  --color-device-fg: var(--pl-device-fg);
+  --color-device-ink: var(--pl-device-ink);
+  --color-device-soft: var(--pl-device-soft);
+  --color-device-line: var(--pl-device-line);
+
+  --color-cloud: var(--pl-cloud);
+  --color-cloud-fg: var(--pl-cloud-fg);
+  --color-cloud-ink: var(--pl-cloud-ink);
+  --color-cloud-soft: var(--pl-cloud-soft);
+  --color-cloud-line: var(--pl-cloud-line);
+
+  --color-review: var(--pl-review);
+  --color-review-fg: var(--pl-review-fg);
+  --color-review-ink: var(--pl-review-ink);
+  --color-review-soft: var(--pl-review-soft);
+  --color-review-line: var(--pl-review-line);
+
+  --color-danger: var(--pl-danger);
+  --color-danger-fg: var(--pl-danger-fg);
+  --color-danger-ink: var(--pl-danger-ink);
+  --color-danger-soft: var(--pl-danger-soft);
+  --color-danger-line: var(--pl-danger-line);
+}
+
+:root {
+  --pl-canvas: #f8f8f7;
+  --pl-surface: var(--color-white);
+  --pl-raised: var(--color-white);
+  --pl-sunken: color-mix(in oklab, var(--color-zinc-50) 70%, transparent);
+  --pl-subtle: var(--color-zinc-100);
+  --pl-emphasis: color-mix(in oklab, var(--color-zinc-200) 70%, transparent);
+  --pl-line: color-mix(in oklab, var(--color-zinc-200) 80%, transparent);
+  --pl-line-soft: var(--color-zinc-100);
+  --pl-line-strong: var(--color-zinc-300);
+  --pl-focus: var(--color-zinc-900);
+  --pl-fg: var(--color-zinc-950);
+  --pl-fg-secondary: var(--color-zinc-700);
+  --pl-fg-muted: var(--color-zinc-500);
+  --pl-fg-faint: var(--color-zinc-400);
+  --pl-inverse: var(--color-zinc-900);
+  --pl-inverse-hover: var(--color-zinc-800);
+  --pl-on-inverse: var(--color-white);
+
+  --pl-device: var(--color-emerald-600);
+  --pl-device-fg: var(--color-emerald-700);
+  --pl-device-ink: var(--color-emerald-950);
+  --pl-device-soft: var(--color-emerald-50);
+  --pl-device-line: color-mix(in oklab, var(--color-emerald-200) 80%, transparent);
+
+  --pl-cloud: var(--color-indigo-600);
+  --pl-cloud-fg: var(--color-indigo-700);
+  --pl-cloud-ink: var(--color-indigo-950);
+  --pl-cloud-soft: var(--color-indigo-50);
+  --pl-cloud-line: color-mix(in oklab, var(--color-indigo-200) 80%, transparent);
+
+  --pl-review: var(--color-amber-500);
+  --pl-review-fg: var(--color-amber-700);
+  --pl-review-ink: var(--color-amber-950);
+  --pl-review-soft: var(--color-amber-50);
+  --pl-review-line: color-mix(in oklab, var(--color-amber-200) 80%, transparent);
+
+  --pl-danger: var(--color-rose-600);
+  --pl-danger-fg: var(--color-rose-700);
+  --pl-danger-ink: var(--color-rose-950);
+  --pl-danger-soft: var(--color-rose-50);
+  --pl-danger-line: color-mix(in oklab, var(--color-rose-200) 80%, transparent);
+}
+
+.dark {
+  --pl-canvas: #09090b;
+  --pl-surface: #111114;
+  --pl-raised: #16161a;
+  --pl-sunken: color-mix(in oklab, var(--color-white) 3%, transparent);
+  --pl-subtle: color-mix(in oklab, var(--color-white) 6%, transparent);
+  --pl-emphasis: color-mix(in oklab, var(--color-white) 8%, transparent);
+  --pl-line: color-mix(in oklab, var(--color-white) 8%, transparent);
+  --pl-line-soft: color-mix(in oklab, var(--color-white) 6%, transparent);
+  --pl-line-strong: color-mix(in oklab, var(--color-white) 16%, transparent);
+  --pl-focus: var(--color-zinc-400);
+  --pl-fg: var(--color-white);
+  --pl-fg-secondary: var(--color-zinc-300);
+  --pl-fg-muted: var(--color-zinc-400);
+  --pl-fg-faint: var(--color-zinc-500);
+  --pl-inverse: var(--color-zinc-100);
+  --pl-inverse-hover: var(--color-white);
+  --pl-on-inverse: var(--color-zinc-950);
+
+  --pl-device: var(--color-emerald-400);
+  --pl-device-fg: var(--color-emerald-400);
+  --pl-device-ink: var(--color-emerald-200);
+  --pl-device-soft: color-mix(in oklab, var(--color-emerald-500) 10%, transparent);
+  --pl-device-line: color-mix(in oklab, var(--color-emerald-500) 20%, transparent);
+
+  --pl-cloud: var(--color-indigo-400);
+  --pl-cloud-fg: var(--color-indigo-400);
+  --pl-cloud-ink: var(--color-indigo-200);
+  --pl-cloud-soft: color-mix(in oklab, var(--color-indigo-500) 10%, transparent);
+  --pl-cloud-line: color-mix(in oklab, var(--color-indigo-500) 20%, transparent);
+
+  --pl-review: var(--color-amber-400);
+  --pl-review-fg: var(--color-amber-400);
+  --pl-review-ink: var(--color-amber-200);
+  --pl-review-soft: color-mix(in oklab, var(--color-amber-500) 10%, transparent);
+  --pl-review-line: color-mix(in oklab, var(--color-amber-500) 20%, transparent);
+
+  --pl-danger: var(--color-rose-400);
+  --pl-danger-fg: var(--color-rose-400);
+  --pl-danger-ink: var(--color-rose-200);
+  --pl-danger-soft: color-mix(in oklab, var(--color-rose-500) 10%, transparent);
+  --pl-danger-line: color-mix(in oklab, var(--color-rose-500) 20%, transparent);
 }
 
 :root {
@@ -87,14 +226,9 @@
   }
   body {
     background-color: var(--color-canvas);
-    color: var(--color-zinc-900);
+    color: var(--color-fg);
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    @apply antialiased transition-colors duration-200 selection:bg-zinc-900 selection:text-white;
-  }
-  .dark body {
-    background-color: var(--color-obsidian);
-    color: var(--color-zinc-100);
-    @apply selection:bg-zinc-200 selection:text-zinc-950;
+    @apply antialiased transition-colors duration-200 selection:bg-inverse selection:text-on-inverse;
   }
   button:not(:disabled),
   [role='button']:not([aria-disabled='true']),
@@ -104,7 +238,7 @@
     cursor: pointer;
   }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-zinc-900 dark:outline-zinc-300;
+    @apply outline-2 outline-offset-2 outline-focus;
   }
 }
 

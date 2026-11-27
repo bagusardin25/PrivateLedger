@@ -59,9 +59,9 @@ function InstallButton() {
     <button
       type="button"
       onClick={() => void promptInstall()}
-      title="Install Private Ledger as an app. It opens in its own window and starts without a connection."
+      title="Install Private Ledger as an app. It opens in its own window and works offline."
       aria-label="Install Private Ledger"
-      className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-2 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-zinc-950 sm:px-2.5 dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-zinc-200 dark:hover:bg-white/[0.08]"
+      className="inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-line bg-raised px-2 text-xs font-medium text-fg-secondary transition-colors hover:bg-subtle hover:text-fg sm:px-2.5"
     >
       <MonitorDown aria-hidden className="size-3.5" />
       <span className="hidden sm:inline">Install</span>
@@ -137,19 +137,19 @@ export function App() {
           e.preventDefault();
           document.getElementById('main')?.focus();
         }}
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:border focus:border-zinc-200 focus:bg-white focus:px-3.5 focus:py-2 focus:text-sm focus:font-medium focus:text-zinc-950 focus:shadow-sm dark:focus:border-white/10 dark:focus:bg-[#111114] dark:focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:border focus:border-line focus:bg-surface focus:px-3.5 focus:py-2 focus:text-sm focus:font-medium focus:text-fg focus:shadow-sm"
       >
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-[#f8f8f7]/85 backdrop-blur-md supports-[backdrop-filter]:bg-[#f8f8f7]/75 dark:border-white/[0.07] dark:bg-[#09090b]/85 dark:supports-[backdrop-filter]:bg-[#09090b]/75">
+      <header className="sticky top-0 z-30 border-b border-line bg-canvas/85 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/75">
         <div className="mx-auto flex max-w-[1380px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6 xl:min-h-14 xl:flex-nowrap xl:py-0">
           <a href="#/welcome" className="group flex shrink-0 items-center gap-2.5 rounded-lg pr-1">
             <BrandMark />
-            <span className="text-sm font-semibold tracking-tight whitespace-nowrap text-zinc-950 dark:text-white">Private Ledger</span>
+            <span className="text-sm font-semibold tracking-tight whitespace-nowrap text-fg">Private Ledger</span>
           </a>
 
-          <span aria-hidden className="hidden h-4 w-px bg-zinc-200 xl:block dark:bg-white/[0.1]" />
+          <span aria-hidden className="hidden h-4 w-px bg-line xl:block" />
 
           <nav
             aria-label="Main"
@@ -164,16 +164,16 @@ export function App() {
                   aria-current={active ? 'page' : undefined}
                   className={`inline-flex min-h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[13px] font-medium whitespace-nowrap transition-colors duration-150 ${
                     active
-                      ? 'bg-zinc-200/70 text-zinc-950 dark:bg-white/[0.09] dark:text-white'
-                      : 'text-zinc-500 hover:bg-zinc-200/45 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/[0.05] dark:hover:text-zinc-100'
+                      ? 'bg-emphasis text-fg'
+                      : 'text-fg-muted hover:bg-subtle hover:text-fg'
                   }`}
                 >
-                  <r.icon aria-hidden className={`size-3.5 ${active ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'}`} />
+                  <r.icon aria-hidden className={`size-3.5 ${active ? 'text-fg' : 'text-fg-faint'}`} />
                   {r.label}
                   {r.id === 'review' && reviewCount > 0 && (
                     <span
                       aria-label={`${reviewCount} to review`}
-                      className="rounded-md bg-amber-100/90 px-1.5 py-0.5 text-[10px] leading-none font-semibold text-amber-800 tabular-nums dark:bg-amber-500/15 dark:text-amber-300"
+                      className="rounded-md bg-review-soft px-1.5 py-0.5 text-[10px] leading-none font-semibold text-review-fg tabular-nums"
                     >
                       {reviewCount}
                     </span>
@@ -189,23 +189,23 @@ export function App() {
             <span
               className={`inline-flex min-h-7 items-center gap-1.5 rounded-lg px-2 text-xs font-medium whitespace-nowrap ${
                 online
-                  ? 'text-zinc-500 dark:text-zinc-400'
-                  : 'border border-amber-200/80 bg-amber-50 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300'
+                  ? 'text-fg-muted'
+                  : 'border border-review-line bg-review-soft text-review-fg'
               }`}
             >
               {online ? (
                 <>
-                  <span aria-hidden className="size-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+                  <span aria-hidden className="size-1.5 rounded-full bg-device" />
                   <span className="hidden sm:inline">Online</span>
                 </>
               ) : (
                 <>
-                  <WifiOff aria-hidden className="size-3.5 text-amber-700 dark:text-amber-400" />
+                  <WifiOff aria-hidden className="size-3.5 text-review-fg" />
                   Offline
                 </>
               )}
             </span>
-            <span aria-hidden className="h-4 w-px bg-zinc-200/90 dark:bg-white/[0.08]" />
+            <span aria-hidden className="h-4 w-px bg-line" />
             <ThemeToggle />
           </div>
         </div>
@@ -248,13 +248,13 @@ export function App() {
         )}
       </div>
 
-      <footer className="mt-auto border-t border-zinc-200/75 dark:border-white/[0.06]">
-        <div className="mx-auto flex max-w-[1380px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-zinc-500 sm:px-6 dark:text-zinc-400">
+      <footer className="mt-auto border-t border-line">
+        <div className="mx-auto flex max-w-[1380px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-fg-muted sm:px-6">
           <span className="inline-flex items-center gap-1.5">
-            <Lock aria-hidden className="size-3 text-emerald-700 dark:text-emerald-400" />
-            Private Ledger · Local-first in Chrome · Built with Firebase AI Logic
+            <Lock aria-hidden className="size-3 text-device-fg" />
+            Private Ledger · Your statement stays on your laptop · Built with Gemini Nano and Firebase AI Logic
           </span>
-          <span>Labels are suggestions you confirm. Not financial or tax advice.</span>
+          <span>AI suggestions are yours to confirm. Not financial or tax advice.</span>
         </div>
       </footer>
     </div>

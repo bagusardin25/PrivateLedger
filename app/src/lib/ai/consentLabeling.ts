@@ -71,7 +71,7 @@ export async function runCloudLabelingWithConsent(): Promise<void> {
           isDemo,
         },
         () => getConsentLabelerModel().generateContent(prompt, { timeout: CLOUD_TIMEOUT_MS }),
-        'The cloud model',
+        'Cloud AI',
       );
 
       let items: Record<string, unknown>[] = [];
@@ -94,7 +94,7 @@ export async function runCloudLabelingWithConsent(): Promise<void> {
               category,
               source: 'cloud' as const,
               needsReview: type === 'unsure',
-              reviewReason: type === 'unsure' ? 'The cloud model was not sure' : undefined,
+              reviewReason: type === 'unsure' ? "Cloud AI wasn't sure" : undefined,
             },
           })),
         );
@@ -106,7 +106,7 @@ export async function runCloudLabelingWithConsent(): Promise<void> {
     const leftover = await db.transactions.filter((t) => t.source === 'pending').toArray();
     if (leftover.length) {
       await db.transactions.bulkUpdate(
-        leftover.map((t) => ({ key: t.id, changes: { type: 'unsure' as const, source: 'cloud' as const, needsReview: true, reviewReason: 'No label from the cloud model' } })),
+        leftover.map((t) => ({ key: t.id, changes: { type: 'unsure' as const, source: 'cloud' as const, needsReview: true, reviewReason: "Cloud AI couldn't sort this one" } })),
       );
     }
     labelingStore.set({ status: 'done' });

@@ -53,6 +53,26 @@ const SAFE_B = [
   'Did I spend more than $500 on equipment?',
 ];
 
+// Set C: written together with rules v3 (amounts in other currencies), so it
+//        only shows that the new patterns work. Reported separately on purpose.
+const UNSAFE_C = [
+  '25/10 GRAB*FOOD JAKARTA Rp 85.000',
+  'TRSF E-BANKING DB 1.500.000 TOKOPEDIA',
+  'Paid 1.234,56 € to Hetzner on 2026-10-04',
+  'Is the 450,00 EUR from Oct 3 business?',
+  'Here are two lines:\n12/10 SPOTIFY IDR 54.990\n14/10 CANVA PRO IDR 165.000',
+  'GOJEK *GORIDE 32.500 03/10',
+];
+
+const SAFE_C = [
+  'How much did I spend on software in rupiah last month?',
+  'Is my business spending above Rp 5.000.000 this month?',
+  'Compare my EUR spending for 2026-09 and 2026-10.',
+  'What were my total business costs in IDR?',
+  'Did I spend more than 1.500.000 on equipment?',
+  'Can I deduct 50% of meals in Indonesia?',
+];
+
 const tokens = merchantTokens(DEMO_ROWS.map((r) => r.description));
 const phrases = merchantPhrases(DEMO_ROWS.map((r) => normalizeMerchant(r.description).key));
 
@@ -77,4 +97,5 @@ function run(name: string, unsafe: string[], safe: string[], maxFalseBlocks: num
 
 const a = run('A (written after rules v1 were locked)', UNSAFE_A, SAFE_A, 1);
 const b = run('B (audit findings, written before rule v2)', UNSAFE_B, SAFE_B, 0);
-process.exitCode = a && b ? 0 : 1;
+const c = run('C (other currencies, written together with rules v3)', UNSAFE_C, SAFE_C, 0);
+process.exitCode = a && b && c ? 0 : 1;

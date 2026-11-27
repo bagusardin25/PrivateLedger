@@ -2,6 +2,7 @@
 // Everything except parseCsvFile is a pure function, tested in scripts/csv.test.ts.
 
 import Papa from 'papaparse';
+import { currencyInText, detectCurrency, pickCurrency } from './currency.ts';
 import type { RawRow } from './prepare';
 
 export interface ParsedCsv {
@@ -11,6 +12,9 @@ export interface ParsedCsv {
 
 /** For dates like 03/04/2026: is the first number the month or the day? */
 export type DateOrder = 'mdy' | 'dmy';
+
+/** "1,234.56" (dot) or "1.234,56" (comma): which character marks the decimals. */
+export type DecimalMark = 'dot' | 'comma';
 
 export interface ColumnMapping {
   date: string;
@@ -24,6 +28,11 @@ export interface ColumnMapping {
   dateOrder: DateOrder;
   /** Card statements often list purchases as positive numbers. */
   spendingIsPositive: boolean;
+  /** ISO 4217 code for every amount in the file, e.g. "IDR". */
+  currency: string;
+  decimalMark: DecimalMark;
+  /** A column naming each row's currency, when the file has one. Rows in another currency are skipped. */
+  currencyColumn: string;
 }
 
 export function parseCsvFile(file: File): Promise<ParsedCsv> {
@@ -70,29 +79,73 @@ export function detectDateOrder(values: (string | undefined)[]): { order: DateOr
   return { order: 'mdy', ambiguous: numeric, numeric };
 }
 
-export function guessMapping(headers: string[], rows: Record<string, string>[] = []): ColumnMapping {
-  const amount = find(headers, /^(amount|amt|value|transaction amount)$/i) || find(headers, /amount/i);
-  const debit = find(headers, /debit|withdrawal|money out|paid out/i);
-  const credit = find(headers, /credit|deposit|money in|paid in/i);
-  const date = find(headers, /^(date|posted date|transaction date|posting date)$/i) || find(headers, /date/i);
+/**
+ * Looks at a whole amount column: "1.234,56" or "12,5" means a decimal comma;
+ * "59.99" means a decimal dot; amounts with only "1.500.000" style groups
+ * (rupiah, yen) also mean the dot is a thousands separator.
+ * `evidence` is false when every value fits both readings.
+ */
+export function detectDecimalMark(values: (string | undefined)[]): { mark: DecimalMark; evidence: boolean } {
+  let dot = 0;
+  let comma = 0;
+  let dotGroups = 0;
+  let commaGroups = 0;
+  for (const value of values) {
+    const digits = (value ?? '').replace(/[^\d.,]/g, '');
+    if (!/\d/.test(digits)) continue;
+    if (/,\d{1,2}$/.test(digits) || /\.\d{3},/.test(digits)) comma += 1;
+    else if (/\.\d{1,2}$/.test(digits) || /,\d{3}\./.test(digits)) dot += 1;
+    else if (/^\d{1,3}(\.\d{3})+$/.test(digits)) dotGroups += 1;
+    else if (/^\d{1,3}(,\d{3})+$/.test(digits)) commaGroups += 1;
+  }
+  if (comma !== dot) return { mark: comma > dot ? 'comma' : 'dot', evidence: true };
+  if (dotGroups !== commaGroups) return { mark: dotGroups > commaGroups ? 'comma' : 'dot', evidence: true };
+  return { mark: 'dot', evidence: false };
+}
+
+/** The columns that hold amounts under a mapping. */
+export function amountColumns(mapping: Pick<ColumnMapping, 'amountMode' | 'amount' | 'debit' | 'credit'>): string[] {
+  return (mapping.amountMode === 'single' ? [mapping.amount] : [mapping.debit, mapping.credit]).filter(Boolean);
+}
+
+export function decimalMarkFor(rows: Record<string, string>[], columns: string[]): DecimalMark {
+  return detectDecimalMark(rows.flatMap((r) => columns.map((c) => r[c]))).mark;
+}
+
+/** `locale` is the browser's language, used only when the file does not name its currency. */
+export function guessMapping(headers: string[], rows: Record<string, string>[] = [], locale?: string): ColumnMapping {
+  const amount = find(headers, /^(amount|amt|value|transaction amount|jumlah|nominal|betrag|montant|importe)$/i) || find(headers, /amount|jumlah|nominal/i);
+  const debit = find(headers, /debit|debet|withdrawal|money out|paid out|keluar/i);
+  const credit = find(headers, /credit|kredit|deposit|money in|paid in|masuk/i);
+  const date =
+    find(headers, /^(date|posted date|transaction date|posting date|tanggal|tgl|tanggal transaksi|datum|buchungstag|buchungsdatum|fecha|data)$/i) ||
+    find(headers, /date|tanggal|tgl|datum|buchung|fecha/i);
+  const amountMode = !amount && debit && credit ? 'split' : 'single';
+  const columns = amountColumns({ amountMode, amount, debit, credit });
+  const currencyGuess = detectCurrency(headers, rows, columns);
   return {
     date,
-    description: find(headers, /desc|memo|payee|merchant|details|narrative|name/i),
-    amountMode: !amount && debit && credit ? 'split' : 'single',
+    description: find(headers, /desc|memo|payee|merchant|details|narrative|name|keterangan|uraian|berita|verwendungszweck|buchungstext|beschreibung|libell|concepto|omschrijving/i),
+    amountMode,
     amount,
     debit,
     credit,
     dateOrder: detectDateOrder(rows.map((r) => r[date])).order,
     spendingIsPositive: false,
+    currency: pickCurrency(currencyGuess, locale),
+    decimalMark: decimalMarkFor(rows, columns),
+    currencyColumn: currencyGuess.column ?? '',
   };
 }
 
 /**
- * Reads "-59.99", "(59.99)", "59.99-", "$1,234.56", "1.234,56", "59.99 DR".
- * Returns undefined when there is no number, so the row is skipped instead of
- * imported as zero.
+ * Reads "-59.99", "(59.99)", "59.99-", "$1,234.56", "1.234,56", "59.99 DR",
+ * "Rp 85.000", "25,000.00 DB". With a decimal mark from the whole column the
+ * reading is exact ("1.500" is 1500 in a rupiah file); without one it guesses
+ * from the value alone. Returns undefined when there is no number, so the row
+ * is skipped instead of imported as zero.
  */
-export function parseAmount(value: string | undefined): number | undefined {
+export function parseAmount(value: string | undefined, mark?: DecimalMark): number | undefined {
   if (value === undefined) return undefined;
   let text = value.trim().replace(/[−‒–—]/g, '-');
   if (!/\d/.test(text)) return undefined;
@@ -102,10 +155,18 @@ export function parseAmount(value: string | undefined): number | undefined {
     negative = true;
     text = text.slice(1, -1);
   }
-  if (/\b(DR|DEBIT)\b/i.test(text)) negative = true;
+  // DR and DB (Indonesian banks) both mark money out; CR and KR are money in.
+  if (/\b(DR|DB|DEBIT)\b/i.test(text)) negative = true;
   text = text.replace(/[^\d.,-]/g, '');
   if (text.endsWith('-') || text.startsWith('-')) negative = true;
   text = text.replace(/-/g, '');
+
+  // A value that does not fit the column's format falls through to the per-value guess below.
+  const fits = mark === 'comma' ? /^(\d+|\d{1,3}(\.\d{3})+)(,\d+)?$/ : /^(\d+|\d{1,3}(,\d{3})+)(\.\d+)?$/;
+  if (mark && fits.test(text)) {
+    const number = Number(mark === 'comma' ? text.replace(/\./g, '').replace(',', '.') : text.replace(/,/g, ''));
+    if (Number.isFinite(number)) return negative ? -Math.abs(number) : number;
+  }
 
   const dots = (text.match(/\./g) ?? []).length;
   const commas = (text.match(/,/g) ?? []).length;
@@ -170,7 +231,7 @@ export function isIsoDate(value: string): boolean {
 }
 
 export function mappingIsComplete(mapping: ColumnMapping): boolean {
-  if (!mapping.date || !mapping.description) return false;
+  if (!mapping.date || !mapping.description || !mapping.currency) return false;
   return mapping.amountMode === 'single' ? Boolean(mapping.amount) : Boolean(mapping.debit && mapping.credit);
 }
 
@@ -182,6 +243,8 @@ export interface RawRowsResult {
   unreadDates: number;
   /** Share of amounts above zero as written in the file, so the UI can hint at a card statement. */
   positiveShare: number;
+  /** Rows the currency column puts in another currency than the one chosen. */
+  otherCurrency: number;
 }
 
 export function toRawRows(parsed: ParsedCsv, mapping: ColumnMapping): RawRowsResult {
@@ -189,17 +252,25 @@ export function toRawRows(parsed: ParsedCsv, mapping: ColumnMapping): RawRowsRes
   let skipped = 0;
   let unreadDates = 0;
   let positive = 0;
+  let otherCurrency = 0;
   for (const record of parsed.rows) {
+    if (mapping.currencyColumn) {
+      const rowCurrency = currencyInText(record[mapping.currencyColumn])?.code;
+      if (rowCurrency && rowCurrency !== mapping.currency) {
+        otherCurrency += 1;
+        continue;
+      }
+    }
     const description = (record[mapping.description] ?? '').trim();
     let amount: number | undefined;
     let writtenPositive = false;
     if (mapping.amountMode === 'single') {
-      amount = parseAmount(record[mapping.amount]);
+      amount = parseAmount(record[mapping.amount], mapping.decimalMark);
       writtenPositive = amount !== undefined && amount > 0;
       if (amount !== undefined && mapping.spendingIsPositive) amount = -amount;
     } else {
-      const out = parseAmount(record[mapping.debit]);
-      const inn = parseAmount(record[mapping.credit]);
+      const out = parseAmount(record[mapping.debit], mapping.decimalMark);
+      const inn = parseAmount(record[mapping.credit], mapping.decimalMark);
       if (out !== undefined && out !== 0) amount = -Math.abs(out);
       else if (inn !== undefined) amount = Math.abs(inn);
     }
@@ -212,5 +283,5 @@ export function toRawRows(parsed: ParsedCsv, mapping: ColumnMapping): RawRowsRes
     if (!isIsoDate(date)) unreadDates += 1;
     rows.push({ date, description, amount });
   }
-  return { rows, skipped, unreadDates, positiveShare: rows.length ? positive / rows.length : 0 };
+  return { rows, skipped, unreadDates, positiveShare: rows.length ? positive / rows.length : 0, otherCurrency };
 }

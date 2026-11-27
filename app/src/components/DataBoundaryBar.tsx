@@ -15,29 +15,29 @@ export function DataBoundaryBar() {
   return (
     <a
       href="#/ledger"
-      aria-label="Data boundary summary. Open the Privacy Ledger."
-      className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl border border-zinc-200/80 bg-white px-4 py-2.5 text-xs transition-colors hover:border-zinc-300 lg:hidden dark:border-white/[0.08] dark:bg-[#111114] dark:hover:border-white/[0.15]"
+      aria-label="Privacy summary. Open the Privacy Ledger."
+      className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl border border-line bg-surface px-4 py-2.5 text-xs transition-colors hover:border-line-strong lg:hidden"
     >
-      <span className="inline-flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100">
-        <ShieldCheck aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" />
-        Boundary
+      <span className="inline-flex items-center gap-1.5 font-semibold text-fg">
+        <ShieldCheck aria-hidden className="size-3.5 text-device-fg" />
+        Privacy
       </span>
-      <span className="inline-flex items-center gap-1.5 font-medium text-zinc-600 tabular-nums dark:text-zinc-300">
-        <Laptop aria-hidden className="size-3.5 text-emerald-700 dark:text-emerald-400" /> {rows.toLocaleString('en-US')} local
+      <span className="inline-flex items-center gap-1.5 font-medium text-fg-secondary tabular-nums">
+        <Laptop aria-hidden className="size-3.5 text-device-fg" /> {rows.toLocaleString('en-US')} on laptop
       </span>
       <span
         className={`inline-flex items-center gap-1.5 font-medium tabular-nums ${
-          nothingSent ? 'text-emerald-700 dark:text-emerald-400' : 'text-indigo-700 dark:text-indigo-400'
+          nothingSent ? 'text-device-fg' : 'text-cloud-fg'
         }`}
       >
-        <Cloud aria-hidden className="size-3.5" /> {counters.rawSentUser} raw sent
+        <Cloud aria-hidden className="size-3.5" /> {counters.rawSentUser} sent
       </span>
       {counters.blockedMessages > 0 && (
-        <span className="inline-flex items-center gap-1.5 font-medium text-rose-700 tabular-nums dark:text-rose-400">
-          <Ban aria-hidden className="size-3.5" /> {counters.blockedMessages} blocked
+        <span className="inline-flex items-center gap-1.5 font-medium text-danger-fg tabular-nums">
+          <Ban aria-hidden className="size-3.5" /> {counters.blockedMessages} stopped
         </span>
       )}
-      <span className="ml-auto inline-flex items-center gap-1 font-medium text-zinc-500 dark:text-zinc-400">
+      <span className="ml-auto inline-flex items-center gap-1 font-medium text-fg-muted">
         Ledger <ArrowRight aria-hidden className="size-3.5" />
       </span>
     </a>

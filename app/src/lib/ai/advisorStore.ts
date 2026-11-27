@@ -52,9 +52,9 @@ export async function sendToAdvisor(text: string): Promise<void> {
     updateUser(userId, 'sent');
     advisorStore.set({ busy: 'asking' });
     const answer = await askAdvisor(session, message, (trace) => push({ kind: 'call', label: describeCall(trace.name, trace.args), result: trace.result }));
-    push({ kind: 'assistant', text: answer || 'No answer came back.' });
+    push({ kind: 'assistant', text: answer || 'No answer came back. Try asking again.' });
   } catch (error) {
-    push({ kind: 'error', text: friendlyCloudError(error, 'The cloud advisor') });
+    push({ kind: 'error', text: friendlyCloudError(error, 'Cloud AI') });
   } finally {
     advisorStore.set({ busy: false });
   }

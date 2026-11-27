@@ -4,9 +4,25 @@
 // rules, and the on-device model work once per merchant instead of once per row.
 
 const PROCESSOR_PREFIXES = new Set(['SQ', 'TST', 'PP', 'SP', 'POS', 'DEBIT', 'CHKCARD', 'CHECKCARD', 'PURCHASE', 'ACH', 'CARD']);
+/**
+ * Card and transfer words that Indonesian and European banks write before the
+ * merchant ("KARTU DEBIT GRAB", "TRSF E-BANKING DB 0710/FTSCY/WS95031 NAME",
+ * "SEPA LASTSCHRIFT"). Without this every card purchase would share one key.
+ */
+const BANK_PREFIXES = new Set([
+  'KARTU', 'KREDIT', 'TRSF', 'TRANSAKSI', 'E-BANKING', 'EBANKING', 'BI-FAST', 'BIFAST', 'SWITCHING', 'DOMESTIK', 'TARIKAN',
+  'QRIS', 'FTSCY', 'FTFVA', 'MCM', 'INHOUSE', 'SEPA', 'LASTSCHRIFT', 'UEBERWEISUNG', 'ÜBERWEISUNG', 'KARTENZAHLUNG', 'PRLV',
+  'VIR', 'CB', 'BIF',
+]);
+/** Direction codes that follow those prefixes: credit/debit, to/from, date. */
+const AFTER_PREFIX = new Set(['CR', 'DB', 'DR', 'KR', 'KE', 'DARI', 'TGL', 'TRANSFER']);
+/** A reference such as 0110 or WS95031: letters and digits only, with at least one digit. */
+const REFERENCE = /^[A-Z0-9]*\d[A-Z0-9]*$/;
 const NOISE = new Set([
   'MKTP', 'MKT', 'STORE', 'WHSE', 'INC', 'CO', 'CORP', 'THE', 'WEB', 'ONLINE', 'US', 'USA',
   'TO', 'FROM', 'FOR', 'OF', 'AND', 'AT',
+  // Indonesian company forms and connecting words: PT Gojek Indonesia Tbk, transfer ke, dari.
+  'PT', 'TBK', 'KE', 'DARI',
   'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'SEPT', 'OCT', 'NOV', 'DEC',
 ]);
 const US_STATES = new Set([
@@ -39,8 +55,16 @@ export function normalizeMerchant(description: string): Merchant {
     .map((t) => t.replace(/^[.'-]+|[.'-]+$/g, ''))
     .filter(Boolean);
 
-  // Drop processor prefixes at the start (SQ *, TST*, CHKCARD 1029 ...).
-  while (tokens.length > 1 && PROCESSOR_PREFIXES.has(tokens[0])) tokens.shift();
+  // Drop processor and bank prefixes at the start (SQ *, TST*, CHKCARD 1029, KARTU DEBIT, TRSF E-BANKING DB 0710 ...),
+  // and the direction codes and reference numbers that come right after them.
+  let stripped = false;
+  while (tokens.length > 1) {
+    const token = tokens[0];
+    const prefix = PROCESSOR_PREFIXES.has(token) || BANK_PREFIXES.has(token);
+    if (!prefix && !(stripped && (AFTER_PREFIX.has(token) || REFERENCE.test(token)))) break;
+    tokens.shift();
+    stripped = true;
+  }
 
   let words = tokens.filter((t) => !/\d/.test(t) && t.length > 1 && !NOISE.has(t));
   // A trailing two-letter state code ("... 800-833-6687 CA") is location, not merchant.

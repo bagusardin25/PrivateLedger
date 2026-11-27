@@ -85,7 +85,7 @@ function highlightLine(line: string, lineIndex: number): ReactNode {
 export function PayloadViewer({
   title,
   content,
-  emptyText = 'Nothing has left this device yet.',
+  emptyText = 'Nothing has left your laptop yet.',
   accent = 'cloud',
   maxHeightClass = 'max-h-56',
   showCopy = true,

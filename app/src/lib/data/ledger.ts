@@ -7,10 +7,10 @@ import { db, type LedgerEntry } from './db';
 
 /** Feature names as they appear in the Privacy Ledger and the Data Boundary panel. */
 export const FEATURE = {
-  labeling: 'Labeling',
-  cloudLabeling: 'Cloud labeling (consent)',
+  labeling: 'Sorting',
+  cloudLabeling: 'Cloud sorting (with your OK)',
   explain: 'Explain merchant',
-  guard: 'Message guard',
+  guard: 'Privacy check',
   summary: 'Monthly summary',
   advisor: 'Advisor',
 } as const;

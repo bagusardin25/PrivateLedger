@@ -4,6 +4,7 @@
 
 import { Schema, type FunctionDeclaration } from 'firebase/ai';
 import { db, type Transaction } from '../data/db';
+import { getLedgerCurrency } from '../util/ledgerCurrency';
 
 type Kind = 'business' | 'personal' | 'all';
 
@@ -54,22 +55,22 @@ function split(rows: Transaction[]) {
 type Args = Record<string, unknown>;
 
 export const LOCAL_FUNCTIONS: Record<string, (rows: Transaction[], args: Args) => object> = {
-  get_available_periods: (rows) => ({ months: monthsOf(rows), currency: 'USD' }),
+  get_available_periods: (rows) => ({ months: monthsOf(rows), currency: getLedgerCurrency() }),
 
   get_business_personal_split: (rows, args) => {
     const period = resolvePeriod(rows, args.period);
-    return { period, currency: 'USD', ...split(rows.filter((t) => inPeriod(t, period))) };
+    return { period, currency: getLedgerCurrency(), ...split(rows.filter((t) => inPeriod(t, period))) };
   },
 
   get_spending_by_category: (rows, args) => {
     const period = resolvePeriod(rows, args.period);
     const kind: Kind = args.type === 'personal' || args.type === 'all' ? args.type : 'business';
-    return { period, type: kind, currency: 'USD', totals: byCategory(rows.filter((t) => inPeriod(t, period)), kind) };
+    return { period, type: kind, currency: getLedgerCurrency(), totals: byCategory(rows.filter((t) => inPeriod(t, period)), kind) };
   },
 
   get_monthly_totals: (rows, args) => {
     const months = monthsOf(rows).filter((m) => (!isMonth(args.from) || m >= args.from) && (!isMonth(args.to) || m <= args.to));
-    return { currency: 'USD', months: months.map((month) => ({ month, ...split(rows.filter((t) => inPeriod(t, month))) })) };
+    return { currency: getLedgerCurrency(), months: months.map((month) => ({ month, ...split(rows.filter((t) => inPeriod(t, month))) })) };
   },
 
   compare_periods: (rows, args) => {
@@ -81,7 +82,7 @@ export const LOCAL_FUNCTIONS: Record<string, (rows: Transaction[], args: Args) =
     const categories = [...new Set([...left.keys(), ...right.keys()])];
     return {
       type: kind,
-      currency: 'USD',
+      currency: getLedgerCurrency(),
       period_a: a,
       period_b: b,
       categories: categories

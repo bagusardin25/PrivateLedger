@@ -74,7 +74,7 @@ export function CategoryDonut({
           fill="none"
           stroke="currentColor"
           strokeWidth={stroke}
-          className="text-zinc-100 dark:text-white/[0.06]"
+          className="text-subtle"
         />
         {slices.map((slice) => {
           const isFocused = active === slice.category;
@@ -101,13 +101,13 @@ export function CategoryDonut({
       </svg>
 
       <div className="pointer-events-none absolute inset-6 flex flex-col items-center justify-center text-center">
-        <span className="max-w-[7.5rem] truncate text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+        <span className="max-w-[7.5rem] truncate text-[11px] font-medium text-fg-muted">
           {focused ? focused.category : 'Total business'}
         </span>
-        <span className="mt-0.5 text-lg font-semibold tracking-tight text-zinc-950 tabular-nums dark:text-white">
+        <span className="mt-0.5 text-lg font-semibold tracking-tight text-fg tabular-nums">
           {formatMoney(focused ? focused.amount : total)}
         </span>
-        <span className="mt-0.5 text-[11px] text-zinc-500 tabular-nums dark:text-zinc-400">
+        <span className="mt-0.5 text-[11px] text-fg-muted tabular-nums">
           {focused ? `${Math.round(focused.share * 100)}% of spend` : `${rows.length} categories`}
         </span>
       </div>

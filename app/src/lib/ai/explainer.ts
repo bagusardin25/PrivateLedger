@@ -58,7 +58,7 @@ export async function explainMerchant(merchantKey: string, merchantName: string,
     const result = await withTimeout(
       getExplainerModel().generateContent(prompt, { timeout: CLOUD_TIMEOUT_MS }),
       onDevice ? ON_DEVICE_TIMEOUT_MS : CLOUD_TIMEOUT_MS + 2_000,
-      'The model',
+      'The AI',
     );
     // Logged from what the SDK reports, not from what was expected.
     const source = result.response.inferenceSource === 'in_cloud' ? 'in_cloud' : 'on_device';
@@ -68,7 +68,7 @@ export async function explainMerchant(merchantKey: string, merchantName: string,
         ...base,
         inferenceSource: 'on_device',
         model: ON_DEVICE_MODEL,
-        payloadPreview: `Merchant name "${merchantName}" explained in this browser. Nothing was sent.`,
+        payloadPreview: `Merchant name "${merchantName}" explained on your laptop. Nothing was sent.`,
         bytes,
         merchantNameCount: 0,
         consent: false,
@@ -101,6 +101,6 @@ export async function explainMerchant(merchantKey: string, merchantName: string,
         error: errorText(error),
       });
     }
-    explainStore.set({ [merchantKey]: { status: 'error', message: onDevice ? `The on-device model could not answer. ${errorText(error)}` : friendlyCloudError(error) } });
+    explainStore.set({ [merchantKey]: { status: 'error', message: onDevice ? `Laptop AI couldn't answer. ${errorText(error)}` : friendlyCloudError(error) } });
   }
 }

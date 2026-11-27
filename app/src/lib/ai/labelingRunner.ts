@@ -72,7 +72,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
       feature: FEATURE.labeling,
       mode: 'ONLY_ON_DEVICE',
       inferenceSource: 'refused',
-      payloadPreview: `On-device AI is ${status}. ${pending.length} rows stay here unlabeled; nothing fell back to the cloud.`,
+      payloadPreview: `Laptop AI is ${status}. ${pending.length} transactions stay on your laptop, not yet sorted. Nothing went to the cloud.`,
       bytes: 0,
       rawRowCount: 0,
       merchantNameCount: 0,
@@ -85,7 +85,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
       total: pending.length,
       batch: 0,
       batches: 0,
-      message: `On-device AI is ${status}. ${pending.length} rows are waiting; nothing was sent anywhere.`,
+      message: `Laptop AI is ${status}. ${pending.length} transactions are waiting to be sorted. Nothing was sent anywhere.`,
     });
     return;
   }
@@ -110,7 +110,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
               category: label.category,
               source: 'on-device' as const,
               needsReview: label.type === 'unsure',
-              reviewReason: label.type === 'unsure' ? 'The on-device model was not sure' : undefined,
+              reviewReason: label.type === 'unsure' ? "Laptop AI wasn't sure" : undefined,
             },
           })),
         );
@@ -128,8 +128,8 @@ export async function runOnDeviceLabeling(): Promise<void> {
         inferenceSource: reachedCloud ? 'in_cloud' : 'on_device',
         model: reachedCloud ? 'cloud (unexpected)' : ON_DEVICE_MODEL,
         payloadPreview: reachedCloud
-          ? `Unexpected: ${rowsInBatch} rows reached the cloud.`
-          : `${batch.length} merchants (${rowsInBatch} rows) labeled in this browser. The ${result.promptBytes}-byte prompt never left the device.`,
+          ? `Unexpected: ${rowsInBatch} transactions reached the cloud.`
+          : `${batch.length} merchants (${rowsInBatch} transactions) sorted on your laptop. The ${result.promptBytes}-byte prompt never left your laptop.`,
         bytes: result.promptBytes,
         rawRowCount: reachedCloud ? rowsInBatch : 0,
         merchantNameCount: reachedCloud ? batch.length : 0,
@@ -145,7 +145,7 @@ export async function runOnDeviceLabeling(): Promise<void> {
       await db.transactions.bulkUpdate(
         leftover.map((t) => ({
           key: t.id,
-          changes: { type: 'unsure' as const, source: 'on-device' as const, needsReview: true, reviewReason: 'No label from the on-device model' },
+          changes: { type: 'unsure' as const, source: 'on-device' as const, needsReview: true, reviewReason: "Laptop AI couldn't sort this one" },
         })),
       );
     }

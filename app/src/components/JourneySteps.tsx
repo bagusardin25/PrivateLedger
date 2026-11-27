@@ -27,24 +27,24 @@ export function JourneySteps({ route }: { route: Route }) {
   const exported = reviewed && lastExport !== undefined;
 
   const raw: Omit<Step, 'state'>[] = [
-    { id: 'import', title: 'Import', status: imported ? `${counts.total} rows` : 'Add CSV' },
+    { id: 'import', title: 'Import', status: imported ? `${counts.total} transactions` : 'Add CSV' },
     {
       id: 'transactions',
-      title: 'Label on device',
+      title: 'Sort',
       status: !imported
-        ? 'Gemini Nano'
+        ? 'On your laptop'
         : labeling.status === 'running'
-          ? `${labeling.where === 'cloud' ? 'Cloud' : 'Labeling'} ${labeling.done}/${labeling.total}`
+          ? `${labeling.where === 'cloud' ? 'Cloud AI' : 'Sorting'} ${labeling.done}/${labeling.total}`
           : labeled
-            ? 'All labeled'
-            : `${counts.waiting} waiting`,
+            ? 'All sorted'
+            : `${counts.waiting} to sort`,
     },
     {
       id: 'review',
       title: 'Review',
-      status: !labeled && counts.review === 0 ? 'Your decisions' : counts.review > 0 ? `${counts.review} to decide` : 'Complete',
+      status: !labeled && counts.review === 0 ? 'Your call' : counts.review > 0 ? `${counts.review} to check` : 'Done',
     },
-    { id: 'summary', title: 'Export', status: exported ? 'CSV saved' : reviewed ? 'Ready' : 'Business CSV' },
+    { id: 'summary', title: 'Export', status: exported ? 'File saved' : reviewed ? 'Ready' : 'For your accountant' },
   ];
   const done = [imported, labeled, reviewed, exported];
   const completedCount = done.filter(Boolean).length;
@@ -54,9 +54,9 @@ export function JourneySteps({ route }: { route: Route }) {
   return (
     <nav
       aria-label="Progress"
-      className="relative overflow-hidden rounded-xl border border-zinc-200/80 bg-white dark:border-white/[0.08] dark:bg-[#111114]"
+      className="relative overflow-hidden rounded-xl border border-line bg-surface"
     >
-      <ol className="grid grid-cols-2 divide-y divide-zinc-100 md:grid-cols-4 md:divide-y-0 dark:divide-white/[0.06]">
+      <ol className="grid grid-cols-2 divide-y divide-line-soft md:grid-cols-4 md:divide-y-0">
         {steps.map((step, i) => {
           const here = step.id === route;
           return (
@@ -66,32 +66,32 @@ export function JourneySteps({ route }: { route: Route }) {
                 aria-current={here ? 'step' : undefined}
                 className={`group flex w-full items-center gap-2.5 px-3.5 py-2.5 transition-colors duration-150 ${
                   here
-                    ? 'bg-zinc-50 dark:bg-white/[0.04]'
-                    : 'hover:bg-zinc-50/70 dark:hover:bg-white/[0.025]'
+                    ? 'bg-sunken'
+                    : 'hover:bg-sunken'
                 }`}
               >
                 <span
                   className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold transition-colors ${
                     step.state === 'done'
-                      ? 'bg-emerald-600 text-white dark:bg-emerald-500 dark:text-zinc-950'
+                      ? 'bg-device text-on-inverse'
                       : step.state === 'current'
-                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950'
-                        : 'border border-zinc-200 text-zinc-500 dark:border-white/[0.12] dark:text-zinc-400'
+                        ? 'bg-inverse text-on-inverse'
+                        : 'border border-line text-fg-muted'
                   }`}
                 >
                   {step.state === 'done' ? <Check aria-hidden className="size-3" strokeWidth={2.75} /> : i + 1}
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col leading-tight sm:flex-row sm:items-baseline sm:gap-1.5">
-                  <span className={`truncate text-xs font-semibold ${here ? 'text-zinc-950 dark:text-white' : 'text-zinc-700 dark:text-zinc-300'}`}>
+                  <span className={`truncate text-xs font-semibold ${here ? 'text-fg' : 'text-fg-secondary'}`}>
                     {step.title}
                   </span>
                   <span
                     className={`truncate text-[11px] tabular-nums ${
                       step.state === 'current' && step.id === 'review'
-                        ? 'font-medium text-amber-700 dark:text-amber-300'
+                        ? 'font-medium text-review-fg'
                         : step.state === 'done'
-                          ? 'text-emerald-700 dark:text-emerald-400'
-                          : 'text-zinc-500 dark:text-zinc-400'
+                          ? 'text-device-fg'
+                          : 'text-fg-muted'
                     }`}
                   >
                     {step.status}
@@ -100,15 +100,15 @@ export function JourneySteps({ route }: { route: Route }) {
                 <span className="sr-only">{step.state === 'done' ? '(done)' : step.state === 'current' ? '(next step)' : ''}</span>
               </a>
               {i < steps.length - 1 && (
-                <ChevronRight aria-hidden className="hidden size-3.5 shrink-0 text-zinc-300 md:block dark:text-zinc-700" />
+                <ChevronRight aria-hidden className="hidden size-3.5 shrink-0 text-line-strong md:block" />
               )}
             </li>
           );
         })}
       </ol>
-      <div aria-hidden className="h-[2px] w-full bg-zinc-100 dark:bg-white/[0.05]">
+      <div aria-hidden className="h-[2px] w-full bg-subtle">
         <div
-          className="h-full bg-emerald-600 transition-[width] duration-500 ease-out dark:bg-emerald-400"
+          className="h-full bg-device transition-[width] duration-500 ease-out"
           style={{ width: `${(completedCount / steps.length) * 100}%` }}
         />
       </div>

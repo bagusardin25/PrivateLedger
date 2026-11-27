@@ -18,7 +18,7 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
       <button
         type="button"
         onClick={() => ask()}
-        className="mt-3 inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-50/70 px-2.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-100/70 hover:text-zinc-950 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300 dark:hover:border-white/[0.15] dark:hover:bg-white/[0.06] dark:hover:text-white"
+        className="mt-3 inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-line bg-sunken px-2.5 text-xs font-medium text-fg-secondary transition-colors hover:border-line-strong hover:bg-subtle hover:text-fg"
       >
         <CircleHelp aria-hidden className="size-3.5 text-zinc-400" /> What is this merchant?
       </button>
@@ -28,31 +28,31 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
   if (state.status === 'loading') {
     return (
       <p
-        className="mt-3 inline-flex items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-600 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-zinc-300"
+        className="mt-3 inline-flex items-center gap-2 rounded-lg border border-line bg-sunken px-3 py-2 text-xs font-medium text-fg-secondary"
         aria-live="polite"
       >
         <LoaderCircle aria-hidden className="size-3.5 animate-spin motion-reduce:animate-none" />
-        {state.where === 'device' ? 'Asking Gemini Nano on this device…' : 'Asking the cloud model…'}
+        {state.where === 'device' ? 'Asking Laptop AI…' : 'Asking Cloud AI…'}
       </p>
     );
   }
 
   if (state.status === 'needs-consent') {
     return (
-      <div className="mt-3 rounded-lg border border-indigo-200/80 bg-indigo-50/50 p-3.5 text-xs dark:border-indigo-500/20 dark:bg-indigo-500/10">
-        <p className="leading-relaxed text-zinc-700 dark:text-zinc-200">
-          On-device AI isn&apos;t available here, so this question would go to the cloud. Only the name{' '}
-          <span className="font-semibold text-zinc-950 dark:text-white">&ldquo;{tx.cleanMerchant}&rdquo;</span> is sent: no amount, date, or bank
+      <div className="mt-3 rounded-lg border border-cloud-line bg-cloud-soft p-3.5 text-xs">
+        <p className="leading-relaxed text-fg-secondary">
+          Laptop AI isn&apos;t available here, so this question would go to Cloud AI. Only the name{' '}
+          <span className="font-semibold text-fg">&ldquo;{tx.cleanMerchant}&rdquo;</span> is sent. No amount, date, or bank
           description.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Button variant="secondary" className="min-h-8 px-2.5 text-xs" onClick={() => ask(true)} disabled={!state.cloudPossible}>
-            <Cloud aria-hidden className="size-3.5 text-indigo-600 dark:text-indigo-400" /> Send the name to the cloud
+            <Cloud aria-hidden className="size-3.5 text-cloud-fg" /> Send the name to Cloud AI
           </Button>
           <Button variant="ghost" className="min-h-8 px-2.5 text-xs" onClick={clear}>
             Not now
           </Button>
-          {!state.cloudPossible && <span className="text-xs text-zinc-500 dark:text-zinc-400">Needs a connection and a configured Firebase project.</span>}
+          {!state.cloudPossible && <span className="text-xs text-fg-muted">Needs an internet connection and Cloud AI set up for this app.</span>}
         </div>
       </div>
     );
@@ -62,7 +62,7 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
     return (
       <p
         role="alert"
-        className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-xs text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200"
+        className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-review-line bg-review-soft px-3 py-2 text-xs text-review-ink"
       >
         {state.message}
         <button type="button" onClick={clear} className="ml-auto font-medium underline">
@@ -76,16 +76,16 @@ export function ExplainMerchant({ tx }: { tx: Transaction }) {
   const local = result.source === 'on_device';
   return (
     <div
-      className="mt-3 rounded-lg border border-zinc-200/80 bg-zinc-50/70 p-3.5 text-sm dark:border-white/[0.08] dark:bg-white/[0.03]"
+      className="mt-3 rounded-lg border border-line bg-sunken p-3.5 text-sm"
       aria-live="polite"
     >
-      <p className="text-[13px] leading-relaxed text-zinc-700 dark:text-zinc-200">
-        {result.known ? result.text : 'Not recognized. The model does not know this merchant, so it did not guess.'}
+      <p className="text-[13px] leading-relaxed text-fg-secondary">
+        {result.known ? result.text : "Not recognized. The AI doesn't know this merchant, so it didn't guess."}
       </p>
       <div className="mt-2">
         <Badge tone={local ? 'device' : 'cloud'}>
           {local ? <Cpu aria-hidden className="size-3" /> : <Cloud aria-hidden className="size-3" />}
-          {local ? 'On-device AI · the name stayed here' : 'Cloud · merchant name only, with your consent'}
+          {local ? 'Laptop AI · the name stayed on your laptop' : 'Cloud AI · merchant name only, with your OK'}
         </Badge>
       </div>
     </div>
